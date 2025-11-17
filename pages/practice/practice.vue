@@ -133,12 +133,17 @@
         <slider @change="onCountChange" :value="exerciseCount" min="5" max="30" show-value />
       </view>
 
-      <view class="form-item">
-        <view class="ai-switch-container">
-          <text class="label">AI 智能出题</text>
+      <view class="form-item ai-switch-item">
+        <view class="ai-switch-header">
+          <view class="ai-switch-title">
+            <text class="ai-icon">🤖</text>
+            <text class="label ai-label">AI 智能出题</text>
+          </view>
           <switch :checked="useAI" @change="onAISwitchChange" color="#667eea" />
         </view>
-        <text class="ai-description">开启后使用 AI 生成更高质量、更具针对性的练习题</text>
+        <view class="ai-description-box">
+          <text class="ai-description">✨ 开启后使用 AI 生成更高质量、更具针对性的练习题，确保答案唯一性</text>
+        </view>
       </view>
 
       <button class="btn-primary mt-20" @click="startPractice">开始练习</button>
@@ -641,6 +646,23 @@ export default {
   margin-top: 20rpx;
 }
 
+.settings-card .title {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 30rpx;
+  padding-bottom: 20rpx;
+  border-bottom: 2rpx solid #f0f0f0;
+  display: flex;
+  align-items: center;
+}
+
+.settings-card .title::before {
+  content: '⚙️';
+  margin-right: 12rpx;
+  font-size: 32rpx;
+}
+
 .form-item {
   margin-bottom: 30rpx;
 }
@@ -650,6 +672,124 @@ export default {
   font-size: 28rpx;
   color: #333;
   margin-bottom: 15rpx;
+  font-weight: 500;
+}
+
+.picker {
+  background: #f8f9fa;
+  padding: 20rpx 30rpx;
+  border-radius: 12rpx;
+  font-size: 28rpx;
+  color: #333;
+  border: 2rpx solid #e9ecef;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.picker:active {
+  background: #e9ecef;
+  border-color: #667eea;
+}
+
+.picker::after {
+  content: '▼';
+  position: absolute;
+  right: 30rpx;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 20rpx;
+  color: #999;
+}
+
+slider {
+  margin-top: 10rpx;
+}
+
+/* AI 开关样式优化 */
+.ai-switch-item {
+  background: linear-gradient(135deg, #f8f9ff 0%, #fff5f8 100%);
+  border: 2rpx solid #e0e7ff;
+  border-radius: 16rpx;
+  padding: 25rpx;
+  margin-bottom: 35rpx;
+  box-shadow: 0 4rpx 12rpx rgba(102, 126, 234, 0.08);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.ai-switch-item::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(102, 126, 234, 0.03) 0%, transparent 70%);
+  animation: glow 3s ease-in-out infinite;
+}
+
+@keyframes glow {
+  0%, 100% {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+}
+
+.ai-switch-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 15rpx;
+  position: relative;
+  z-index: 1;
+}
+
+.ai-switch-title {
+  display: flex;
+  align-items: center;
+  flex: 1;
+}
+
+.ai-icon {
+  font-size: 36rpx;
+  margin-right: 12rpx;
+  animation: bounce 2s ease-in-out infinite;
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6rpx);
+  }
+}
+
+.ai-label {
+  margin-bottom: 0;
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #667eea;
+}
+
+.ai-description-box {
+  background: rgba(102, 126, 234, 0.05);
+  padding: 15rpx 20rpx;
+  border-radius: 12rpx;
+  border-left: 4rpx solid #667eea;
+  position: relative;
+  z-index: 1;
+}
+
+.ai-description {
+  font-size: 24rpx;
+  color: #666;
+  line-height: 1.6;
 }
 
 /* AI 生成状态指示器 */
