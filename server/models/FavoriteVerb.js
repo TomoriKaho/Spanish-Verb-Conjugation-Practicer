@@ -1,9 +1,9 @@
-const { userDb: db } = require('../database/db')
+const { userDb, vocabularyDb } = require('../database/db')
 
 class FavoriteVerb {
   // 添加收藏
   static add(userId, verbId) {
-    const stmt = db.prepare(`
+    const stmt = userDb.prepare(`
       INSERT OR IGNORE INTO favorite_verbs (user_id, verb_id)
       VALUES (?, ?)
     `)
@@ -13,7 +13,7 @@ class FavoriteVerb {
 
   // 取消收藏
   static remove(userId, verbId) {
-    const stmt = db.prepare(`
+    const stmt = userDb.prepare(`
       DELETE FROM favorite_verbs
       WHERE user_id = ? AND verb_id = ?
     `)
@@ -23,7 +23,7 @@ class FavoriteVerb {
 
   // 检查是否已收藏
   static isFavorited(userId, verbId) {
-    const stmt = db.prepare(`
+    const stmt = userDb.prepare(`
       SELECT id FROM favorite_verbs
       WHERE user_id = ? AND verb_id = ?
     `)
@@ -33,26 +33,45 @@ class FavoriteVerb {
 
   // 获取用户的收藏列表
   static getByUserId(userId) {
-    const stmt = db.prepare(`
-      SELECT 
-        fv.id,
-        fv.verb_id,
-        fv.created_at,
-        v.infinitive,
-        v.meaning,
-        v.conjugation_type,
-        v.is_irregular
-      FROM favorite_verbs fv
-      JOIN verbs v ON fv.verb_id = v.id
-      WHERE fv.user_id = ?
-      ORDER BY fv.created_at DESC
+    // 先从用户数据库获取收藏记录
+    const stmt = userDb.prepare(`
+      SELECT id, verb_id, created_at
+      FROM favorite_verbs
+      WHERE user_id = ?
+      ORDER BY created_at DESC
     `)
-    return stmt.all(userId)
+    const favorites = stmt.all(userId)
+    
+    // 如果有收藏，从词库数据库获取动词信息
+    if (favorites.length > 0) {
+      const verbIds = favorites.map(f => f.verb_id)
+      const placeholders = verbIds.map(() => '?').join(',')
+      const verbStmt = vocabularyDb.prepare(`
+        SELECT id, infinitive, meaning, conjugation_type, is_irregular 
+        FROM verbs WHERE id IN (${placeholders})
+      `)
+      const verbs = verbStmt.all(...verbIds)
+      const verbMap = {}
+      verbs.forEach(v => verbMap[v.id] = v)
+      
+      // 合并数据
+      favorites.forEach(f => {
+        const verb = verbMap[f.verb_id]
+        if (verb) {
+          f.infinitive = verb.infinitive
+          f.meaning = verb.meaning
+          f.conjugation_type = verb.conjugation_type
+          f.is_irregular = verb.is_irregular
+        }
+      })
+    }
+    
+    return favorites
   }
 
   // 获取收藏的动词ID列表
   static getVerbIds(userId) {
-    const stmt = db.prepare(`
+    const stmt = userDb.prepare(`
       SELECT verb_id FROM favorite_verbs
       WHERE user_id = ?
     `)
@@ -62,7 +81,7 @@ class FavoriteVerb {
 
   // 获取收藏数量
   static getCount(userId) {
-    const stmt = db.prepare(`
+    const stmt = userDb.prepare(`
       SELECT COUNT(*) as count FROM favorite_verbs
       WHERE user_id = ?
     `)

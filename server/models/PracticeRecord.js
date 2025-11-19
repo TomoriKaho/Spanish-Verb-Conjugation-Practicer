@@ -1,11 +1,11 @@
-const { userDb: db } = require('../database/db')
+const { userDb, vocabularyDb } = require('../database/db')
 
 class PracticeRecord {
   // 创建练习记录
   static create(recordData) {
     const { userId, verbId, exerciseType, isCorrect, answer, correctAnswer, tense, mood, person } = recordData
     
-    const stmt = db.prepare(`
+    const stmt = userDb.prepare(`
       INSERT INTO practice_records (user_id, verb_id, exercise_type, is_correct, answer, correct_answer, tense, mood, person)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     `)
@@ -20,7 +20,7 @@ class PracticeRecord {
 
   // 更新用户进度
   static updateUserProgress(userId, verbId, isCorrect) {
-    const stmt = db.prepare(`
+    const stmt = userDb.prepare(`
       INSERT INTO user_progress (user_id, verb_id, practice_count, correct_count, mastery_level, last_practiced_at)
       VALUES (?, ?, 1, ?, 0, datetime('now', 'localtime'))
       ON CONFLICT(user_id, verb_id) DO UPDATE SET
@@ -42,20 +42,42 @@ class PracticeRecord {
 
   // 获取用户练习记录
   static getByUserId(userId, limit = 50) {
-    const stmt = db.prepare(`
-      SELECT pr.*, v.infinitive, v.meaning 
-      FROM practice_records pr
-      JOIN verbs v ON pr.verb_id = v.id
-      WHERE pr.user_id = ?
-      ORDER BY pr.created_at DESC
+    // 先从用户数据库获取记录
+    const stmt = userDb.prepare(`
+      SELECT * FROM practice_records
+      WHERE user_id = ?
+      ORDER BY created_at DESC
       LIMIT ?
     `)
-    return stmt.all(userId, limit)
+    const records = stmt.all(userId, limit)
+    
+    // 如果有记录，从词库数据库获取动词信息
+    if (records.length > 0) {
+      const verbIds = [...new Set(records.map(r => r.verb_id))]
+      const placeholders = verbIds.map(() => '?').join(',')
+      const verbStmt = vocabularyDb.prepare(`
+        SELECT id, infinitive, meaning FROM verbs WHERE id IN (${placeholders})
+      `)
+      const verbs = verbStmt.all(...verbIds)
+      const verbMap = {}
+      verbs.forEach(v => verbMap[v.id] = v)
+      
+      // 合并动词信息
+      records.forEach(r => {
+        const verb = verbMap[r.verb_id]
+        if (verb) {
+          r.infinitive = verb.infinitive
+          r.meaning = verb.meaning
+        }
+      })
+    }
+    
+    return records
   }
 
   // 获取用户统计数据
   static getStatistics(userId) {
-    const stmt = db.prepare(`
+    const stmt = userDb.prepare(`
       SELECT 
         COUNT(*) as total_exercises,
         SUM(is_correct) as correct_exercises,
@@ -69,7 +91,7 @@ class PracticeRecord {
 
   // 获取今日练习统计
   static getTodayStatistics(userId) {
-    const stmt = db.prepare(`
+    const stmt = userDb.prepare(`
       SELECT 
         COUNT(*) as total_exercises,
         SUM(is_correct) as correct_exercises
@@ -81,14 +103,37 @@ class PracticeRecord {
 
   // 获取用户掌握的动词列表
   static getMasteredVerbs(userId, masteryLevel = 3) {
-    const stmt = db.prepare(`
-      SELECT v.*, up.mastery_level, up.practice_count, up.correct_count
-      FROM user_progress up
-      JOIN verbs v ON up.verb_id = v.id
-      WHERE up.user_id = ? AND up.mastery_level >= ?
-      ORDER BY up.mastery_level DESC, up.last_practiced_at DESC
+    // 先从用户数据库获取进度记录
+    const stmt = userDb.prepare(`
+      SELECT verb_id, mastery_level, practice_count, correct_count, last_practiced_at
+      FROM user_progress
+      WHERE user_id = ? AND mastery_level >= ?
+      ORDER BY mastery_level DESC, last_practiced_at DESC
     `)
-    return stmt.all(userId, masteryLevel)
+    const progress = stmt.all(userId, masteryLevel)
+    
+    // 如果有记录，从词库数据库获取动词信息
+    if (progress.length > 0) {
+      const verbIds = progress.map(p => p.verb_id)
+      const placeholders = verbIds.map(() => '?').join(',')
+      const verbStmt = vocabularyDb.prepare(`
+        SELECT * FROM verbs WHERE id IN (${placeholders})
+      `)
+      const verbs = verbStmt.all(...verbIds)
+      const verbMap = {}
+      verbs.forEach(v => verbMap[v.id] = v)
+      
+      // 合并数据
+      return progress.map(p => ({
+        ...verbMap[p.verb_id],
+        mastery_level: p.mastery_level,
+        practice_count: p.practice_count,
+        correct_count: p.correct_count,
+        last_practiced_at: p.last_practiced_at
+      })).filter(item => item.id) // 过滤掉找不到动词的记录
+    }
+    
+    return []
   }
 }
 

@@ -29,7 +29,10 @@ router.get('/statistics', authMiddleware, (req, res) => {
       success: true,
       statistics: {
         total: stats,
-        today: todayStats,
+        today: {
+          total: todayStats.total_exercises || 0,
+          correct: todayStats.correct_exercises || 0
+        },
         masteredVerbsCount: masteredVerbs.length,
         masteredVerbs: masteredVerbs.slice(0, 10) // 只返回前10个
       }

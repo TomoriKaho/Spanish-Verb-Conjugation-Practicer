@@ -129,6 +129,12 @@ export default {
       })
     },
     async checkIn() {
+      // 检查今日是否有练习记录
+      if (!this.todayStats.total || this.todayStats.total === 0) {
+        showToast('你今天还没练习哦！', 'none')
+        return
+      }
+
       try {
         const res = await api.checkIn()
         if (res.success) {

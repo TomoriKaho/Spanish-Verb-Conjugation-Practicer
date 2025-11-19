@@ -131,10 +131,47 @@ class ExerciseGeneratorService {
   }
 
   /**
-   * 使用AI生成新题目
+   * 验证AI返回数据的完整性
+   */
+  static validateAIResultData(aiResult, exerciseType) {
+    if (!aiResult) {
+      return { valid: false, reason: 'AI返回结果为空' }
+    }
+
+    if (exerciseType === 'sentence') {
+      // 例句填空题必须字段
+      if (!aiResult.sentence || aiResult.sentence === 'undefined') {
+        return { valid: false, reason: '例句字段缺失或为undefined' }
+      }
+      if (!aiResult.translation || aiResult.translation === 'undefined') {
+        return { valid: false, reason: '翻译字段缺失或为undefined' }
+      }
+      if (!aiResult.answer || aiResult.answer === 'undefined') {
+        return { valid: false, reason: '答案字段缺失或为undefined' }
+      }
+    } else if (exerciseType === 'fill') {
+      // 填空题必须字段
+      if (!aiResult.question || aiResult.question === 'undefined') {
+        return { valid: false, reason: '题目字段缺失或为undefined' }
+      }
+      if (!aiResult.answer || aiResult.answer === 'undefined') {
+        return { valid: false, reason: '答案字段缺失或为undefined' }
+      }
+      // example字段是可选的，但不能是字符串'undefined'
+      if (aiResult.example === 'undefined') {
+        aiResult.example = null  // 修正为null
+      }
+    }
+
+    return { valid: true }
+  }
+
+  /**
+   * 使用AI生成新题目（带重试机制）
    */
   static async generateWithAI(options) {
     const { userId, exerciseType, tenses, conjugationTypes, includeIrregular, verbIds } = options
+    const maxRetries = 3  // 最多重试3次
 
     // 获取动词
     const queryOptions = {}
@@ -178,54 +215,98 @@ class ExerciseGeneratorService {
 
     const randomConjugation = filteredConjugations[Math.floor(Math.random() * filteredConjugations.length)]
 
-    // 使用AI生成题目
-    let aiResult
-    if (exerciseType === 'sentence') {
-      aiResult = await DeepSeekService.generateSentenceExercise(verb, randomConjugation)
-    } else if (exerciseType === 'fill') {
-      aiResult = await DeepSeekService.generateFillBlankExercise(verb, randomConjugation)
-    } else {
-      throw new Error('不支持的AI生成题型')
-    }
+    // 重试循环：最多尝试3次生成和验证
+    let aiResult = null
+    let validation = null
+    let lastError = null
 
-    // 验证AI生成的题目
-    const validation = await QuestionValidatorService.quickValidate({
-      questionType: exerciseType,
-      questionText: exerciseType === 'sentence' ? aiResult.sentence : aiResult.question,
-      correctAnswer: aiResult.answer || randomConjugation.conjugated_form,
-      exampleSentence: aiResult.example,
-      translation: aiResult.translation,
-      hint: aiResult.hint,
-      verb: verb
-    })
-
-    // 如果验证通过，保存到公共题库（统一初始置信度为50）
-    if (validation.passed) {
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {
-        const questionData = {
-          verbId: verb.id,
+        console.log(`[AI生成] 第${attempt}次尝试生成题目 (动词: ${verb.infinitive}, 类型: ${exerciseType})`)
+
+        // 使用AI生成题目
+        if (exerciseType === 'sentence') {
+          aiResult = await DeepSeekService.generateSentenceExercise(verb, randomConjugation)
+        } else if (exerciseType === 'fill') {
+          aiResult = await DeepSeekService.generateFillBlankExercise(verb, randomConjugation)
+        } else {
+          throw new Error('不支持的AI生成题型')
+        }
+
+        // 数据完整性检查
+        const dataCheck = this.validateAIResultData(aiResult, exerciseType)
+        if (!dataCheck.valid) {
+          console.log(`[AI生成] 第${attempt}次数据验证失败: ${dataCheck.reason}`)
+          lastError = dataCheck.reason
+          continue  // 重试
+        }
+
+        // 验证AI生成的题目质量
+        validation = await QuestionValidatorService.quickValidate({
           questionType: exerciseType,
           questionText: exerciseType === 'sentence' ? aiResult.sentence : aiResult.question,
           correctAnswer: aiResult.answer || randomConjugation.conjugated_form,
-          exampleSentence: aiResult.example,
-          translation: aiResult.translation,
-          hint: aiResult.hint,
-          tense: randomConjugation.tense,
-          mood: randomConjugation.mood,
-          person: randomConjugation.person,
-          confidenceScore: 50  // 所有新生成题目的初始置信度统一为50
-        }
+          exampleSentence: exerciseType === 'sentence' ? aiResult.sentence : (aiResult.example || null),
+          translation: aiResult.translation || null,
+          hint: aiResult.hint || null,
+          verb: verb
+        })
 
-        // 检查是否已存在相同题目
-        if (!Question.existsInPublic(verb.id, questionData.questionText)) {
-          Question.addToPublic(questionData)
-          console.log(`新题目已加入公共题库（初始置信度: 50）`)
+        // 如果验证通过，跳出循环
+        if (validation.passed) {
+          console.log(`[AI生成] 第${attempt}次尝试成功，题目通过验证`)
+          break
+        } else {
+          console.log(`[AI生成] 第${attempt}次质量验证未通过: ${validation.reason}`)
+          lastError = validation.reason
+          
+          // 如果不是最后一次尝试，继续重试
+          if (attempt < maxRetries) {
+            await new Promise(resolve => setTimeout(resolve, 500))  // 延迟500ms后重试
+          }
         }
       } catch (error) {
-        console.error('保存题目到题库失败:', error)
+        console.error(`[AI生成] 第${attempt}次尝试出错:`, error.message)
+        lastError = error.message
+        
+        // 如果不是最后一次尝试，继续重试
+        if (attempt < maxRetries) {
+          await new Promise(resolve => setTimeout(resolve, 1000))
+        }
       }
-    } else {
-      console.log(`AI生成的题目未通过验证: ${validation.reason}`)
+    }
+
+    // 3次尝试后的处理
+    if (!validation || !validation.passed || !aiResult) {
+      console.log(`[AI生成] 经过${maxRetries}次尝试仍未生成合格题目，最后错误: ${lastError}`)
+      console.log(`[AI生成] 降级使用传统算法生成题目`)
+      // 降级到传统方法生成
+      return await this.generateTraditionalExercise(options)
+    }
+
+    // 验证通过，保存到公共题库（统一初始置信度为50）
+    try {
+      const questionData = {
+        verbId: verb.id,
+        questionType: exerciseType,
+        questionText: exerciseType === 'sentence' ? aiResult.sentence : aiResult.question,
+        correctAnswer: aiResult.answer || randomConjugation.conjugated_form,
+        exampleSentence: exerciseType === 'sentence' ? aiResult.sentence : (aiResult.example || null),
+        translation: aiResult.translation || null,
+        hint: aiResult.hint || null,
+        tense: randomConjugation.tense,
+        mood: randomConjugation.mood,
+        person: randomConjugation.person,
+        confidenceScore: 50  // 所有新生成题目的初始置信度统一为50
+      }
+
+      // 检查是否已存在相同题目
+      if (!Question.existsInPublic(verb.id, questionData.questionText)) {
+        Question.addToPublic(questionData)
+        console.log(`新题目已加入公共题库（初始置信度: 50）`)
+      }
+    } catch (error) {
+      console.error('保存题目到题库失败:', error)
     }
 
     // 格式化返回
@@ -252,7 +333,7 @@ class ExerciseGeneratorService {
       exercise.hint = aiResult.hint
     } else if (exerciseType === 'fill') {
       exercise.question = aiResult.question
-      exercise.example = aiResult.example
+      exercise.example = aiResult.example || null
       exercise.hint = aiResult.hint
     }
 

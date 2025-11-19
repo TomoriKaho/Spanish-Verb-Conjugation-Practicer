@@ -1,17 +1,17 @@
-const { userDb: db } = require('../database/db')
+const { userDb, vocabularyDb } = require('../database/db')
 
 class WrongVerb {
   // 添加或更新错题记录
   static addOrUpdate(userId, verbId) {
     // 先检查是否存在
-    const existing = db.prepare(`
+    const existing = userDb.prepare(`
       SELECT id, wrong_count FROM wrong_verbs
       WHERE user_id = ? AND verb_id = ?
     `).get(userId, verbId)
 
     if (existing) {
       // 更新错题次数和时间
-      const stmt = db.prepare(`
+      const stmt = userDb.prepare(`
         UPDATE wrong_verbs
         SET wrong_count = wrong_count + 1,
             last_wrong_at = datetime('now', 'localtime')
@@ -21,7 +21,7 @@ class WrongVerb {
       return existing.wrong_count + 1
     } else {
       // 新增错题记录
-      const stmt = db.prepare(`
+      const stmt = userDb.prepare(`
         INSERT INTO wrong_verbs (user_id, verb_id, wrong_count)
         VALUES (?, ?, 1)
       `)
@@ -32,7 +32,7 @@ class WrongVerb {
 
   // 删除错题记录（答对后可选择移除）
   static remove(userId, verbId) {
-    const stmt = db.prepare(`
+    const stmt = userDb.prepare(`
       DELETE FROM wrong_verbs
       WHERE user_id = ? AND verb_id = ?
     `)
@@ -42,28 +42,45 @@ class WrongVerb {
 
   // 获取用户的错题列表
   static getByUserId(userId) {
-    const stmt = db.prepare(`
-      SELECT 
-        wv.id,
-        wv.verb_id,
-        wv.wrong_count,
-        wv.last_wrong_at,
-        wv.created_at,
-        v.infinitive,
-        v.meaning,
-        v.conjugation_type,
-        v.is_irregular
-      FROM wrong_verbs wv
-      JOIN verbs v ON wv.verb_id = v.id
-      WHERE wv.user_id = ?
-      ORDER BY wv.last_wrong_at DESC
+    // 先从用户数据库获取错题记录
+    const stmt = userDb.prepare(`
+      SELECT id, verb_id, wrong_count, last_wrong_at, created_at
+      FROM wrong_verbs
+      WHERE user_id = ?
+      ORDER BY last_wrong_at DESC
     `)
-    return stmt.all(userId)
+    const wrongs = stmt.all(userId)
+    
+    // 如果有错题，从词库数据库获取动词信息
+    if (wrongs.length > 0) {
+      const verbIds = wrongs.map(w => w.verb_id)
+      const placeholders = verbIds.map(() => '?').join(',')
+      const verbStmt = vocabularyDb.prepare(`
+        SELECT id, infinitive, meaning, conjugation_type, is_irregular 
+        FROM verbs WHERE id IN (${placeholders})
+      `)
+      const verbs = verbStmt.all(...verbIds)
+      const verbMap = {}
+      verbs.forEach(v => verbMap[v.id] = v)
+      
+      // 合并数据
+      wrongs.forEach(w => {
+        const verb = verbMap[w.verb_id]
+        if (verb) {
+          w.infinitive = verb.infinitive
+          w.meaning = verb.meaning
+          w.conjugation_type = verb.conjugation_type
+          w.is_irregular = verb.is_irregular
+        }
+      })
+    }
+    
+    return wrongs
   }
 
   // 获取错题动词ID列表
   static getVerbIds(userId) {
-    const stmt = db.prepare(`
+    const stmt = userDb.prepare(`
       SELECT verb_id FROM wrong_verbs
       WHERE user_id = ?
     `)
@@ -73,7 +90,7 @@ class WrongVerb {
 
   // 获取错题数量
   static getCount(userId) {
-    const stmt = db.prepare(`
+    const stmt = userDb.prepare(`
       SELECT COUNT(*) as count FROM wrong_verbs
       WHERE user_id = ?
     `)
@@ -83,7 +100,7 @@ class WrongVerb {
 
   // 检查是否在错题本中
   static isWrong(userId, verbId) {
-    const stmt = db.prepare(`
+    const stmt = userDb.prepare(`
       SELECT id FROM wrong_verbs
       WHERE user_id = ? AND verb_id = ?
     `)
