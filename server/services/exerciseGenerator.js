@@ -41,10 +41,31 @@ class ExerciseGeneratorService {
     // 选择题和变位题：直接用固定算法生成所有题目（同步、不使用AI）
     if (exerciseType === 'choice' || exerciseType === 'conjugate') {
       console.log(`批量生成 - 使用传统算法生成${exerciseType === 'choice' ? '选择题' : '变位题'}: ${count}个`)
-      for (let i = 0; i < count; i++) {
+      
+      // 使用Set来跟踪已生成的题目，避免重复
+      const generatedKeys = new Set()
+      const maxAttempts = count * 10 // 最大尝试次数，避免无限循环
+      let attempts = 0
+      
+      while (exercises.length < count && attempts < maxAttempts) {
+        attempts++
         const exercise = this.generateTraditionalExercise(options)
-        exercises.push(exercise)
+        
+        // 生成唯一键：动词ID + 时态 + 语气 + 人称
+        const key = `${exercise.verbId}-${exercise.tense}-${exercise.mood}-${exercise.person}`
+        
+        // 检查是否重复
+        if (!generatedKeys.has(key)) {
+          generatedKeys.add(key)
+          exercises.push(exercise)
+        }
       }
+      
+      // 如果尝试次数用完还没达到要求的数量，输出警告
+      if (exercises.length < count) {
+        console.warn(`警告: 只生成了 ${exercises.length}/${count} 个不重复的题目`)
+      }
+      
       return { exercises, questionPool: [] }
     }
 

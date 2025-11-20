@@ -65,8 +65,8 @@
         <view
           v-for="(option, index) in currentExercise.options"
           :key="index"
-          :class="['option-item', selectedAnswer === option ? 'selected' : '']"
-          @click="selectOption(option)"
+          :class="['option-item', selectedAnswer === option ? 'selected' : '', showFeedback ? 'disabled' : '']"
+          @click="!showFeedback && selectOption(option)"
         >
           <text>{{ option }}</text>
         </view>
@@ -113,7 +113,8 @@
           class="answer-input"
           v-model="userAnswer"
           placeholder="请填入正确的动词变位"
-          :focus="true"
+          :disabled="showFeedback"
+          :focus="!showFeedback"
         />
       </view>
 
@@ -160,35 +161,29 @@
           class="answer-input"
           v-model="userAnswer"
           placeholder="请输入变位形式"
-          :focus="true"
+          :disabled="showFeedback"
+          :focus="!showFeedback"
         />
       </view>
 
-      <button class="btn-primary mt-20" @click="submitAnswer">提交答案</button>
-
-      <!-- 题目生成状态指示器 -->
-      <view class="ai-status" v-if="generatingCount > 0">
-        <view class="ai-status-icon">🤖</view>
-        <text class="ai-status-text">正在生成第 {{ exercises.length + 1 }}-{{ Math.min(exercises.length + generatingCount, exerciseCount) }} 题...</text>
-      </view>
-    </view>
-
-    <!-- 答案反馈 -->
-    <view class="modal" v-if="showFeedback" @click="nextExercise">
-      <view class="modal-content" :class="isCorrect ? 'correct' : 'wrong'" @click.stop>
+      <!-- 内嵌答案反馈区域 -->
+      <view class="inline-feedback" v-if="showFeedback" :class="isCorrect ? 'correct' : 'wrong'">
         <!-- 错题重做标记 -->
         <view class="retry-badge" v-if="currentExercise && currentExercise.isRetry">
           <text class="retry-text">🔄 错题重做</text>
         </view>
         
-        <view class="feedback-icon">{{ isCorrect ? '✓' : '✗' }}</view>
-        <text class="feedback-title">{{ isCorrect ? '回答正确！' : '回答错误' }}</text>
+        <view class="feedback-header">
+          <view class="feedback-icon">{{ isCorrect ? '✓' : '✗' }}</view>
+          <text class="feedback-title">{{ isCorrect ? '回答正确！' : '回答错误' }}</text>
+        </view>
+        
         <view class="feedback-detail" v-if="!isCorrect">
           <text class="label">正确答案：</text>
           <text class="answer">{{ currentExercise.correctAnswer }}</text>
         </view>
         
-        <!-- 题目评价按钮（仅错题重做时显示） -->
+        <!-- 题目评价按钮（仅AI生成题或题库题显示） -->
         <view class="rating-buttons" v-if="showRatingButtons && !hasRated">
           <text class="rating-prompt">这道题的质量如何？</text>
           <view class="rating-btns">
@@ -202,8 +197,14 @@
             </button>
           </view>
         </view>
-        
-        <button class="btn-secondary mt-20" @click="nextExercise">下一题</button>
+      </view>
+
+      <button class="btn-primary mt-20" @click="handleAnswerAction">{{ showFeedback ? '下一题' : '提交答案' }}</button>
+
+      <!-- 题目生成状态指示器 -->
+      <view class="ai-status" v-if="generatingCount > 0">
+        <view class="ai-status-icon">🤖</view>
+        <text class="ai-status-text">正在生成第 {{ exercises.length + 1 }}-{{ Math.min(exercises.length + generatingCount, exerciseCount) }} 题...</text>
       </view>
     </view>
 
@@ -852,6 +853,17 @@ export default {
       this.showTranslation = !this.showTranslation
     },
     
+    // 统一处理提交答案和下一题的按钮点击
+    handleAnswerAction() {
+      if (this.showFeedback) {
+        // 已经显示反馈，点击进入下一题
+        this.nextExercise()
+      } else {
+        // 还未提交，点击提交答案
+        this.submitAnswer()
+      }
+    },
+    
     async submitAnswer() {
       const answer = this.exerciseType === 'choice' ? this.selectedAnswer : this.userAnswer
 
@@ -893,10 +905,12 @@ export default {
           }
           this.totalAnswered++
           
-          // 如果是重做的错题且是填空题或例句填空，显示评价按钮
-          if (this.currentExercise.isRetry && 
-              (this.exerciseType === 'fill' || this.exerciseType === 'sentence')) {
-            this.showRatingButtons = true
+          // 如果是填空题或例句填空（AI生成题或题库题），显示评价按钮
+          if (this.exerciseType === 'fill' || this.exerciseType === 'sentence') {
+            // 只有AI生成的题目或题库题目才显示评价按钮
+            if (this.currentExercise.aiGenerated || this.currentExercise.fromQuestionBank) {
+              this.showRatingButtons = true
+            }
           }
           
           this.showFeedback = true
@@ -1281,6 +1295,11 @@ export default {
   color: #667eea;
 }
 
+.option-item.disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .input-container {
   padding: 20rpx 0;
 }
@@ -1405,6 +1424,11 @@ export default {
   text-align: center;
 }
 
+.answer-input[disabled] {
+  opacity: 0.6;
+  background: #e8e8e8;
+}
+
 .modal {
   position: fixed;
   top: 0;
@@ -1416,6 +1440,162 @@ export default {
   align-items: center;
   justify-content: center;
   z-index: 999;
+}
+
+/* 内嵌反馈区域样式 */
+.inline-feedback {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 30rpx;
+  margin: 30rpx 0 20rpx;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.08);
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20rpx);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.inline-feedback.correct {
+  border-left: 6rpx solid #52c41a;
+  background: linear-gradient(135deg, #f6ffed 0%, #ffffff 100%);
+}
+
+.inline-feedback.wrong {
+  border-left: 6rpx solid #ff4d4f;
+  background: linear-gradient(135deg, #fff1f0 0%, #ffffff 100%);
+}
+
+.inline-feedback .retry-badge {
+  display: inline-block;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+  padding: 6rpx 16rpx;
+  border-radius: 20rpx;
+  font-size: 22rpx;
+  margin-bottom: 15rpx;
+}
+
+.inline-feedback .retry-text {
+  font-size: 22rpx;
+}
+
+.inline-feedback .feedback-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15rpx;
+}
+
+.inline-feedback .feedback-icon {
+  font-size: 48rpx;
+  margin-right: 15rpx;
+}
+
+.inline-feedback.correct .feedback-icon {
+  color: #52c41a;
+}
+
+.inline-feedback.wrong .feedback-icon {
+  color: #ff4d4f;
+}
+
+.inline-feedback .feedback-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.inline-feedback .feedback-detail {
+  background: rgba(0, 0, 0, 0.03);
+  padding: 20rpx;
+  border-radius: 12rpx;
+  margin-bottom: 15rpx;
+}
+
+.inline-feedback .feedback-detail .label {
+  font-size: 24rpx;
+  color: #999;
+  margin-bottom: 8rpx;
+}
+
+.inline-feedback .feedback-detail .answer {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.inline-feedback .rating-buttons {
+  margin-top: 20rpx;
+  padding-top: 20rpx;
+  border-top: 2rpx solid rgba(0, 0, 0, 0.06);
+}
+
+.inline-feedback .rating-prompt {
+  display: block;
+  font-size: 26rpx;
+  color: #666;
+  margin-bottom: 15rpx;
+  text-align: center;
+}
+
+.inline-feedback .rating-btns {
+  display: flex;
+  gap: 15rpx;
+  justify-content: center;
+}
+
+.inline-feedback .rating-btn {
+  flex: 1;
+  max-width: 200rpx;
+  padding: 20rpx;
+  border-radius: 12rpx;
+  font-size: 26rpx;
+  font-weight: 600;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.inline-feedback .rating-btn::after {
+  border: none;
+}
+
+.inline-feedback .rating-btn.good-btn {
+  background: linear-gradient(135deg, #52c41a 0%, #73d13d 100%);
+  color: #fff;
+  border: none;
+}
+
+.inline-feedback .rating-btn.good-btn:active {
+  background: linear-gradient(135deg, #389e0d 0%, #52c41a 100%);
+  transform: scale(0.95);
+}
+
+.inline-feedback .rating-btn.bad-btn {
+  background: linear-gradient(135deg, #ff4d4f 0%, #ff7875 100%);
+  color: #fff;
+  border: none;
+}
+
+.inline-feedback .rating-btn.bad-btn:active {
+  background: linear-gradient(135deg, #cf1322 0%, #ff4d4f 100%);
+  transform: scale(0.95);
+}
+
+.inline-feedback .rating-icon {
+  font-size: 36rpx;
+  margin-bottom: 8rpx;
 }
 
 .modal-content {
