@@ -1,5 +1,5 @@
 // API基础配置
-const BASE_URL = 'http://362ff83b.r39.cpolar.top/api'
+const BASE_URL = 'http://3f4a1b22.r39.cpolar.top/api'
 
 // 请求封装
 const request = (options) => {

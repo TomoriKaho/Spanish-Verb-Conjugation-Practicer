@@ -125,6 +125,10 @@ export default {
   color: #fff;
 }
 
+.stats-overview .title {
+  color: #fff;
+}
+
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
