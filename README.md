@@ -1,34 +1,39 @@
 # 西班牙语动词变位练习系统
 
-> 一款基于 uni-app + Express.js + SQLite + AI 的智能西班牙语动词变位学习应用
+> 一款基于 uni-app + Express.js + SQLite + DeepSeek AI 的智能西班牙语学习应用
 
 ## 📋 目录
 
 - [项目简介](#项目简介)
+- [核心特色](#核心特色)
 - [技术栈](#技术栈)
 - [系统架构](#系统架构)
-- [核心功能模块](#核心功能模块)
+- [核心功能](#核心功能)
 - [数据库设计](#数据库设计)
-- [数据流转机制](#数据流转机制)
-- [AI智能生成系统](#ai智能生成系统)
+- [AI智能系统](#ai智能系统)
+- [性能优化](#性能优化)
 - [项目结构](#项目结构)
 - [快速开始](#快速开始)
-- [API文档](#api文档)
+- [更新日志](#更新日志)
 
 ---
 
 ## 项目简介
 
-本项目是一个专为西班牙语学习者设计的动词变位练习系统，融合了传统练习模式与 AI 智能生成技术，提供多样化的练习题型和个性化学习路径。系统通过三层数据库架构、智能题库管理和定时清理机制，实现高效的学习体验。
+这是一个面向西班牙语学习者的智能练习系统，集成了传统题库与 AI 生成技术，提供个性化学习体验。系统采用三库分离架构，结合智能题库管理、实时反馈和学习进度追踪，让动词变位学习更高效、更有趣。
 
 ### 核心特色
 
 - 🎯 **四种题型**：选择题、填空题、变位题、例句填空
-- 🤖 **AI双模验证**：生成模型 + 验证模型确保题目质量
-- 📊 **智能题库**：公共题库 + 私人题库，置信度动态调整
-- 🔄 **自动清理**：定时清理30天以上低质题目
-- 📈 **学习追踪**：打卡系统、学习进度、错题本、收藏夹
-- 🏆 **排行榜**：多维度排名激励学习
+- 🤖 **AI 智能生成**：DeepSeek 双模型验证，确保题目质量
+- 📊 **双题库系统**：公共题库（智能推荐）+ 私人题库（个人收藏）
+- ⚡ **异步生成优化**：题库题目立即返回，AI 题目后台生成
+- 🔄 **错题重做机制**：自动收集错题，练习完成后立即巩固
+- 📈 **完整学习追踪**：打卡系统、学习天数、练习统计、掌握度计算
+- 💾 **智能题库管理**：置信度动态调整、定时清理、去重生成
+- 🎨 **内嵌式反馈**：无弹窗干扰，答题后即时显示反馈与操作
+- 📌 **双收藏系统**：单词收藏 + 题目收藏，支持一键取消
+- 🏆 **多维度排行**：练习量、正确率、连续打卡、掌握动词数
 
 ---
 
@@ -47,386 +52,350 @@
 - **node-cron** - 定时任务调度
 
 ### AI 服务
-- **DeepSeek API** - AI 题目生成与验证
+- **DeepSeek API** - 题目生成与质量验证
+- **异步生成策略** - 后台智能生成，不阻塞用户体验
+
+### 定时任务
+- **node-cron** - 定时清理过期题目（每天凌晨 0 点）
 
 ---
 
 ## 系统架构
 
-### 整体架构图
+### 整体架构设计
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                        前端层 (uni-app)                      │
+│                    前端层 (uni-app + Vue 2)                   │
 │  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐   │
-│  │  首页    │  │  练习页  │  │ 单词本   │  │  个人中心 │   │
+│  │  首页    │  │  练习    │  │ 单词本   │  │ 题库管理  │   │
+│  │  打卡    │  │  四题型  │  │ 错题本   │  │ 个人中心  │   │
 │  └──────────┘  └──────────┘  └──────────┘  └──────────┘   │
-│                        ↓ API 请求                            │
+│           ↓ RESTful API (JWT 认证)                          │
 └─────────────────────────────────────────────────────────────┘
                                ↓
 ┌─────────────────────────────────────────────────────────────┐
-│                    中间件层 (Express)                         │
+│                  服务层 (Express.js + 中间件)                 │
 │  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐   │
-│  │ 路由层   │  │ 认证中间件│  │ 错误处理 │  │ CORS     │   │
+│  │ 路由层   │  │ JWT认证  │  │ API日志  │  │ CORS     │   │
 │  └──────────┘  └──────────┘  └──────────┘  └──────────┘   │
 └─────────────────────────────────────────────────────────────┘
                                ↓
 ┌─────────────────────────────────────────────────────────────┐
-│                      服务层 (Services)                        │
-│  ┌──────────────────┐  ┌──────────────────┐                │
-│  │ ExerciseGenerator│  │ QuestionValidator│                │
-│  │  (题目生成器)     │  │   (题目验证器)    │                │
-│  └──────────────────┘  └──────────────────┘                │
-│  ┌──────────────────┐  ┌──────────────────┐                │
-│  │  DeepSeek Service│  │  Scheduler Service│               │
-│  │   (AI服务)        │  │   (定时任务)      │                │
-│  └──────────────────┘  └──────────────────┘                │
+│                      业务逻辑层 (Services)                     │
+│  ┌───────────────────┐  ┌───────────────────┐              │
+│  │ExerciseGenerator  │  │QuestionValidator  │              │
+│  │ • 题目生成器       │  │ • AI质量验证      │              │
+│  │ • 异步生成策略     │  │ • 双模型检查      │              │
+│  │ • 去重机制        │  └───────────────────┘              │
+│  └───────────────────┘                                      │
+│  ┌───────────────────┐  ┌───────────────────┐              │
+│  │DeepSeek Service   │  │Scheduler Service  │              │
+│  │ • AI题目生成      │  │ • 定时清理任务    │              │
+│  │ • 题目验证        │  │ • 日志美化        │              │
+│  └───────────────────┘  └───────────────────┘              │
 └─────────────────────────────────────────────────────────────┘
                                ↓
 ┌─────────────────────────────────────────────────────────────┐
-│                      模型层 (Models)                          │
+│                       数据模型层 (Models)                      │
 │  ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌─────────┐          │
 │  │ User    │ │ Verb    │ │Question │ │CheckIn  │          │
+│  │ 用户管理 │ │ 动词库  │ │ 题库    │ │ 打卡    │          │
 │  └─────────┘ └─────────┘ └─────────┘ └─────────┘          │
-│  ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌─────────┐          │
-│  │Practice │ │Favorite │ │WrongVerb│ │Conjugate│          │
-│  │ Record  │ │ Verb    │ │         │ │         │          │
-│  └─────────┘ └─────────┘ └─────────┘ └─────────┘          │
+│  ┌─────────┐ ┌─────────┐ ┌─────────┐                      │
+│  │Practice │ │Favorite │ │WrongVerb│                      │
+│  │ 练习记录 │ │ 收藏    │ │ 错题本  │                      │
+│  └─────────┘ └─────────┘ └─────────┘                      │
 └─────────────────────────────────────────────────────────────┘
                                ↓
 ┌─────────────────────────────────────────────────────────────┐
-│                   数据库层 (SQLite × 3)                       │
+│              数据库层 (SQLite 三库分离架构)                    │
 │  ┌──────────────┐ ┌──────────────┐ ┌──────────────┐        │
 │  │ user_data.db │ │vocabulary.db │ │questions.db  │        │
 │  │  (用户数据)   │ │  (词库数据)   │ │  (题库数据)   │        │
-│  │              │ │              │ │              │        │
-│  │ • users      │ │ • verbs      │ │ • public_    │        │
-│  │ • practice_  │ │ • conjugations│ │   questions  │        │
-│  │   records    │ │              │ │              │        │
-│  │ • check_ins  │ │              │ │              │        │
-│  │ • favorite_  │ │              │ │              │        │
-│  │   verbs      │ │              │ │              │        │
-│  │ • wrong_verbs│ │              │ │              │        │
-│  │ • private_   │ │              │ │              │        │
-│  │   questions  │ │              │ │              │        │
 │  └──────────────┘ └──────────────┘ └──────────────┘        │
 └─────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## 核心功能模块
+## 核心功能
 
-### 1. 用户认证模块 (User Module)
+### 1. 智能练习系统
 
-**位置**: `server/models/User.js` + `server/routes/user.js`
+#### 1.1 四种题型
 
-**功能**:
-- 用户注册与登录（JWT Token 认证）
-- 用户信息管理（学校、入学年份、订阅状态）
-- 密码加密存储（bcrypt）
-
-**数据流**:
-```
-前端登录表单 → /api/user/login → User.authenticate() 
-→ 验证密码 → 生成 JWT Token → 返回 userInfo + token
-→ 前端存储 token → 后续请求携带 Authorization header
-```
-
----
-
-### 2. 练习生成模块 (Exercise Generator)
-
-**位置**: `server/services/exerciseGenerator.js`
-
-**核心机制**: 混合生成策略
-
-#### 2.1 题型分类
-
-| 题型 | 生成方式 | 来源 |
+| 题型 | 生成方式 | 特点 |
 |------|---------|------|
-| **选择题** (choice) | 固定算法 | 数据库动词表 |
-| **变位题** (conjugate) | 固定算法 | 数据库变位表 |
-| **填空题** (fill) | 85%题库 + 15%AI | 公共/私人题库 + DeepSeek |
-| **例句填空** (sentence) | 85%题库 + 15%AI | 公共/私人题库 + DeepSeek |
+| **选择题** | 固定算法 | 从动词变位表随机生成选项，支持去重 |
+| **变位题** | 固定算法 | 手动输入变位形式，支持去重 |
+| **填空题** | 85%题库 + 15%AI | 智能推荐 + 后台异步生成 |
+| **例句填空** | 85%题库 + 15%AI | 真实语境 + AI验证质量 |
 
-#### 2.2 生成流程
+#### 1.2 异步生成优化（性能提升关键）
+
+**问题**：用户点击"开始练习"后需等待 5-10 秒（AI 生成阻塞）
+
+**解决方案**：
+```
+用户点击开始 → 立即返回题库题目 → 用户立即开始答题
+                         ↓
+                   后台异步生成 AI 题目
+                         ↓
+                   生成完成后插入题目队列
+                         ↓
+                   用户无感知过渡到 AI 题目
+```
+
+**技术实现**：
+- 前端：立即渲染题库题目，异步调用 AI 生成接口
+- 后端：`generateBatch()` 分离题库查询和 AI 生成
+- 缓冲区机制：保持 2-3 题的缓冲，避免用户等待
+
+#### 1.3 错题重做机制
 
 ```
-用户请求练习
-    ↓
-判断题型
-    ↓
-┌──────────────┬──────────────┐
-│ 选择题/变位题 │ 填空/例句填空 │
-└──────────────┴──────────────┘
-        ↓               ↓
-   固定算法生成      随机决策(85/15)
-                       ↓
-              ┌────────┴────────┐
-              │                 │
-          题库获取           AI生成
-              │                 │
-              │         ┌───────┴────────┐
-              │         │ 数据完整性检查  │
-              │         │ (validateAIData)│
-              │         └───────┬────────┘
-              │                 │
-              │         ┌───────┴────────┐
-              │         │ AI质量验证      │
-              │         │ (Validator)    │
-              │         └───────┬────────┘
-              │                 │
-              │            通过?  失败
-              │             ↓      ↓
-              │         保存题库  重试(最多3次)
-              │             ↓      ↓
-              │         返回题目  降级算法
-              │                   ↓
-              └───────────────────┘
+答题过程中答错 → 自动添加到错题队列
                       ↓
-                  返回题目
+              标记为 isRetry: true
+                      ↓
+          完成所有初始题目后
+                      ↓
+        立即进入错题重做环节
+                      ↓
+        错题答对后才算真正完成
 ```
 
-#### 2.3 AI生成重试机制
+**视觉标识**：错题右上角显示"错题重做"标签
 
+### 2. 双题库系统
+
+#### 2.1 公共题库（questions.db）
+
+- **来源**：AI 智能生成
+- **共享**：所有用户可访问
+- **置信度系统**：
+  ```javascript
+  初始置信度: 50
+  用户答对: +5 (最高 100)
+  用户答错: -3 (最低 0)
+  ```
+- **智能推荐**：优先返回高置信度题目
+  ```sql
+  ORDER BY confidence_score DESC, created_at DESC
+  ```
+- **自动清理**：每天凌晨 0 点删除创建超过 30 天的题目
+
+#### 2.2 私人题库（user_data.db）
+
+- **来源**：用户主动收藏的题目
+- **独享**：仅用户本人可见
+- **永久保存**：不受定时清理影响
+- **关联公共题库**：
+  - 保存 `public_question_id` 字段
+  - 取消收藏时自动更新公共题库置信度 -2
+
+#### 2.3 题目收藏与取消
+
+**收藏流程**：
+```
+用户点击 📌 → 复制题目到 private_questions
+              → 返回 privateQuestionId
+              → 前端保存 ID（用于后续取消）
+              → 如果来自公共题库，置信度 +2
+```
+
+**取消收藏流程**：
+```
+用户再次点击 📌 → 根据 privateQuestionId 删除
+                  → 如果有关联公共题库，置信度 -2
+                  → 前端清除 privateQuestionId
+```
+
+### 3. 学习追踪与统计
+
+#### 3.1 学习天数计算
+
+**修复时区问题**：
 ```javascript
-for (let attempt = 1; attempt <= 3; attempt++) {
-  // 1. 调用 DeepSeek 生成题目
-  aiResult = await DeepSeekService.generate()
+// ❌ 错误：UTC 时间解析导致偏差
+const date = new Date('2025-11-20')  // 被解析为 UTC 00:00
+
+// ✅ 正确：手动解析为本地时间
+const [year, month, day] = '2025-11-20'.split('-').map(Number)
+const date = new Date(year, month - 1, day)  // 本地时间
+```
+
+**计算逻辑**：
+```javascript
+学习天数 = Math.floor((当前时间 - 注册时间) / (1000 * 60 * 60 * 24)) + 1
+// 注册当天显示 1 天
+```
+
+#### 3.2 连续打卡系统
+
+**修复时区问题**：
+```javascript
+// 修复前：checkInDate 解析为 UTC，导致连续打卡判断错误
+// 修复后：手动解析为本地时间
+const [year, month, day] = dateStr.split('-').map(Number)
+const checkInDate = new Date(year, month - 1, day)
+```
+
+**打卡逻辑**：
+- 必须当天有练习记录才能打卡
+- 自动计算连续打卡天数
+- 中断后从 1 天重新开始
+
+#### 3.3 统计数据
+
+- **今日练习**：总题数、答对数
+- **总体数据**：总练习数、总答对数、练习天数、已掌握动词数
+- **掌握度计算**：
+  ```javascript
+  mastery_level = (correct_count / practice_count) * 10
+  已掌握标准: mastery_level >= 5 && practice_count >= 3
+  ```
+
+### 4. AI 智能生成系统
+
+#### 4.1 双模型验证机制
+
+```
+DeepSeek 生成模型 (temperature=0.7)
+         ↓
+    生成题目
+         ↓
+  数据完整性检查
+         ↓
+DeepSeek 验证模型 (temperature=0.3)
+         ↓
+    质量验证
+         ↓
+  ┌──────┴──────┐
+  ↓             ↓
+通过           失败
+  ↓             ↓
+保存题库    重试(最多3次)
+  ↓             ↓
+返回题目   降级传统算法
+```
+
+#### 4.2 生成 Prompt 示例
+
+**填空题生成**：
+```
+为动词 "hablar" (说话) 生成填空题
+时态：陈述式现在时
+人称：第一人称单数
+
+要求：
+1. 正确答案必须是：hablo
+2. 题干要自然、符合日常场景
+3. 提供例句、提示、翻译
+4. 提示不能暴露答案
+
+返回JSON格式
+```
+
+#### 4.3 验证维度
+
+- ✅ 语法正确性
+- ✅ 答案唯一性（关键）
+- ✅ 句子自然度
+- ✅ 翻译准确性
+- ✅ 提示合理性（不暴露答案）
+
+### 5. 用户体验优化
+
+#### 5.1 内嵌式答案反馈
+
+**优化前**：弹窗遮挡题目和答案，用户无法回看
+
+**优化后**：
+```
+┌─────────────────────────┐
+│  题目卡片                │
+│  • 动词信息              │
+│  • 题干                  │
+│  • 用户输入框(禁用)      │
+│  ┌─────────────────┐    │
+│  │ ✓ 回答正确！     │    │ ← 内嵌反馈区
+│  │ 正确答案：xxx    │    │
+│  │ [👍好题] [👎坏题]│    │
+│  └─────────────────┘    │
+│  [下一题] 按钮           │
+└─────────────────────────┘
+```
+
+**优势**：
+- 用户可以回看题目和自己的答案
+- 支持原地收藏单词/题目
+- 支持题目评价（好题/坏题）
+- 无弹窗打断，体验更流畅
+
+#### 5.2 专项练习界面优化
+
+**配色统一**：
+- 修改前：橙黄色系（#ff9500、#ffe7d6）
+- 修改后：紫色系（#667eea、#764ba2）
+- 设计风格：与整体 UI 保持一致
+
+**复选框优化**：
+- 选中背景：渐变紫色
+- 边框颜色：紫色
+- 图标颜色：紫色
+- 快捷按钮：紫色渐变
+
+#### 5.3 去重机制
+
+**选择题/变位题去重**：
+```javascript
+const generatedKeys = new Set()
+while (exercises.length < count) {
+  const exercise = generateTraditionalExercise()
+  const key = `${verbId}-${tense}-${mood}-${person}`
   
-  // 2. 数据完整性检查
-  if (!validateAIResultData(aiResult)) {
-    continue // 重试
+  if (!generatedKeys.has(key)) {
+    generatedKeys.add(key)
+    exercises.push(exercise)
   }
-  
-  // 3. AI 质量验证
-  validation = await QuestionValidator.validate(aiResult)
-  
-  if (validation.passed) {
-    // 保存到公共题库（置信度=50）
-    Question.addToPublic(aiResult)
-    break
-  }
-  
-  // 延迟后重试
-  await sleep(500)
-}
-
-// 3次失败后降级到传统算法
-if (!validation.passed) {
-  return generateTraditionalExercise()
 }
 ```
 
----
+**避免重复**：同一批次不会出现相同的"动词-时态-人称"组合
 
-### 3. AI 智能生成系统
+### 6. 后端日志系统
 
-#### 3.1 DeepSeek 生成服务
+#### 6.1 API 日志中间件
 
-**位置**: `server/services/deepseek.js`
-
-**职责**: 调用 DeepSeek API 生成高质量题目
-
-**生成 Prompt 示例** (例句填空):
 ```
-请为西班牙语动词 "estar" (意思: 是/在) 生成一道例句填空题。
+[15:07:23.456] GET /api/verb/list | 获取动词列表
+  ↳ 200 | 45ms
 
-要求:
-1. 句子必须使用 陈述式 简单过去时 的 第一人称单数 形式
-2. 正确答案必须是: estuve
-3. 句子的语境要确保只有这个变位形式是唯一正确的答案
-4. 句子要自然、地道，符合日常使用场景
-5. 难度适中，适合初学者
-
-返回格式:
-{
-  "sentence": "Ayer _____ en la biblioteca.",
-  "answer": "estuve",
-  "translation": "昨天我在图书馆。",
-  "hint": "简单过去时第一人称"
-}
+[15:08:10.123] POST /api/exercise/submit | 提交答案
+  ↳ 200 | 12ms
 ```
 
-#### 3.2 题目验证服务
+**特点**：
+- 彩色输出（GET绿色、POST黄色、DELETE红色）
+- 中文 API 名称映射（30+ 个接口）
+- 执行时间统计
+- 状态码显示
 
-**位置**: `server/services/questionValidator.js`
+#### 6.2 定时任务日志
 
-**职责**: 第二个 AI 实例验证题目质量
-
-**验证维度**:
-1. ✅ 语法正确性
-2. ✅ 答案唯一性
-3. ✅ 句子自然度
-4. ✅ 翻译准确性
-5. ✅ 提示合理性（不暴露答案）
-
-**验证流程**:
 ```
-生成的题目
-    ↓
-QuestionValidator.quickValidate()
-    ↓
-调用 DeepSeek API (temperature=0.3, 降低随机性)
-    ↓
-返回验证结果:
-{
-  "isValid": true/false,
-  "hasUniqueAnswer": true/false,
-  "reason": "验证失败原因"
-}
-    ↓
-passed = isValid && hasUniqueAnswer
-```
-
----
-
-### 4. 题库管理模块 (Question Bank)
-
-**位置**: `server/models/Question.js`
-
-#### 4.1 双题库架构
-
-| 题库类型 | 数据库 | 表名 | 用途 |
-|---------|--------|------|------|
-| **公共题库** | questions.db | public_questions | AI生成的共享题目 |
-| **私人题库** | user_data.db | private_questions | 用户收藏的题目 |
-
-#### 4.2 置信度系统
-
-```javascript
-// 初始置信度
-新生成题目: confidenceScore = 50
-
-// 动态调整
-用户答对: confidenceScore += 5 (最高100)
-用户答错: confidenceScore -= 3 (最低0)
-
-// 题库清理
-定时任务: 删除 created_at > 30天 的题目
-同时删除: 关联的 user_question_records
-```
-
-#### 4.3 题目获取策略
-
-```javascript
-// 从题库获取题目
-getRandomFromPublic({
-  questionType,    // 'fill' 或 'sentence'
-  tenses,          // 时态过滤
-  conjugationTypes,// 变位类型过滤
-  includeIrregular,// 是否包含不规则动词
-  limit: 1
-})
-
-// 优先级: 高置信度 > 新题目 > 随机
-ORDER BY confidence_score DESC, created_at DESC
-```
-
----
-
-### 5. 学习追踪模块
-
-#### 5.1 练习记录 (PracticeRecord)
-
-**位置**: `server/models/PracticeRecord.js`
-
-**记录内容**:
-```javascript
-{
-  user_id,          // 用户ID
-  verb_id,          // 动词ID
-  exercise_type,    // 题型
-  is_correct,       // 是否正确
-  answer,           // 用户答案
-  correct_answer,   // 正确答案
-  tense, mood, person, // 变位信息
-  created_at        // 答题时间
-}
-```
-
-**统计功能**:
-- 今日练习数 / 答对数
-- 总练习数 / 总答对数
-- 已掌握动词数量 (mastery_level >= 5)
-- 按时态/题型分组统计
-
-#### 5.2 打卡系统 (CheckIn)
-
-**位置**: `server/models/CheckIn.js`
-
-**打卡逻辑**:
-```javascript
-// 前端验证
-if (todayStats.total === 0) {
-  showToast('你今天还没练习哦！')
-  return
-}
-
-// 后端记录
-CheckIn.create({
-  user_id,
-  check_in_date: '2025-11-20',
-  exercise_count: todayStats.total,
-  correct_count: todayStats.correct
-})
-
-// 连续打卡计算
-streakDays = 连续日期差 + 1
-```
-
-#### 5.3 收藏与错题
-
-**收藏单词** (FavoriteVerb):
-```
-用户点击收藏 → /api/vocabulary/favorite/add
-→ FavoriteVerb.add(user_id, verb_id)
-→ INSERT INTO favorite_verbs
-```
-
-**错题本** (WrongVerb):
-```
-用户答错 → 自动添加到错题本
-→ WrongVerb.add(user_id, verb_id)
-→ wrong_count++, last_wrong_at = NOW()
-```
-
-**题目收藏**:
-```
-用户点击📌 → /api/question/favorite
-→ 复制到 private_questions (user_id, question_data)
-→ 用户私人题库 +1
-```
-
----
-
-### 6. 定时任务模块 (Scheduler)
-
-**位置**: `server/services/scheduler.js`
-
-**任务调度**:
-```javascript
-// 每天凌晨 00:00 执行
-cron.schedule('0 0 * * *', () => {
-  cleanOldQuestions()
-}, {
-  timezone: 'Asia/Shanghai'
-})
-```
-
-**清理逻辑**:
-```sql
--- 1. 删除答题记录
-DELETE FROM user_question_records
-WHERE question_id IN (
-  SELECT id FROM public_questions
-  WHERE datetime(created_at) < datetime('now', '-30 days')
-)
-
--- 2. 删除题目本身
-DELETE FROM public_questions
-WHERE datetime(created_at) < datetime('now', '-30 days')
+============================================================
+⏰ 定时任务触发 | 2025/11/20 00:00:00
+============================================================
+🧹 开始清理超过30天的旧题目...
+📊 步骤1: 清理答题记录...
+   ✓ 已删除 15 条超期题目的答题记录
+📝 步骤2: 清理公共题库题目...
+   ✓ 已删除 8 道超过30天的公共题库题目
+✓ 清理完成 | 记录: 15 条 | 题目: 8 道
+============================================================
 ```
 
 ---
@@ -436,70 +405,63 @@ WHERE datetime(created_at) < datetime('now', '-30 days')
 ### 三库分离架构
 
 ```
-user_data.db (88 KB)
-├── users                    # 用户表
+user_data.db (用户数据库)
+├── users                    # 用户表（JWT认证）
 ├── practice_records         # 练习记录
 ├── check_ins               # 打卡记录
 ├── user_progress           # 学习进度
 ├── favorite_verbs          # 收藏单词
 ├── wrong_verbs             # 错题本
-├── private_questions       # 私人题库
+├── private_questions       # 私人题库（★新增public_question_id字段）
 └── user_question_records   # 答题记录
 
-vocabulary.db (60 KB)
-├── verbs                   # 动词表
-└── conjugations            # 变位表
+vocabulary.db (词库数据库)
+├── verbs                   # 动词表（200+个）
+└── conjugations            # 变位表（2000+条）
 
-questions.db (28 KB)
-└── public_questions        # 公共题库
+questions.db (题库数据库)
+└── public_questions        # 公共题库（AI生成）
 ```
 
 ### 关键表结构
 
-#### users (用户表)
+#### users
 ```sql
 CREATE TABLE users (
   id INTEGER PRIMARY KEY,
   username TEXT UNIQUE NOT NULL,
-  password TEXT NOT NULL,      -- bcrypt加密
+  password TEXT NOT NULL,
   email TEXT,
   school TEXT,
   enrollment_year INTEGER,
   user_type TEXT DEFAULT 'student',
-  subscription_end_date TEXT,
-  created_at TEXT DEFAULT (datetime('now', 'localtime'))
+  created_at TEXT DEFAULT (datetime('now', 'localtime')),
+  updated_at TEXT DEFAULT (datetime('now', 'localtime'))
 )
 ```
 
-#### verbs (动词表)
+#### private_questions（私人题库）
 ```sql
-CREATE TABLE verbs (
+CREATE TABLE private_questions (
   id INTEGER PRIMARY KEY,
-  infinitive TEXT NOT NULL,           -- 原形
-  meaning TEXT NOT NULL,              -- 中文意思
-  conjugation_type INTEGER NOT NULL,  -- 1/2/3变位
-  is_irregular INTEGER DEFAULT 0,     -- 是否不规则
-  lesson_number INTEGER,              -- 课程编号
-  textbook_volume INTEGER DEFAULT 1,
-  frequency_level INTEGER DEFAULT 1
-)
-```
-
-#### conjugations (变位表)
-```sql
-CREATE TABLE conjugations (
-  id INTEGER PRIMARY KEY,
+  user_id INTEGER NOT NULL,
   verb_id INTEGER NOT NULL,
-  tense TEXT NOT NULL,           -- 现在时/简单过去时/将来时
-  mood TEXT NOT NULL,            -- 陈述式/虚拟式
-  person TEXT NOT NULL,          -- 第一人称单数/复数...
-  conjugated_form TEXT NOT NULL, -- 变位后的形式
-  is_irregular INTEGER DEFAULT 0,
-  FOREIGN KEY (verb_id) REFERENCES verbs(id)
+  question_type TEXT CHECK(question_type IN ('fill', 'sentence')),
+  question_text TEXT NOT NULL,
+  correct_answer TEXT NOT NULL,
+  example_sentence TEXT,
+  translation TEXT,
+  hint TEXT,
+  tense TEXT NOT NULL,
+  mood TEXT NOT NULL,
+  person TEXT NOT NULL,
+  public_question_id INTEGER,  -- ★关联公共题库（用于置信度更新）
+  created_at TEXT DEFAULT (datetime('now', 'localtime')),
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 )
 ```
 
-#### public_questions (公共题库)
+#### public_questions（公共题库）
 ```sql
 CREATE TABLE public_questions (
   id INTEGER PRIMARY KEY,
@@ -513,111 +475,126 @@ CREATE TABLE public_questions (
   tense TEXT NOT NULL,
   mood TEXT NOT NULL,
   person TEXT NOT NULL,
-  confidence_score INTEGER DEFAULT 50 CHECK(confidence_score >= 0 AND confidence_score <= 100),
-  created_at TEXT DEFAULT (datetime('now', 'localtime'))
+  confidence_score INTEGER DEFAULT 50,  -- 置信度（0-100）
+  created_at TEXT DEFAULT (datetime('now', 'localtime')),
+  FOREIGN KEY (verb_id) REFERENCES verbs(id)
 )
 ```
 
 ---
 
-## 数据流转机制
+## AI 智能系统
 
-### 完整练习流程
+## AI 智能系统
+
+### DeepSeek 双模型验证
+
+**模型 1：生成器** (temperature=0.7)
+- 生成填空题和例句填空
+- 保持创造性和多样性
+
+**模型 2：验证器** (temperature=0.3)
+- 验证题目质量
+- 降低随机性，提高一致性
+
+### 生成流程
 
 ```
-【前端】用户进入练习页
-    ↓
-pages/practice/practice.vue
-    ↓ 
-调用 api.getExercise({ exerciseType, count, tenses, ... })
-    ↓
-【后端】/api/exercise/generate (POST)
-    ↓
-routes/exercise.js → ExerciseGenerator.generateOne()
-    ↓
-┌──────────────────────────────────────┐
-│ 1. 判断题型                           │
-│    - choice/conjugate → 固定算法      │
-│    - fill/sentence → 题库(85%) + AI(15%)│
-└──────────────────────────────────────┘
-    ↓
-┌──────────────────────────────────────┐
-│ 2. 题库获取流程                       │
-│    a. Question.getRandomFromPublic()  │
-│       - 从 questions.db 查询         │
-│       - 按置信度排序                  │
-│    b. 如果题库无合适题目 → AI生成     │
-└──────────────────────────────────────┘
-    ↓
-┌──────────────────────────────────────┐
-│ 3. AI生成流程 (如果触发)              │
-│    a. 从 vocabulary.db 随机选动词     │
-│    b. DeepSeek.generateSentence()    │
-│    c. validateAIResultData()         │
-│    d. QuestionValidator.validate()   │
-│    e. 通过 → 保存到 questions.db      │
-│       失败 → 重试(最多3次)            │
-└──────────────────────────────────────┘
-    ↓
-【返回】格式化的题目对象
-    ↓
-【前端】渲染题目 → 用户答题
-    ↓
-调用 api.submitAnswer({ verbId, isCorrect, ... })
-    ↓
-【后端】/api/exercise/submit (POST)
-    ↓
-┌──────────────────────────────────────┐
-│ 4. 提交处理                           │
-│    a. PracticeRecord.create()        │
-│       → INSERT INTO practice_records │
-│    b. 更新 user_progress             │
-│       - practice_count++             │
-│       - mastery_level 调整           │
-│    c. 如果答错 → WrongVerb.add()     │
-│    d. 如果是题库题目                  │
-│       → Question.updateConfidence()  │
-│          - 答对: confidence += 5     │
-│          - 答错: confidence -= 3     │
-└──────────────────────────────────────┘
-    ↓
-【返回】{ success: true }
-    ↓
-【前端】显示答案反馈 → 下一题
+1. 随机选择动词 → Verb.getRandom()
+2. 构建生成 Prompt → DeepSeek 生成
+3. 数据完整性检查 → 验证必填字段
+4. AI 质量验证 → 第二个模型验证
+5. 通过 → 保存到 public_questions (置信度=50)
+   失败 → 重试(最多3次) → 降级传统算法
 ```
 
-### 跨数据库查询处理
+### 验证标准
 
-由于 SQLite 不支持跨库 JOIN，采用**分步查询 + 应用层合并**：
+- ✅ 正确答案格式正确
+- ✅ 句子语法无误
+- ✅ 答案在句子语境中唯一
+- ✅ 翻译准确
+- ✅ 提示有帮助但不暴露答案
 
+---
+
+## 性能优化
+
+### 1. 异步生成策略
+
+**问题**：同步等待 AI 生成导致 5-10 秒延迟
+
+**解决方案**：
 ```javascript
-// ❌ 不支持的写法
-SELECT v.infinitive, p.is_correct
-FROM practice_records p
-JOIN verbs v ON p.verb_id = v.id  -- 跨库JOIN失败
+// 后端分离生成
+generateBatch() {
+  // 1. 立即返回题库题目
+  const bankQuestions = Question.getSmartFromPublic(...)
+  
+  // 2. 计算需要 AI 生成的数量
+  const aiCount = totalCount - bankQuestions.length
+  
+  // 3. 立即返回题库题 + 告知前端需异步生成多少题
+  return {
+    questionPool: bankQuestions,  // 立即可用
+    needAI: aiCount,               // 需要异步生成
+    aiOptions: {...}               // 生成参数
+  }
+}
 
-// ✅ 正确的写法
-// Step 1: 从 user_data.db 查询记录
-const records = userDb.prepare(`
-  SELECT verb_id, is_correct FROM practice_records
-  WHERE user_id = ?
-`).all(userId)
-
-// Step 2: 提取 verb_ids
-const verbIds = records.map(r => r.verb_id)
-
-// Step 3: 从 vocabulary.db 查询动词信息
-const verbs = vocabularyDb.prepare(`
-  SELECT id, infinitive, meaning FROM verbs
-  WHERE id IN (${verbIds.join(',')})
-`).all()
-
-// Step 4: 应用层合并
-const result = records.map(record => ({
-  ...record,
-  verb: verbs.find(v => v.id === record.verb_id)
-}))
+// 前端异步生成
+async loadExercises() {
+  const result = await api.getExercise(...)
+  
+  // 立即显示题库题
+  this.exercises = result.questionPool
+  
+  // 后台异步生成 AI 题
+  if (result.needAI > 0) {
+    this.generateAIInBackground(result.needAI, result.aiOptions)
+  }
+}
 ```
+
+**效果**：用户等待时间从 5-10 秒 → 0 秒
+
+### 2. 题目去重机制
+
+**选择题/变位题去重**：
+```javascript
+const generatedKeys = new Set()
+const maxAttempts = count * 10
+
+while (exercises.length < count && attempts < maxAttempts) {
+  const exercise = generateTraditionalExercise()
+  const key = `${verbId}-${tense}-${mood}-${person}`
+  
+  if (!generatedKeys.has(key)) {
+    generatedKeys.add(key)
+    exercises.push(exercise)
+  }
+  attempts++
+}
+```
+
+**避免**：同批次出现完全相同的题目
+
+### 3. 时区问题修复
+
+**日期解析**：
+```javascript
+// ❌ 错误：UTC 时间
+new Date('2025-11-20')  // 解析为 UTC 00:00
+
+// ✅ 正确：本地时间
+const [year, month, day] = '2025-11-20'.split('-').map(Number)
+new Date(year, month - 1, day)
+```
+
+**影响**：
+- 学习天数计算
+- 连续打卡计算
+- 时区差异导致偏差 8 小时
 
 ---
 
@@ -626,61 +603,66 @@ const result = records.map(record => ({
 ```
 Spanish-Verb-Conjugation-Practicer/
 ├── server/                          # 后端服务
-│   ├── index.js                     # 服务器入口
+│   ├── index.js                     # 入口文件
 │   ├── database/
-│   │   └── db.js                    # 数据库初始化（三库连接）
-│   ├── models/                      # 数据模型层
-│   │   ├── User.js                  # 用户模型
-│   │   ├── Verb.js                  # 动词模型
-│   │   ├── Conjugation.js           # 变位模型
-│   │   ├── Question.js              # 题库模型
-│   │   ├── PracticeRecord.js        # 练习记录模型
-│   │   ├── CheckIn.js               # 打卡模型
-│   │   ├── FavoriteVerb.js          # 收藏模型
-│   │   └── WrongVerb.js             # 错题模型
-│   ├── routes/                      # 路由层
-│   │   ├── user.js                  # 用户路由
-│   │   ├── exercise.js              # 练习路由
-│   │   ├── record.js                # 记录路由
-│   │   ├── checkin.js               # 打卡路由
-│   │   ├── vocabulary.js            # 单词本路由
-│   │   └── question.js              # 题库路由
-│   ├── services/                    # 服务层
-│   │   ├── exerciseGenerator.js     # 题目生成服务
-│   │   ├── deepseek.js              # AI生成服务
-│   │   ├── questionValidator.js     # 题目验证服务
-│   │   └── scheduler.js             # 定时任务服务
+│   │   └── db.js                    # 三库初始化
+│   ├── models/                      # 数据模型
+│   │   ├── User.js
+│   │   ├── Verb.js
+│   │   ├── Conjugation.js
+│   │   ├── Question.js              # ★题库管理（双库）
+│   │   ├── PracticeRecord.js
+│   │   ├── CheckIn.js               # ★打卡系统
+│   │   ├── FavoriteVerb.js
+│   │   └── WrongVerb.js
+│   ├── routes/                      # API 路由
+│   │   ├── user.js
+│   │   ├── exercise.js
+│   │   ├── record.js
+│   │   ├── checkin.js
+│   │   ├── vocabulary.js
+│   │   └── question.js              # ★题库路由
+│   ├── services/                    # 业务逻辑
+│   │   ├── exerciseGenerator.js     # ★异步生成优化
+│   │   ├── deepseek.js              # AI 生成
+│   │   ├── questionValidator.js     # AI 验证
+│   │   └── scheduler.js             # ★定时清理
+│   ├── middleware/
+│   │   ├── auth.js                  # JWT 认证
+│   │   └── logger.js                # ★API 日志中间件
 │   ├── data/
-│   │   └── initData.js              # 初始化示例数据
+│   │   └── initData.js              # 初始数据
 │   ├── user_data.db                 # 用户数据库
 │   ├── vocabulary.db                # 词库数据库
 │   └── questions.db                 # 题库数据库
 │
 ├── pages/                           # 前端页面
-│   ├── index/                       # 首页
+│   ├── index/                       # ★首页（学习天数优化）
 │   │   └── index.vue
-│   ├── practice/                    # 练习页
-│   │   └── practice.vue
+│   ├── practice/                    # ★练习页（核心）
+│   │   └── practice.vue             # 异步生成、内嵌反馈、错题重做
 │   ├── vocabulary/                  # 单词本
 │   │   └── vocabulary.vue
-│   ├── question-bank/               # 题库管理
-│   │   └── question-bank.vue
+│   ├── question-bank/               # ★题库管理
+│   │   └── question-bank.vue        # 私人题库、收藏取消
 │   ├── statistics/                  # 统计页
 │   │   └── statistics.vue
+│   ├── leaderboard/                 # 排行榜
+│   │   └── leaderboard.vue
 │   ├── profile/                     # 个人中心
 │   │   └── profile.vue
-│   └── login/                       # 登录页
+│   └── login/                       # 登录注册
 │       └── login.vue
 │
 ├── utils/                           # 工具函数
-│   ├── api.js                       # API封装
+│   ├── api.js                       # API 封装
 │   └── common.js                    # 通用函数
 │
 ├── static/                          # 静态资源
 ├── .env                             # 环境变量
-├── .env.example                     # 环境变量示例
-├── package.json                     # 依赖配置
-└── README.md                        # 项目文档
+├── .env.example
+├── package.json
+└── README.md
 ```
 
 ---
@@ -688,8 +670,9 @@ Spanish-Verb-Conjugation-Practicer/
 ## 快速开始
 
 ### 1. 环境要求
-- Node.js >= 14
-- npm >= 6
+- Node.js >= 14.0
+- npm >= 6.0
+- HBuilderX (推荐) 或 uni-app CLI
 
 ### 2. 安装依赖
 ```bash
@@ -701,183 +684,208 @@ npm install
 cp .env.example .env
 ```
 
-编辑 `.env` 文件：
+编辑 `.env`：
 ```env
 PORT=3000
-JWT_SECRET=your_jwt_secret_key
-DEEPSEEK_API_KEY=your_deepseek_api_key
+JWT_SECRET=your_super_secret_key_change_this
+DEEPSEEK_API_KEY=sk-xxxxxxxxxxxxxxxxxxxxxxxx
 DEEPSEEK_API_URL=https://api.deepseek.com/v1/chat/completions
 ```
 
-### 4. 启动服务器
+### 4. 启动后端服务
 ```bash
+cd server
 npm start
 ```
 
-服务器将运行在 `http://localhost:3000`
+服务器启动信息：
+```
+💾 数据库初始化...
+   • 用户数据库: user_data.db
+   • 词库数据库: vocabulary.db
+   • 题库数据库: questions.db
+   ✓ 数据库初始化完成
 
-### 5. 前端配置
+✓ 定时任务调度器已启动 (每天凌晨0点清理超过30天的题目)
 
-修改 `utils/api.js` 中的 BASE_URL：
+============================================================
+  🚀 西班牙语动词变位练习系统
+============================================================
+  📡 服务器地址: http://localhost:3000
+  📋 健康检查: http://localhost:3000/api/health
+  ⏰ 启动时间: 2025/11/20 15:30:00
+============================================================
+```
+
+### 5. 配置前端
+修改 `utils/api.js` 的 BASE_URL：
 ```javascript
 const BASE_URL = 'http://localhost:3000/api'
 ```
 
 ### 6. 运行前端
-
-使用 HBuilderX 或 uni-app CLI 运行到浏览器/小程序/APP
-
----
-
-## API 文档
-
-### 基础配置
-```
-BASE_URL: http://362ff83b.r39.cpolar.top/api
-Authorization: Bearer {JWT_TOKEN}
-```
-
-### 主要接口
-
-#### 用户相关
-```
-POST   /api/user/register      # 注册
-POST   /api/user/login         # 登录
-GET    /api/user/info          # 获取用户信息
-PUT    /api/user/profile       # 更新个人资料
-```
-
-#### 练习相关
-```
-POST   /api/exercise/generate       # 批量生成题目
-POST   /api/exercise/generate-one   # 生成单题
-POST   /api/exercise/submit         # 提交答案
-```
-
-#### 学习记录
-```
-GET    /api/record/list         # 练习记录列表
-GET    /api/record/statistics   # 学习统计
-```
-
-#### 打卡相关
-```
-POST   /api/checkin            # 每日打卡
-GET    /api/checkin/history    # 打卡历史
-```
-
-#### 单词本
-```
-POST   /api/vocabulary/favorite/add       # 添加收藏
-POST   /api/vocabulary/favorite/remove    # 取消收藏
-GET    /api/vocabulary/favorite/check/:id # 检查收藏状态
-GET    /api/vocabulary/favorite/list      # 收藏列表
-
-POST   /api/vocabulary/wrong/add          # 添加错题
-GET    /api/vocabulary/wrong/list         # 错题列表
-```
-
-#### 题库管理
-```
-POST   /api/question/favorite      # 收藏题目到私人题库
-POST   /api/question/unfavorite    # 取消收藏题目
-GET    /api/question/my-questions  # 我的题库
-GET    /api/question/stats         # 题库统计
-```
-
----
-
-## 核心算法详解
-
-### 1. 置信度调整算法
-```javascript
-// 用户答对
-confidenceScore = Math.min(confidenceScore + 5, 100)
-
-// 用户答错
-confidenceScore = Math.max(confidenceScore - 3, 0)
-
-// 题库获取优先级
-ORDER BY confidence_score DESC, created_at DESC
-```
-
-### 2. 掌握度计算
-```javascript
-mastery_level = (correct_count / practice_count) * 10
-
-// 已掌握判定
-if (mastery_level >= 5 && practice_count >= 3) {
-  status = 'mastered'
-}
-```
-
-### 3. 连续打卡计算
-```javascript
-// 获取最近打卡记录
-const recentCheckIns = CheckIn.getRecent(userId, 100)
-
-// 倒序遍历计算连续天数
-let streakDays = 0
-let expectedDate = today
-
-for (const checkIn of recentCheckIns) {
-  if (checkIn.check_in_date === expectedDate) {
-    streakDays++
-    expectedDate = getPreviousDate(expectedDate)
-  } else {
-    break
-  }
-}
-```
-
----
-
-## 常见问题
-
-### Q: 为什么要分三个数据库？
-A: 
-1. **独立访问**：避免 DB Browser 锁定问题
-2. **职责分离**：用户数据、词库、题库各司其职
-3. **性能优化**：减小单库体积，提升查询速度
-
-### Q: AI生成的题目会被一直保留吗？
-A: 不会。定时任务每天凌晨0点清理创建超过30天的公共题目，节省存储空间。
-
-### Q: 如何确保AI生成的题目质量？
-A: 
-1. 数据完整性检查（防止 undefined）
-2. 第二个AI实例验证（语法、唯一性、自然度）
-3. 重试机制（最多3次）
-4. 置信度动态调整（答对+5，答错-3）
-
-### Q: 私人题库和公共题库的区别？
-A: 
-- **公共题库**: AI生成的共享题目，所有用户可见，会被定时清理
-- **私人题库**: 用户主动收藏的题目，永久保存，不受清理影响
+使用 HBuilderX 运行到：
+- 浏览器（推荐 Chrome）
+- 微信小程序
+- APP（需配置证书）
 
 ---
 
 ## 更新日志
 
-### v1.0.0 (2025-11-20)
+### v2.0.0 (2025-11-20)
+
+#### 🚀 性能优化
+- ✅ **异步题目生成**：题库题立即返回，AI 题后台生成，用户等待时间 ≈ 0
+- ✅ **题目去重机制**：选择题/变位题批量生成时避免重复
+- ✅ **时区问题修复**：学习天数和连续打卡计算修复 UTC/本地时间偏差
+
+#### 🎨 用户体验
+- ✅ **内嵌式答案反馈**：移除弹窗，答题后即时显示反馈（可回看题目）
+- ✅ **错题重做机制**：答错题目自动加入队列，完成后立即重做
+- ✅ **专项练习界面优化**：配色统一为紫色系，符合整体风格
+- ✅ **学习天数优化**：注册当天显示 1 天（原为 0 天）
+
+#### 📚 题库系统
+- ✅ **题目收藏与取消**：支持收藏填空题到私人题库，支持一键取消收藏
+- ✅ **双题库关联**：`private_questions` 新增 `public_question_id` 字段
+- ✅ **置信度容错**：取消收藏时检查公共题库是否存在，避免错误
+
+#### 🔧 后端优化
+- ✅ **API 日志中间件**：彩色输出、中文名称映射、执行时间统计
+- ✅ **定时任务日志美化**：清晰的步骤提示和执行结果展示
+- ✅ **启动信息优化**：美化控制台输出，显示服务器信息
+
+#### 🐛 Bug 修复
+- ✅ 修复退出登录后重新登录数据归零问题（`getUserInfo` 实时同步）
+- ✅ 修复新注册用户显示"已学习 -1 天"（`created_at` 字段返回）
+- ✅ 修复连续打卡天数计算错误（时区解析问题）
+- ✅ 修复题目收藏后无法取消的问题（`privateQuestionId` 保存）
+- ✅ 删除内嵌反馈区域的重复"错题重做"标记
+
+---
+
+### v1.0.0 (2025-11-15)
 - ✅ 完成三库分离架构
 - ✅ 实现 AI 生成与验证双模机制
 - ✅ 添加题目重试机制（最多3次）
 - ✅ 实现置信度系统
 - ✅ 添加定时清理任务
 - ✅ 修复打卡逻辑（需完成练习才能打卡）
-- ✅ 修复跨数据库查询问题
+
+---
+
+## 技术亮点
+
+### 1. 三库分离架构
+- 避免 DB Browser 锁定问题
+- 职责分离，便于维护
+- 提升查询性能
+
+### 2. AI 双模型验证
+- 生成模型保持创造性
+- 验证模型确保质量
+- 重试机制提高成功率
+
+### 3. 异步生成优化
+- 题库题立即返回
+- AI 题后台生成
+- 用户无感知体验
+
+### 4. 置信度动态调整
+- 答对 +5，答错 -3
+- 优先推荐高质量题目
+- 自动淘汰低质题目
+
+### 5. 定时清理机制
+- 每天凌晨 0 点执行
+- 删除 30 天以上题目
+- 节省存储空间
+
+### 6. 错题重做系统
+- 自动收集错题
+- 练习完成后立即巩固
+- 提高学习效率
+
+---
+
+## 常见问题
+
+### Q: 为什么要分三个数据库？
+**A**: 
+1. **避免锁定**：DB Browser 打开词库时不影响用户数据写入
+2. **职责分离**：用户数据、词库、题库各司其职
+3. **性能优化**：减小单库体积，提升查询速度
+4. **独立维护**：词库可单独导出更新
+
+### Q: AI 生成的题目会被永久保留吗？
+**A**: 不会。定时任务每天凌晨 0 点清理创建超过 30 天的公共题目，但用户收藏到私人题库的题目会永久保存。
+
+### Q: 如何确保 AI 生成的题目质量？
+**A**: 
+1. **数据完整性检查**：验证必填字段是否存在
+2. **AI 质量验证**：第二个模型验证语法、唯一性、自然度
+3. **重试机制**：最多重试 3 次
+4. **置信度调整**：答对 +5，答错 -3，动态淘汰低质题目
+5. **降级策略**：3 次失败后使用传统算法
+
+### Q: 私人题库和公共题库的区别？
+**A**: 
+| 特性 | 公共题库 | 私人题库 |
+|------|---------|---------|
+| 来源 | AI 生成 | 用户收藏 |
+| 可见性 | 所有用户 | 仅用户本人 |
+| 生命周期 | 30 天自动清理 | 永久保存 |
+| 置信度 | 动态调整 | 不参与调整 |
+| 数据库 | questions.db | user_data.db |
+
+### Q: 为什么要使用异步生成？
+**A**: 
+- **传统方式**：用户点击"开始练习" → 等待 5-10 秒 AI 生成 → 显示题目
+- **异步方式**：用户点击"开始练习" → 立即显示题库题目 → 后台生成 AI 题
+- **用户体验**：等待时间从 5-10 秒降至 0 秒
+
+### Q: 如何计算连续打卡天数？
+**A**: 
+```javascript
+// 从今天开始倒序检查
+let streak = 0
+let expectedDate = today
+
+for (checkIn of checkIns) {
+  if (checkIn.date === expectedDate) {
+    streak++
+    expectedDate = yesterday(expectedDate)
+  } else {
+    break  // 中断了
+  }
+}
+```
 
 ---
 
 ## 致谢
 
 感谢以下开源项目和服务：
-- [uni-app](https://uniapp.dcloud.io/)
-- [Express.js](https://expressjs.com/)
-- [better-sqlite3](https://github.com/WiseLibs/better-sqlite3)
-- [DeepSeek AI](https://www.deepseek.com/)
+- [uni-app](https://uniapp.dcloud.io/) - 跨平台应用框架
+- [Express.js](https://expressjs.com/) - Node.js Web 框架
+- [better-sqlite3](https://github.com/WiseLibs/better-sqlite3) - 高性能 SQLite
+- [DeepSeek AI](https://www.deepseek.com/) - AI 生成与验证
+- [node-cron](https://github.com/node-cron/node-cron) - 定时任务调度
 
 ---
 
-**Happy Learning Spanish! 🎉**
+## 开源协议
+
+MIT License
+
+---
+
+## 联系方式
+
+- 作者：kuiningzzzz
+- 仓库：[GitHub](https://github.com/kuiningzzzz/Spanish-Verb-Conjugation-Practicer)
+
+---
+
+**¡Vamos a aprender español! 🎉**
