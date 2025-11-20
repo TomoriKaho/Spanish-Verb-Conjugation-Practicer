@@ -140,19 +140,44 @@ export default {
 
         // 计算学习天数
         if (this.userInfo.created_at) {
-          const start = new Date(this.userInfo.created_at)
+          console.log('📅 原始created_at:', this.userInfo.created_at)
+          
+          // 修复时区问题：SQLite存储格式为 'YYYY-MM-DD HH:MM:SS'，需要手动解析为本地时间
+          const dateStr = this.userInfo.created_at
+          let start
+          
+          // 尝试解析日期时间格式
+          if (dateStr.includes(' ')) {
+            // 格式：'2025-11-20 15:30:00'
+            const [datePart, timePart] = dateStr.split(' ')
+            const [year, month, day] = datePart.split('-').map(Number)
+            const [hour = 0, minute = 0, second = 0] = timePart ? timePart.split(':').map(Number) : [0, 0, 0]
+            start = new Date(year, month - 1, day, hour, minute, second)
+          } else if (dateStr.includes('-')) {
+            // 格式：'2025-11-20'
+            const [year, month, day] = dateStr.split('-').map(Number)
+            start = new Date(year, month - 1, day)
+          } else {
+            // 其他格式，尝试直接解析
+            start = new Date(dateStr)
+          }
+          
           const now = new Date()
+          console.log('🕐 解析后的日期:', start)
+          console.log('🕐 当前日期:', now)
           
           // 验证日期是否有效
           if (!isNaN(start.getTime())) {
             const days = Math.floor((now - start) / (1000 * 60 * 60 * 24))
-            this.studyDays = Math.max(0, days) // 确保不会出现负数
+            this.studyDays = Math.max(1, days + 1) // 从1开始计数，今天注册显示1天
+            console.log('📊 学习天数:', this.studyDays, '天')
           } else {
-            console.error('无效的创建日期:', this.userInfo.created_at)
-            this.studyDays = 0
+            console.error('❌ 无效的创建日期:', this.userInfo.created_at)
+            this.studyDays = 1
           }
         } else {
-          this.studyDays = 0
+          console.warn('⚠️ 用户信息中没有created_at字段')
+          this.studyDays = 1
         }
       } catch (error) {
         console.error('加载数据失败:', error)
