@@ -127,7 +127,7 @@ export default {
           const checkInRes = await api.getCheckInHistory()
           console.log('📅 打卡信息返回:', checkInRes)
           if (checkInRes.success) {
-            // 使用严格的类型检查，避免0被误判为falsy
+            // 使用类型检查，避免0被误判为falsy
             this.streakDays = typeof checkInRes.streakDays === 'number' ? checkInRes.streakDays : 0
             this.hasCheckedInToday = checkInRes.hasCheckedInToday
             console.log('✅ 连续打卡天数:', this.streakDays)
@@ -207,7 +207,7 @@ export default {
       }
     },
     goToLeaderboard() {
-      uni.switchTab({
+      uni.navigateTo({
         url: '/pages/leaderboard/leaderboard'
       })
     },

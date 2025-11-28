@@ -144,18 +144,6 @@ function initUserDatabase() {
     )
   `)
 
-  // 数据迁移：为已存在的private_questions表添加public_question_id列
-  try {
-    const columns = userDb.prepare("PRAGMA table_info(private_questions)").all()
-    const hasPublicQuestionId = columns.some(col => col.name === 'public_question_id')
-    if (!hasPublicQuestionId) {
-      userDb.exec('ALTER TABLE private_questions ADD COLUMN public_question_id INTEGER')
-      console.log('   ℹ️  数据库迁移: 添加 public_question_id 列')
-    }
-  } catch (error) {
-    console.log('   ⚠️  数据库迁移失败:', error.message)
-  }
-
   // 用户答题记录表（记录每个用户对每个题目的练习次数和评价）
   userDb.exec(`
     CREATE TABLE IF NOT EXISTS user_question_records (

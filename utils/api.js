@@ -1,5 +1,7 @@
 // API基础配置
-const BASE_URL = 'http://3f4a1b22.r39.cpolar.top/api'
+// 开发环境：使用 cpolar 内网穿透地址
+// 生产环境：替换为实际服务器地址
+const BASE_URL = 'http://3841cf32.r39.cpolar.top/api'
 
 // 请求封装
 const request = (options) => {
