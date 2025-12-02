@@ -34,7 +34,7 @@ async function initSampleCourseData() {
     
     // 为第一册创建课程
     const lesson1 = Lesson.create(
-      textbook1.lastID,
+      textbook1.lastInsertRowid,
       '第一课 - 基础动词',
       1,
       '学习西班牙语最基础的动词和现在时变位',
@@ -44,7 +44,7 @@ async function initSampleCourseData() {
     );
     
     const lesson2 = Lesson.create(
-      textbook1.lastID,
+      textbook1.lastInsertRowid,
       '第二课 - 日常动词',
       2,
       '学习日常生活中常用的动词',
@@ -54,7 +54,7 @@ async function initSampleCourseData() {
     );
     
     const lesson3 = Lesson.create(
-      textbook1.lastID,
+      textbook1.lastInsertRowid,
       '第三课 - 过去时态',
       3,
       '学习简单过去时的用法',
@@ -65,7 +65,7 @@ async function initSampleCourseData() {
     
     // 为第二册创建课程
     const lesson4 = Lesson.create(
-      textbook2.lastID,
+      textbook2.lastInsertRowid,
       '第一课 - 将来时',
       1,
       '学习将来时的变位规则',
@@ -86,7 +86,7 @@ async function initSampleCourseData() {
     
     if (baseVerbs.length > 0) {
       const verbIds = baseVerbs.map(v => v.id);
-      LessonVerb.addBatch(lesson1.lastID, verbIds);
+      LessonVerb.addBatch(lesson1.lastInsertRowid, verbIds);
       console.log(`   ✓ 为第一课添加了 ${verbIds.length} 个单词`);
     }
     
@@ -99,7 +99,7 @@ async function initSampleCourseData() {
     
     if (dailyVerbs.length > 0) {
       const verbIds = dailyVerbs.map(v => v.id);
-      LessonVerb.addBatch(lesson2.lastID, verbIds);
+      LessonVerb.addBatch(lesson2.lastInsertRowid, verbIds);
       console.log(`   ✓ 为第二课添加了 ${verbIds.length} 个单词`);
     }
     
@@ -112,7 +112,7 @@ async function initSampleCourseData() {
     
     if (pastVerbs.length > 0) {
       const verbIds = pastVerbs.map(v => v.id);
-      LessonVerb.addBatch(lesson3.lastID, verbIds);
+      LessonVerb.addBatch(lesson3.lastInsertRowid, verbIds);
       console.log(`   ✓ 为第三课添加了 ${verbIds.length} 个单词`);
     }
     
@@ -125,7 +125,7 @@ async function initSampleCourseData() {
     
     if (futureVerbs.length > 0) {
       const verbIds = futureVerbs.map(v => v.id);
-      LessonVerb.addBatch(lesson4.lastID, verbIds);
+      LessonVerb.addBatch(lesson4.lastInsertRowid, verbIds);
       console.log(`   ✓ 为第四课添加了 ${verbIds.length} 个单词`);
     }
     
