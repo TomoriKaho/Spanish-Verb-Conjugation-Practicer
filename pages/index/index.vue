@@ -36,8 +36,10 @@
     </view>
 
     <view class="action-buttons">
-      <button class="btn-primary" @click="goToCourse">课程练习</button>
-      <button class="btn-primary mt-20" @click="startPractice">开始练习</button>
+      <view class="button-row">
+        <button class="btn-primary half-width" @click="goToCourse">课程练习</button>
+        <button class="btn-primary half-width" @click="startPractice">单词练习</button>
+      </view>
       <button class="btn-secondary mt-20" @click="checkIn" v-if="!hasCheckedInToday">每日打卡</button>
       <view class="checked-in-tip mt-20" v-else>
         <text>✓ 今日已打卡</text>
@@ -313,6 +315,16 @@ export default {
 
 .action-buttons {
   padding: 20rpx 0;
+}
+
+.button-row {
+  display: flex;
+  gap: 20rpx;
+}
+
+.half-width {
+  flex: 1;
+  margin: 0;
 }
 
 .checked-in-tip {

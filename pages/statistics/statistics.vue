@@ -1,12 +1,5 @@
 <template>
   <view class="container">
-    <!-- 背景装饰 -->
-    <view class="background-stats">
-      <view class="stat-circle circle-1"></view>
-      <view class="stat-circle circle-2"></view>
-      <view class="stat-circle circle-3"></view>
-    </view>
-
     <!-- 页面标题 -->
     <view class="page-header">
       <text class="page-title">学习统计</text>
@@ -23,10 +16,6 @@
           <view class="stat-content">
             <text class="stat-value">{{ stat.value }}</text>
             <text class="stat-label">{{ stat.label }}</text>
-          </view>
-          <view class="stat-trend" :class="stat.trend">
-            <text class="trend-icon">{{ stat.trend === 'up' ? '📈' : '📉' }}</text>
-            <text class="trend-value">{{ stat.change }}%</text>
           </view>
         </view>
       </view>
@@ -219,8 +208,6 @@ export default {
           icon: '📝',
           label: '总练习题数',
           value: this.totalStats.total_exercises || 0,
-          trend: 'up',
-          change: 12,
           color: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
         },
         {
@@ -228,8 +215,6 @@ export default {
           icon: '✅',
           label: '答对题数',
           value: this.totalStats.correct_exercises || 0,
-          trend: 'up',
-          change: 8,
           color: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)'
         },
         {
@@ -237,8 +222,6 @@ export default {
           icon: '📚',
           label: '练习动词',
           value: this.totalStats.practiced_verbs || 0,
-          trend: 'up',
-          change: 5,
           color: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)'
         },
         {
@@ -246,8 +229,6 @@ export default {
           icon: '📅',
           label: '练习天数',
           value: this.totalStats.practice_days || 0,
-          trend: 'up',
-          change: 15,
           color: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)'
         }
       ]
@@ -325,42 +306,6 @@ export default {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   position: relative;
   overflow-x: hidden;
-}
-
-.background-stats {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  pointer-events: none;
-}
-
-.stat-circle {
-  position: absolute;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.1);
-}
-
-.circle-1 {
-  width: 200rpx;
-  height: 200rpx;
-  top: 10%;
-  right: -100rpx;
-}
-
-.circle-2 {
-  width: 150rpx;
-  height: 150rpx;
-  bottom: 20%;
-  left: -75rpx;
-}
-
-.circle-3 {
-  width: 100rpx;
-  height: 100rpx;
-  top: 50%;
-  right: 20%;
 }
 
 .page-header {
@@ -444,26 +389,6 @@ export default {
   display: block;
   font-size: 24rpx;
   color: #666;
-}
-
-.stat-trend {
-  display: flex;
-  align-items: center;
-  gap: 5rpx;
-  padding: 8rpx 12rpx;
-  border-radius: 15rpx;
-  font-size: 20rpx;
-  font-weight: bold;
-}
-
-.stat-trend.up {
-  background: rgba(76, 175, 80, 0.1);
-  color: #4caf50;
-}
-
-.stat-trend.down {
-  background: rgba(244, 67, 54, 0.1);
-  color: #f44336;
 }
 
 /* 正确率分析 */

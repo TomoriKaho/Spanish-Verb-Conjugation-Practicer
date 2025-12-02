@@ -1,33 +1,30 @@
 <template>
   <view class="container">
-    <!-- 背景装饰 -->
-    <view class="profile-background">
-      <view class="bg-shape shape-1"></view>
-      <view class="bg-shape shape-2"></view>
-      <view class="bg-shape shape-3"></view>
-    </view>
-
-    <!-- 用户头像区域 -->
-    <view class="profile-header">
-      <view class="header-background"></view>
-      <view class="user-avatar-section">
-        <view class="avatar-container">
-          <view class="avatar-wrapper">
-            <text class="avatar-text">{{ avatarText }}</text>
-            <view class="avatar-badge" v-if="userInfo && userInfo.isVIP">VIP</view>
-          </view>
-          <view class="camera-icon" @click="changeAvatar">📷</view>
-        </view>
-        <view class="user-info">
-          <text class="username">{{ userInfo && userInfo.username }}</text>
-          <view class="user-tags">
-            <view class="user-tag" :class="userTypeClass">
-              <text class="tag-icon">{{ userTypeIcon }}</text>
-              <text class="tag-text">{{ userTypeText }}</text>
+    <!-- 用户资料卡片 -->
+    <view class="profile-card">
+      <view class="profile-background">
+        <view class="gradient-overlay"></view>
+      </view>
+      <view class="profile-content">
+        <view class="user-avatar-section">
+          <view class="avatar-container">
+            <view class="avatar-wrapper">
+              <text class="avatar-text">{{ avatarText }}</text>
+              <view class="avatar-badge" v-if="userInfo && userInfo.isVIP">VIP</view>
             </view>
-            <view class="user-tag streak" v-if="streakDays > 0">
-              <text class="tag-icon">🔥</text>
-              <text class="tag-text">连续 {{ streakDays }} 天</text>
+            <view class="camera-icon" @click="changeAvatar">📷</view>
+          </view>
+          <view class="user-info">
+            <text class="username">{{ userInfo && userInfo.username }}</text>
+            <view class="user-tags">
+              <view class="user-tag" :class="userTypeClass">
+                <text class="tag-icon">{{ userTypeIcon }}</text>
+                <text class="tag-text">{{ userTypeText }}</text>
+              </view>
+              <view class="user-tag streak" v-if="streakDays > 0">
+                <text class="tag-icon">🔥</text>
+                <text class="tag-text">连续 {{ streakDays }} 天</text>
+              </view>
             </view>
           </view>
         </view>
@@ -36,7 +33,6 @@
 
     <!-- 学习成就 -->
     <view class="achievement-section">
-      <view class="section-title">学习成就</view>
       <view class="achievement-grid">
         <view class="achievement-item">
           <view class="achievement-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
@@ -363,8 +359,18 @@ export default {
 .container {
   min-height: 100vh;
   background: #f8f9fa;
+  padding: 30rpx 40rpx 40rpx;
+}
+
+/* 个人资料卡片 */
+.profile-card {
+  background: #fff;
+  border-radius: 25rpx;
+  overflow: hidden;
+  box-shadow: 0 10rpx 30rpx rgba(0, 0, 0, 0.08);
+  border: 1rpx solid #f0f0f0;
+  margin-bottom: 30rpx;
   position: relative;
-  overflow-x: hidden;
 }
 
 .profile-background {
@@ -372,54 +378,37 @@ export default {
   top: 0;
   left: 0;
   right: 0;
-  height: 400rpx;
+  height: 200rpx;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   z-index: 0;
 }
 
-.bg-shape {
+.gradient-overlay {
   position: absolute;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.1);
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    45deg,
+    rgba(255, 255, 255, 0.05) 25%,
+    transparent 25%,
+    transparent 75%,
+    rgba(255, 255, 255, 0.05) 75%
+  );
+  background-size: 60rpx 60rpx;
+  opacity: 0.3;
 }
 
-.shape-1 {
-  width: 200rpx;
-  height: 200rpx;
-  top: -100rpx;
-  right: -100rpx;
-}
-
-.shape-2 {
-  width: 150rpx;
-  height: 150rpx;
-  top: 50%;
-  left: -75rpx;
-}
-
-.shape-3 {
-  width: 100rpx;
-  height: 100rpx;
-  bottom: 50rpx;
-  right: 20%;
-}
-
-/* 用户头像区域 */
-.profile-header {
+.profile-content {
   position: relative;
   z-index: 1;
-}
-
-.header-background {
-  height: 200rpx;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 40rpx 40rpx 30rpx 40rpx;
 }
 
 .user-avatar-section {
-  padding: 0 40rpx;
-  margin-top: -80rpx;
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   gap: 30rpx;
 }
 
@@ -428,19 +417,19 @@ export default {
 }
 
 .avatar-wrapper {
-  width: 160rpx;
-  height: 160rpx;
-  border-radius: 30rpx;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 25rpx;
+  background: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 48rpx;
+  font-size: 40rpx;
   font-weight: bold;
-  color: #fff;
-  box-shadow: 0 20rpx 40rpx rgba(0, 0, 0, 0.2);
+  color: #667eea;
+  box-shadow: 0 8rpx 20rpx rgba(0, 0, 0, 0.1);
   position: relative;
-  border: 4rpx solid #fff;
+  border: 3rpx solid #f0f0f0;
 }
 
 .avatar-badge {
@@ -458,28 +447,27 @@ export default {
 
 .camera-icon {
   position: absolute;
-  bottom: -10rpx;
-  right: -10rpx;
-  width: 50rpx;
-  height: 50rpx;
-  background: #fff;
+  bottom: -8rpx;
+  right: -8rpx;
+  width: 44rpx;
+  height: 44rpx;
+  background: #667eea;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 24rpx;
-  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.15);
-  border: 2rpx solid #f0f0f0;
+  font-size: 20rpx;
+  box-shadow: 0 4rpx 12rpx rgba(102, 126, 234, 0.3);
+  border: 2rpx solid #fff;
 }
 
 .user-info {
   flex: 1;
-  padding-bottom: 20rpx;
 }
 
 .username {
   display: block;
-  font-size: 36rpx;
+  font-size: 32rpx;
   font-weight: bold;
   color: #fff;
   margin-bottom: 15rpx;
@@ -502,20 +490,17 @@ export default {
 }
 
 .user-tag.student {
-  background: rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(10px);
+  background: #3c622c;
   color: #fff;
 }
 
 .user-tag.public {
-  background: rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(10px);
+  background: #764ba2;
   color: #fff;
 }
 
 .user-tag.streak {
-  background: rgba(255, 107, 107, 0.2);
-  backdrop-filter: blur(10px);
+  background: #ff6b6b;
   color: #fff;
 }
 
@@ -525,17 +510,7 @@ export default {
 
 /* 学习成就 */
 .achievement-section {
-  padding: 40rpx 40rpx 20rpx;
-  position: relative;
-  z-index: 1;
-}
-
-.section-title {
-  display: block;
-  font-size: 32rpx;
-  font-weight: bold;
-  color: #333;
-  margin-bottom: 30rpx;
+  padding: 0 0 20rpx;
 }
 
 .achievement-grid {
@@ -587,7 +562,7 @@ export default {
 
 /* 个人信息 */
 .info-section {
-  padding: 20rpx 40rpx;
+  padding: 0 0 20rpx;
 }
 
 .info-card {
@@ -666,7 +641,7 @@ export default {
 
 /* 订阅信息 */
 .subscription-section {
-  padding: 20rpx 40rpx;
+  padding: 0 0 20rpx;
 }
 
 .subscription-card {
@@ -735,7 +710,7 @@ export default {
 
 /* 功能菜单 */
 .menu-section {
-  padding: 20rpx 40rpx;
+  padding: 0 0 20rpx;
 }
 
 .menu-card {
@@ -795,7 +770,7 @@ export default {
 
 /* 退出登录 */
 .logout-section {
-  padding: 30rpx 40rpx 40rpx;
+  padding: 0 0 40rpx;
 }
 
 .logout-button {
