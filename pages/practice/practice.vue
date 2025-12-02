@@ -55,7 +55,7 @@
         <text class="meaning">{{ currentExercise.meaning }}</text>
       </view>
 
-      <view class="question-section">
+      <view v-if="exerciseType !== 'sentence'" class="question-section">
         <text class="tense-info">{{ currentExercise.mood }} - {{ currentExercise.tense }}</text>
         <text class="person-info">{{ currentExercise.person }}</text>
       </view>
