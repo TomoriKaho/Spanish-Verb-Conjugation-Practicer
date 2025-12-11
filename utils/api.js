@@ -1,7 +1,7 @@
 // API基础配置
 // 开发环境：使用 cpolar 内网穿透地址
 // 生产环境：替换为实际服务器地址
-const BASE_URL = 'http://7c66324f.r39.cpolar.top/api'
+const BASE_URL = 'http://2fde56bc.r39.cpolar.top/api'
 
 // 请求封装
 const request = (options) => {
@@ -60,6 +60,7 @@ const request = (options) => {
 // API接口
 export default {
   // 用户相关
+  sendVerificationCode: (data) => request({ url: '/user/send-verification-code', method: 'POST', data }),
   register: (data) => request({ url: '/user/register', method: 'POST', data }),
   login: (data) => request({ url: '/user/login', method: 'POST', data }),
   getUserInfo: () => request({ url: '/user/info' }),

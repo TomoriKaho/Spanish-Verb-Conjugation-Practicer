@@ -1,16 +1,120 @@
 const express = require('express')
 const router = express.Router()
 const User = require('../models/User')
+const VerificationCode = require('../models/VerificationCode')
+const emailService = require('../services/emailService')
 const { generateToken } = require('../middleware/auth')
+
+/**
+ * 生成6位随机验证码
+ */
+function generateVerificationCode() {
+  return Math.floor(100000 + Math.random() * 900000).toString()
+}
+
+/**
+ * 发送验证码
+ */
+router.post('/send-verification-code', async (req, res) => {
+  try {
+    const { email } = req.body
+
+    // 验证邮箱格式
+    if (!email || !email.trim()) {
+      return res.status(400).json({ error: '请输入邮箱地址' })
+    }
+
+    const trimmedEmail = email.trim().toLowerCase()
+
+    // 验证必须是edu.cn结尾
+    if (!trimmedEmail.endsWith('edu.cn')) {
+      return res.status(400).json({ error: '学生认证邮箱必须以edu.cn结尾' })
+    }
+
+    // 检查邮箱是否已被注册
+    const existingUser = User.findByEmail(trimmedEmail)
+    if (existingUser) {
+      return res.status(400).json({ error: '该邮箱已被注册' })
+    }
+
+    // 检查是否可以发送（防止频繁发送）
+    const { canSend, waitTime } = VerificationCode.canSend(trimmedEmail, 60)
+    if (!canSend) {
+      return res.status(429).json({ 
+        error: `请${waitTime}秒后再试`,
+        waitTime 
+      })
+    }
+
+    // 生成验证码
+    const code = generateVerificationCode()
+
+    // 保存验证码到数据库（有效期2分钟）
+    VerificationCode.create(trimmedEmail, code, 2)
+
+    // 发送邮件
+    try {
+      await emailService.sendVerificationCode(trimmedEmail, code)
+      
+      res.json({
+        success: true,
+        message: '验证码已发送，请查收邮件',
+        expiresIn: 120 // 2分钟
+      })
+    } catch (emailError) {
+      console.error('邮件发送失败:', emailError.message)
+      
+      // 根据错误信息提供更友好的提示
+      let errorMsg = emailError.message
+      
+      if (errorMsg.includes('未配置')) {
+        errorMsg = '邮箱服务未配置，请联系管理员'
+      } else if (errorMsg.includes('认证失败')) {
+        errorMsg = '邮箱服务配置错误，请联系管理员'
+      }
+      
+      return res.status(500).json({ 
+        error: errorMsg
+      })
+    }
+  } catch (error) {
+    console.error('发送验证码错误:', error)
+    res.status(500).json({ error: '发送验证码失败，请稍后重试' })
+  }
+})
 
 // 用户注册
 router.post('/register', (req, res) => {
   try {
-    const { username, password, email, school, enrollmentYear, userType } = req.body
+    const { username, password, email, school, enrollmentYear, userType, verificationCode } = req.body
 
     // 验证必填字段
     if (!username || !password) {
       return res.status(400).json({ error: '用户名和密码不能为空' })
+    }
+
+    // 学生身份需要邮箱认证
+    if (userType === 'student') {
+      if (!email || !email.trim()) {
+        return res.status(400).json({ error: '学生身份必须提供认证邮箱' })
+      }
+
+      const trimmedEmail = email.trim().toLowerCase()
+
+      // 验证必须是edu.cn结尾
+      if (!trimmedEmail.endsWith('edu.cn')) {
+        return res.status(400).json({ error: '学生认证邮箱必须以edu.cn结尾' })
+      }
+
+      // 验证验证码
+      if (!verificationCode) {
+        return res.status(400).json({ error: '请输入邮箱验证码' })
+      }
+
+      const verification = VerificationCode.verify(trimmedEmail, verificationCode)
+      if (!verification.valid) {
+        return res.status(400).json({ error: verification.message })
+      }
     }
 
     // 检查用户名是否已存在
@@ -31,7 +135,7 @@ router.post('/register', (req, res) => {
     const userId = User.create({
       username,
       password,
-      email,
+      email: email ? email.trim().toLowerCase() : null,
       school,
       enrollmentYear,
       userType: userType || 'student'

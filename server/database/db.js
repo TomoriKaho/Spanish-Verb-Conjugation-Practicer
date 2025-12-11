@@ -123,6 +123,24 @@ function initUserDatabase() {
     )
   `)
 
+  // 验证码表（用于学生邮箱认证）
+  userDb.exec(`
+    CREATE TABLE IF NOT EXISTS verification_codes (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      email TEXT NOT NULL,
+      code TEXT NOT NULL,
+      expires_at TEXT NOT NULL,
+      used INTEGER DEFAULT 0,
+      created_at TEXT DEFAULT (datetime('now', 'localtime'))
+    )
+  `)
+
+  // 创建索引以提高查询效率
+  userDb.exec(`
+    CREATE INDEX IF NOT EXISTS idx_verification_email 
+    ON verification_codes(email)
+  `)
+
   // 私人题库表（用户收藏的题目）
   userDb.exec(`
     CREATE TABLE IF NOT EXISTS private_questions (

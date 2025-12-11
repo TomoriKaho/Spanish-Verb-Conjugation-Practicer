@@ -27,7 +27,39 @@
         </view>
 
         <view v-if="!isLogin">
-          <view class="form-item">
+          <view class="form-item" v-if="formData.userType === 'student'">
+            <text class="label required">认证邮箱（必填）</text>
+            <view class="input-with-button">
+              <input 
+                class="input flex-input" 
+                v-model="formData.email" 
+                placeholder="请输入edu.cn结尾的学生邮箱" 
+                :disabled="codeCountdown > 0"
+              />
+              <button 
+                class="code-button" 
+                @click="sendCode" 
+                :disabled="codeCountdown > 0 || !isValidEmail"
+              >
+                {{ codeButtonText }}
+              </button>
+            </view>
+            <text class="hint-text">学生身份需要edu.cn邮箱认证</text>
+          </view>
+
+          <view class="form-item" v-if="formData.userType === 'student'">
+            <text class="label required">邮箱验证码</text>
+            <input 
+              class="input" 
+              type="number" 
+              maxlength="6"
+              v-model="formData.verificationCode" 
+              placeholder="请输入6位验证码" 
+            />
+            <text class="hint-text">验证码有效期2分钟</text>
+          </view>
+
+          <view class="form-item" v-if="formData.userType === 'public'">
             <text class="label">邮箱</text>
             <input class="input" v-model="formData.email" placeholder="请输入邮箱（选填）" />
           </view>
@@ -43,7 +75,7 @@
           </view>
 
           <view class="form-item">
-            <text class="label">用户类型</text>
+            <text class="label required">用户类型</text>
             <picker @change="onUserTypeChange" :value="userTypeIndex" :range="userTypes" range-key="label">
               <view class="picker">
                 {{ userTypes[userTypeIndex].label }}
@@ -79,13 +111,33 @@ export default {
         email: '',
         school: '',
         enrollmentYear: '',
-        userType: 'student'
+        userType: 'student',
+        verificationCode: ''
       },
       userTypes: [
         { value: 'student', label: '学生' },
         { value: 'public', label: '社会人士' }
       ],
-      userTypeIndex: 0
+      userTypeIndex: 0,
+      codeCountdown: 0,
+      countdownTimer: null
+    }
+  },
+  computed: {
+    isValidEmail() {
+      const email = this.formData.email
+      return email && email.trim().toLowerCase().endsWith('edu.cn')
+    },
+    codeButtonText() {
+      if (this.codeCountdown > 0) {
+        return `${this.codeCountdown}秒后重试`
+      }
+      return '发送验证码'
+    }
+  },
+  beforeDestroy() {
+    if (this.countdownTimer) {
+      clearInterval(this.countdownTimer)
     }
   },
   methods: {
@@ -97,17 +149,92 @@ export default {
         email: '',
         school: '',
         enrollmentYear: '',
-        userType: 'student'
+        userType: 'student',
+        verificationCode: ''
+      }
+      this.codeCountdown = 0
+      if (this.countdownTimer) {
+        clearInterval(this.countdownTimer)
       }
     },
     onUserTypeChange(e) {
       this.userTypeIndex = e.detail.value
       this.formData.userType = this.userTypes[e.detail.value].value
+      // 切换用户类型时清空验证码相关
+      if (this.formData.userType === 'public') {
+        this.formData.verificationCode = ''
+        this.codeCountdown = 0
+        if (this.countdownTimer) {
+          clearInterval(this.countdownTimer)
+        }
+      }
+    },
+    async sendCode() {
+      if (!this.isValidEmail) {
+        showToast('请输入edu.cn结尾的学生邮箱')
+        return
+      }
+
+      if (this.codeCountdown > 0) {
+        return
+      }
+
+      showLoading('发送中...')
+
+      try {
+        const res = await api.sendVerificationCode({ 
+          email: this.formData.email.trim() 
+        })
+
+        hideLoading()
+
+        if (res.success) {
+          showToast('验证码已发送，请查收邮件', 'success')
+          
+          // 开始倒计时
+          this.codeCountdown = 60
+          this.countdownTimer = setInterval(() => {
+            this.codeCountdown--
+            if (this.codeCountdown <= 0) {
+              clearInterval(this.countdownTimer)
+              this.countdownTimer = null
+            }
+          }, 1000)
+        } else {
+          showToast(res.error || '发送失败')
+        }
+      } catch (error) {
+        hideLoading()
+        console.error('发送验证码错误:', error)
+        if (error.waitTime) {
+          showToast(`请${error.waitTime}秒后再试`)
+        } else {
+          showToast(error.error || '发送失败，请稍后重试')
+        }
+      }
     },
     async handleSubmit() {
       if (!this.formData.username || !this.formData.password) {
         showToast('请填写用户名和密码')
         return
+      }
+
+      // 注册时的额外验证
+      if (!this.isLogin) {
+        if (this.formData.userType === 'student') {
+          if (!this.isValidEmail) {
+            showToast('学生身份需要edu.cn结尾的邮箱')
+            return
+          }
+          if (!this.formData.verificationCode) {
+            showToast('请输入邮箱验证码')
+            return
+          }
+          if (this.formData.verificationCode.length !== 6) {
+            showToast('验证码应为6位数字')
+            return
+          }
+        }
       }
 
       showLoading(this.isLogin ? '登录中...' : '注册中...')
@@ -215,6 +342,21 @@ export default {
   margin-bottom: 15rpx;
 }
 
+.label.required::after {
+  content: ' *';
+  color: #ff4d4f;
+}
+
+.input-with-button {
+  display: flex;
+  gap: 15rpx;
+  align-items: center;
+}
+
+.flex-input {
+  flex: 1;
+}
+
 .input {
   width: 100%;
   height: 80rpx;
@@ -222,6 +364,30 @@ export default {
   border-radius: 12rpx;
   padding: 0 20rpx;
   font-size: 28rpx;
+}
+
+.code-button {
+  height: 80rpx;
+  padding: 0 25rpx;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+  border: none;
+  border-radius: 12rpx;
+  font-size: 24rpx;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.code-button[disabled] {
+  background: #ccc;
+  color: #999;
+}
+
+.hint-text {
+  display: block;
+  font-size: 22rpx;
+  color: #999;
+  margin-top: 10rpx;
 }
 
 .picker {

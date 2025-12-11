@@ -1,6 +1,7 @@
 const express = require('express')
 const cors = require('cors')
-require('dotenv').config()
+const path = require('path')
+require('dotenv').config({ path: path.join(__dirname, '.env') })
 const { initDatabase } = require('./database/db')
 const { initSampleData } = require('./data/initData')
 const apiLogger = require('./middleware/logger')
@@ -70,14 +71,26 @@ app.use((req, res) => {
 })
 
 // 启动服务器
-app.listen(PORT, () => {
-  console.log('\n' + '='.repeat(60))
-  console.log('  🚀 \x1b[32m西班牙语动词变位练习系统\x1b[0m')
-  console.log('='.repeat(60))
-  console.log(`  📡 服务器地址: \x1b[36mhttp://localhost:${PORT}\x1b[0m`)
-  console.log(`  📋 健康检查: \x1b[36mhttp://localhost:${PORT}/api/health\x1b[0m`)
-  console.log(`  ⏰ 启动时间: ${new Date().toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' })}`)
-  console.log('='.repeat(60) + '\n')
-})
+const startServer = async () => {
+  app.listen(PORT, async () => {
+    console.log('\n' + '='.repeat(60))
+    console.log('  🚀 \x1b[32m西班牙语动词变位练习系统\x1b[0m')
+    console.log('='.repeat(60))
+    console.log(`  📡 服务器地址: \x1b[36mhttp://localhost:${PORT}\x1b[0m`)
+    console.log(`  📋 健康检查: \x1b[36mhttp://localhost:${PORT}/api/health\x1b[0m`)
+    console.log(`  ⏰ 启动时间: ${new Date().toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' })}`)
+    console.log('='.repeat(60) + '\n')
+    
+    // 测试邮件服务连接
+    try {
+      const emailService = require('./services/emailService')
+      await emailService.verifyConnection()
+    } catch (error) {
+      console.log('\x1b[33m   ⚠ 邮件服务测试失败:\x1b[0m', error.message)
+    }
+  })
+}
+
+startServer()
 
 module.exports = app
