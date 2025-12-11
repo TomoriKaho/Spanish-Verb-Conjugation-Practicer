@@ -203,6 +203,50 @@
       </view>
     </view>
 
+    <!-- 练习总结弹窗 -->
+    <view class="modal" v-if="showSummary">
+      <view class="modal-content summary" @click.stop>
+        <text class="summary-title">🎯 本次练习总结</text>
+        
+        <view class="summary-stats">
+          <view class="summary-row">
+            <text class="summary-label">总题数：</text>
+            <text class="summary-value">{{ summaryData.total }} 题</text>
+          </view>
+          <view class="summary-row success">
+            <text class="summary-label">答对：</text>
+            <text class="summary-value">{{ summaryData.correct }} 题</text>
+          </view>
+          <view class="summary-row error">
+            <text class="summary-label">答错：</text>
+            <text class="summary-value">{{ summaryData.wrong }} 题</text>
+          </view>
+          <view class="summary-row accuracy">
+            <text class="summary-label">正确率：</text>
+            <text class="summary-value highlight">{{ summaryData.accuracy }}%</text>
+          </view>
+        </view>
+        
+        <view class="summary-divider"></view>
+        
+        <view class="summary-question" v-if="wrongExercises.length > 0">
+          <text class="question-icon">❓</text>
+          <text class="question-text">发现 {{ wrongExercises.length }} 道错题，是否进行错题重做？</text>
+        </view>
+        
+        <view class="summary-actions">
+          <button class="btn-primary" @click="startRetryWrong" v-if="wrongExercises.length > 0">
+            <text class="btn-icon">🔄</text>
+            <text>重做错题</text>
+          </button>
+          <button class="btn-secondary" @click="skipRetryAndFinish">
+            <text class="btn-icon">✓</text>
+            <text>{{ wrongExercises.length > 0 ? '跳过' : '完成' }}</text>
+          </button>
+        </view>
+      </view>
+    </view>
+
     <!-- 完成练习 -->
     <view class="modal" v-if="showResult" @click="finishPractice">
       <view class="modal-content result" @click.stop>
@@ -417,7 +461,16 @@ export default {
       showCustomMessage: false,
       customMessageText: '',
       messageType: 'success',  // 'success' 或 'error'
-      messageTimer: null
+      messageTimer: null,
+      
+      // 练习总结弹窗
+      showSummary: false,  // 显示总结弹窗
+      summaryData: {       // 总结数据
+        total: 0,
+        correct: 0,
+        wrong: 0,
+        accuracy: 0
+      }
     }
   },
   onLoad(options) {
@@ -1055,18 +1108,9 @@ export default {
 
       // 检查是否完成所有初始题目（但还有错题需要重做）
       if (this.totalAnswered >= this.exerciseCount && this.wrongExercises.length > 0) {
-        // 开始重做错题
-        console.log('开始重做错题，共', this.wrongExercises.length, '题')
-        // 将错题添加到exercises数组
-        this.exercises.push(...this.wrongExercises)
-        // 清空错题队列
-        this.wrongExercises = []
-        // 更新总题数
-        this.exerciseCount = this.exercises.length
-        // 继续下一题
-        this.currentIndex++
-        this.checkFavoriteStatus()
-        this.checkQuestionFavoriteStatus()
+        // 显示练习总结弹窗，让用户选择是否重做错题
+        console.log('完成原有题目，有', this.wrongExercises.length, '道错题')
+        this.showPracticeSummary()
         return
       }
 
@@ -1131,8 +1175,53 @@ export default {
         }
       }
     },
+    // 显示练习总结弹窗
+    showPracticeSummary() {
+      const initialCorrect = this.correctCount
+      const initialTotal = this.exerciseCount
+      const initialWrong = initialTotal - initialCorrect
+      const accuracy = initialTotal > 0 ? Math.round((initialCorrect / initialTotal) * 100) : 0
+      
+      this.summaryData = {
+        total: initialTotal,
+        correct: initialCorrect,
+        wrong: initialWrong,
+        accuracy: accuracy
+      }
+      
+      this.showSummary = true
+    },
+    
+    // 选择重做错题
+    startRetryWrong() {
+      this.showSummary = false
+      console.log('开始重做错题，共', this.wrongExercises.length, '题')
+      
+      // 将错题添加到exercises数组
+      this.exercises.push(...this.wrongExercises)
+      // 清空错题队列
+      this.wrongExercises = []
+      // 更新总题数
+      this.exerciseCount = this.exercises.length
+      // 继续下一题
+      this.currentIndex++
+      this.checkFavoriteStatus()
+      this.checkQuestionFavoriteStatus()
+    },
+    
+    // 跳过错题重做，直接完成
+    skipRetryAndFinish() {
+      this.showSummary = false
+      // 清空错题队列
+      this.wrongExercises = []
+      this.wrongExercisesSet.clear()
+      // 显示最终结果
+      this.showResult = true
+    },
+    
     finishPractice() {
       this.showResult = false
+      this.showSummary = false
       this.hasStarted = false
       this.exercises = []
       this.currentIndex = 0
@@ -1140,6 +1229,8 @@ export default {
       this.totalAnswered = 0
       this.generatingCount = 0
       this.generationError = false
+      this.wrongExercises = []
+      this.wrongExercisesSet.clear()
     },
     restartPractice() {
       this.showResult = false
@@ -2306,6 +2397,110 @@ slider {
   border-radius: 12rpx;
   padding: 0 20rpx;
   line-height: 80rpx;
+  font-size: 28rpx;
+}
+
+/* 练习总结弹窗样式 */
+.modal-content.summary {
+  padding: 50rpx 40rpx;
+}
+
+.summary-title {
+  display: block;
+  text-align: center;
+  font-size: 38rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 40rpx;
+}
+
+.summary-stats {
+  margin-bottom: 30rpx;
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20rpx 0;
+  border-bottom: 2rpx solid #f0f0f0;
+}
+
+.summary-row:last-child {
+  border-bottom: none;
+}
+
+.summary-label {
+  font-size: 28rpx;
+  color: #666;
+}
+
+.summary-value {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #333;
+}
+
+.summary-row.success .summary-value {
+  color: #52c41a;
+}
+
+.summary-row.error .summary-value {
+  color: #ff4d4f;
+}
+
+.summary-row.accuracy .summary-value.highlight {
+  font-size: 36rpx;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.summary-divider {
+  height: 2rpx;
+  background: linear-gradient(90deg, transparent, #e0e0e0, transparent);
+  margin: 30rpx 0;
+}
+
+.summary-question {
+  background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+  border-left: 6rpx solid #ff9800;
+  padding: 25rpx;
+  border-radius: 12rpx;
+  display: flex;
+  align-items: center;
+  margin-bottom: 30rpx;
+}
+
+.question-icon {
+  font-size: 32rpx;
+  margin-right: 15rpx;
+  flex-shrink: 0;
+}
+
+.question-text {
+  font-size: 28rpx;
+  color: #e65100;
+  font-weight: 500;
+  line-height: 1.6;
+}
+
+.summary-actions {
+  display: flex;
+  gap: 20rpx;
+  margin-top: 10rpx;
+}
+
+.summary-actions button {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10rpx;
+}
+
+.summary-actions .btn-icon {
   font-size: 28rpx;
 }
 </style>
