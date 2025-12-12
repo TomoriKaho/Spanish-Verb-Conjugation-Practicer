@@ -1194,8 +1194,8 @@ export default {
           }
           this.totalAnswered++
           
-          // 如果是例句填空（AI生成题或题库题），显示评价按钮
-          if (this.exerciseType === 'sentence') {
+          // 如果是例句填空且是错题重做，显示评价按钮
+          if (this.exerciseType === 'sentence' && this.currentExercise.isRetry) {
             // 只有AI生成的题目或题库题目才显示评价按钮
             if (this.currentExercise.aiGenerated || this.currentExercise.fromQuestionBank) {
               this.showRatingButtons = true

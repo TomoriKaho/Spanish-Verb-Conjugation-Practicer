@@ -48,6 +48,17 @@ class CheckIn {
     let streak = 0
     const today = new Date()
     today.setHours(0, 0, 0, 0)
+    
+    // 检查今天是否打卡（使用本地时间格式）
+    const year = today.getFullYear()
+    const month = String(today.getMonth() + 1).padStart(2, '0')
+    const day = String(today.getDate()).padStart(2, '0')
+    const todayStr = `${year}-${month}-${day}`
+    
+    const hasTodayCheckIn = records[0].check_in_date === todayStr
+    
+    // 如果今天没打卡，从昨天开始计算（偏移量为1）
+    const startOffset = hasTodayCheckIn ? 0 : 1
 
     for (let i = 0; i < records.length; i++) {
       // 修复时区问题：使用本地时间解析日期字符串
@@ -56,7 +67,7 @@ class CheckIn {
       const checkInDate = new Date(year, month - 1, day)
       
       const expectedDate = new Date(today)
-      expectedDate.setDate(today.getDate() - i)
+      expectedDate.setDate(today.getDate() - (i + startOffset))
       expectedDate.setHours(0, 0, 0, 0)
 
       if (checkInDate.getTime() === expectedDate.getTime()) {
