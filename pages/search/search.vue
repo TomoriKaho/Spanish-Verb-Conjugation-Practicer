@@ -33,6 +33,12 @@
             <text v-if="verb.isIrregular" class="irregular-badge">不规则</text>
           </view>
           <text class="verb-meaning">{{ verb.meaning }}</text>
+          <!-- 如果是通过变位形式匹配的，显示匹配的变位 -->
+          <view v-if="verb.matchedForm" class="matched-form-info">
+            <text class="matched-form-label">匹配变位：</text>
+            <text class="matched-form-text">{{ verb.matchedForm }}</text>
+            <text class="original-verb-label">原型：{{ verb.infinitive }}</text>
+          </view>
           <view class="verb-meta">
             <text class="meta-item">{{ verb.conjugationType }}</text>
           </view>
@@ -55,6 +61,12 @@
             <text v-if="verb.isIrregular" class="irregular-badge">不规则</text>
           </view>
           <text class="verb-meaning">{{ verb.meaning }}</text>
+          <!-- 如果是通过变位形式匹配的，显示匹配的变位 -->
+          <view v-if="verb.matchedForm" class="matched-form-info">
+            <text class="matched-form-label">匹配变位：</text>
+            <text class="matched-form-text">{{ verb.matchedForm }}</text>
+            <text class="original-verb-label">原型：{{ verb.infinitive }}</text>
+          </view>
           <view class="verb-meta">
             <text class="meta-item">{{ verb.conjugationType }}</text>
           </view>
@@ -290,6 +302,34 @@ export default {
   color: #666;
   margin-bottom: 15rpx;
   display: block;
+}
+
+/* 变位形式匹配信息 */
+.matched-form-info {
+  background: linear-gradient(135deg, #e3f2fd, #f3e5f5);
+  padding: 15rpx 20rpx;
+  border-radius: 12rpx;
+  margin-bottom: 15rpx;
+  border-left: 4rpx solid #667eea;
+}
+
+.matched-form-label {
+  font-size: 24rpx;
+  color: #999;
+  margin-right: 10rpx;
+}
+
+.matched-form-text {
+  font-size: 26rpx;
+  color: #667eea;
+  font-weight: 600;
+  margin-right: 20rpx;
+}
+
+.original-verb-label {
+  font-size: 24rpx;
+  color: #666;
+  font-style: italic;
 }
 
 .verb-meta {

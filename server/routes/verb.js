@@ -42,12 +42,19 @@ router.get('/search/:keyword', authMiddleware, (req, res) => {
 
     const { vocabularyDb } = require('../database/db')
     
-    // 1. 精确搜索：原形动词包含关键词，或者变位形式完全匹配
-    const exactQuery = `
-      SELECT DISTINCT v.id, v.infinitive, v.meaning, v.conjugation_type, v.is_irregular
+    // 1. 精确搜索：分两步进行，优先匹配原型
+    
+    // 1.1 先查询原型匹配的动词
+    const infinitiveQuery = `
+      SELECT 
+        v.id, 
+        v.infinitive, 
+        v.meaning, 
+        v.conjugation_type, 
+        v.is_irregular,
+        NULL as matched_form
       FROM verbs v
-      LEFT JOIN conjugations c ON v.id = c.verb_id
-      WHERE LOWER(v.infinitive) LIKE ? OR LOWER(c.conjugated_form) = ?
+      WHERE LOWER(v.infinitive) LIKE ?
       ORDER BY 
         CASE 
           WHEN LOWER(v.infinitive) = ? THEN 1
@@ -55,52 +62,109 @@ router.get('/search/:keyword', authMiddleware, (req, res) => {
           ELSE 3
         END,
         v.infinitive
-      LIMIT 10
     `
     
-    const exactMatches = vocabularyDb.prepare(exactQuery).all(
+    const infinitiveMatches = vocabularyDb.prepare(infinitiveQuery).all(
       `%${keyword}%`,
-      keyword,
       keyword,
       `${keyword}%`
     )
-
-    // 2. 模糊搜索：使用编辑距离算法（简化版）
-    // 查找所有动词，然后在应用层过滤
-    const allVerbsQuery = `
-      SELECT DISTINCT v.id, v.infinitive, v.meaning, v.conjugation_type, v.is_irregular
+    
+    // 1.2 再查询变位形式匹配的动词（排除已经通过原型匹配的）
+    const infinitiveVerbIds = infinitiveMatches.map(v => v.id)
+    const conjugationQuery = `
+      SELECT DISTINCT 
+        v.id, 
+        v.infinitive, 
+        v.meaning, 
+        v.conjugation_type, 
+        v.is_irregular,
+        c.conjugated_form as matched_form
       FROM verbs v
-      WHERE v.id NOT IN (${exactMatches.map(v => v.id).join(',') || '0'})
+      INNER JOIN conjugations c ON v.id = c.verb_id
+      WHERE LOWER(c.conjugated_form) = ?
+        ${infinitiveVerbIds.length > 0 ? `AND v.id NOT IN (${infinitiveVerbIds.join(',')})` : ''}
+      ORDER BY v.infinitive
     `
     
-    const allVerbs = vocabularyDb.prepare(allVerbsQuery).all()
+    const conjugationMatches = vocabularyDb.prepare(conjugationQuery).all(keyword)
     
-    // 简单的模糊匹配：检查是否包含关键词的大部分字符
-    const fuzzyMatches = allVerbs.filter(verb => {
+    // 合并结果并去重
+    const exactMatchesMap = new Map()
+    
+    // 先添加原型匹配（优先级更高）
+    for (const result of infinitiveMatches) {
+      exactMatchesMap.set(result.id, result)
+    }
+    
+    // 再添加变位匹配（如果该动词还没有）
+    for (const result of conjugationMatches) {
+      if (!exactMatchesMap.has(result.id)) {
+        exactMatchesMap.set(result.id, result)
+      }
+    }
+    
+    const exactMatches = Array.from(exactMatchesMap.values()).slice(0, 10)
+
+    // 2. 模糊搜索：包含原型模糊匹配和变位形式模糊匹配
+    // 先获取所有未在精确结果中的动词及其变位
+    const exactVerbIds = exactMatches.map(v => v.id)
+    const fuzzyQuery = `
+      SELECT DISTINCT 
+        v.id, 
+        v.infinitive, 
+        v.meaning, 
+        v.conjugation_type, 
+        v.is_irregular,
+        GROUP_CONCAT(c.conjugated_form, '|') as all_forms
+      FROM verbs v
+      LEFT JOIN conjugations c ON v.id = c.verb_id
+      WHERE v.id NOT IN (${exactVerbIds.length > 0 ? exactVerbIds.join(',') : '0'})
+      GROUP BY v.id
+    `
+    
+    const allVerbs = vocabularyDb.prepare(fuzzyQuery).all()
+    
+    // 模糊匹配：检查原型和所有变位形式
+    const fuzzyMatches = []
+    
+    for (const verb of allVerbs) {
       const infinitive = verb.infinitive.toLowerCase()
+      const allForms = verb.all_forms ? verb.all_forms.toLowerCase().split('|') : []
       
-      // 方法1：检查关键词的每个字符是否按顺序出现在单词中
-      let keywordIndex = 0
-      for (let i = 0; i < infinitive.length && keywordIndex < keyword.length; i++) {
-        if (infinitive[i] === keyword[keywordIndex]) {
-          keywordIndex++
+      let matchedForm = null
+      let matchScore = 0
+      
+      // 检查原型匹配
+      const infinitiveScore = calculateMatchScore(infinitive, keyword)
+      if (infinitiveScore > matchScore) {
+        matchScore = infinitiveScore
+        matchedForm = null // 原型匹配，不需要标注
+      }
+      
+      // 检查所有变位形式
+      for (const form of allForms) {
+        if (!form) continue
+        const formScore = calculateMatchScore(form, keyword)
+        if (formScore > matchScore) {
+          matchScore = formScore
+          matchedForm = form
         }
       }
-      const sequentialMatch = keywordIndex >= Math.ceil(keyword.length * 0.7) // 至少70%字符按顺序匹配
       
-      // 方法2：检查关键词的字符是否大部分出现在单词中（不考虑顺序）
-      const keywordChars = keyword.split('')
-      const infinitiveChars = infinitive.split('')
-      let matchCount = 0
-      keywordChars.forEach(char => {
-        if (infinitiveChars.includes(char)) {
-          matchCount++
-        }
-      })
-      const charMatch = matchCount >= Math.ceil(keyword.length * 0.7) // 至少70%字符存在
-      
-      return sequentialMatch || charMatch
-    }).slice(0, 5) // 最多返回5个模糊匹配
+      // 如果匹配分数 >= 0.7，加入结果
+      if (matchScore >= 0.7) {
+        fuzzyMatches.push({
+          ...verb,
+          matched_form: matchedForm,
+          match_score: matchScore
+        })
+      }
+    }
+    
+    // 按匹配分数排序，取前5个
+    fuzzyMatches.sort((a, b) => b.match_score - a.match_score)
+    fuzzyMatches.splice(5)
 
     // 格式化结果
     const conjugationTypeMap = {
@@ -114,7 +178,8 @@ router.get('/search/:keyword', authMiddleware, (req, res) => {
       infinitive: verb.infinitive,
       meaning: verb.meaning,
       conjugationType: conjugationTypeMap[verb.conjugation_type] || '未知',
-      isIrregular: verb.is_irregular === 1
+      isIrregular: verb.is_irregular === 1,
+      matchedForm: verb.matched_form || null // 如果是通过变位形式匹配的，返回该形式
     })
 
     res.json({
@@ -127,6 +192,32 @@ router.get('/search/:keyword', authMiddleware, (req, res) => {
     res.status(500).json({ error: '搜索失败' })
   }
 })
+
+// 计算匹配分数的辅助函数
+function calculateMatchScore(text, keyword) {
+  // 方法1：顺序匹配
+  let keywordIndex = 0
+  for (let i = 0; i < text.length && keywordIndex < keyword.length; i++) {
+    if (text[i] === keyword[keywordIndex]) {
+      keywordIndex++
+    }
+  }
+  const sequentialScore = keywordIndex / keyword.length
+  
+  // 方法2：字符存在匹配
+  const keywordChars = keyword.split('')
+  const textChars = text.split('')
+  let matchCount = 0
+  keywordChars.forEach(char => {
+    if (textChars.includes(char)) {
+      matchCount++
+    }
+  })
+  const charScore = matchCount / keyword.length
+  
+  // 返回较高的分数
+  return Math.max(sequentialScore, charScore)
+}
 
 // 获取动词详情和完整变位
 router.get('/:id', authMiddleware, (req, res) => {
