@@ -311,20 +311,59 @@ class ExerciseGeneratorService {
       throw new Error('该动词没有变位数据')
     }
 
-    // 根据时态筛选
+    // 扩展的时态映射（支持所有18种时态）
+    const tenseMap = {
+      // 简单陈述式（5个）
+      'presente': '现在时',
+      'preterito': '简单过去时',
+      'imperfecto': '未完成过去时',
+      'futuro': '将来时',
+      'condicional': '条件式',
+      // 虚拟式（3个）
+      'subjuntivo_presente': '虚拟现在时',
+      'subjuntivo_imperfecto': '虚拟过去时',
+      'subjuntivo_futuro': '虚拟将来时',
+      // 命令式（2个）
+      'imperativo_afirmativo': '肯定命令式',
+      'imperativo_negativo': '否定命令式',
+      // 复合陈述式（5个）
+      'perfecto': '现在完成时',
+      'pluscuamperfecto': '过去完成时',
+      'futuro_perfecto': '将来完成时',
+      'condicional_perfecto': '条件完成时',
+      'preterito_anterior': '先过去时',
+      // 复合虚拟式（3个）
+      'subjuntivo_perfecto': '虚拟现在完成时',
+      'subjuntivo_pluscuamperfecto': '虚拟过去完成时',
+      'subjuntivo_futuro_perfecto': '虚拟将来完成时'
+    }
+
+    // 语气映射
+    const moodMap = {
+      'indicativo': '陈述式',
+      'subjuntivo': '虚拟式',
+      'imperativo': '命令式',
+      'indicativo_compuesto': '复合陈述式',
+      'subjuntivo_compuesto': '复合虚拟式'
+    }
+
+    // 根据时态和语气筛选
     let filteredConjugations = conjugations
+    
+    // 优先按语气筛选（如果指定了moods参数）
+    if (options.moods && options.moods.length > 0) {
+      const selectedMoodNames = options.moods.map(m => moodMap[m]).filter(Boolean)
+      filteredConjugations = filteredConjugations.filter(c => selectedMoodNames.includes(c.mood))
+    }
+    
+    // 再按时态筛选
     if (tenses && tenses.length > 0) {
-      const tenseMap = {
-        'presente': '现在时',
-        'preterito': '简单过去时',
-        'futuro': '将来时'
-      }
       const selectedTenseNames = tenses.map(t => tenseMap[t]).filter(Boolean)
-      filteredConjugations = conjugations.filter(c => selectedTenseNames.includes(c.tense))
+      filteredConjugations = filteredConjugations.filter(c => selectedTenseNames.includes(c.tense))
     }
 
     if (filteredConjugations.length === 0) {
-      throw new Error('没有符合所选时态的变位数据')
+      throw new Error('没有符合所选时态和语气的变位数据')
     }
 
     const randomConjugation = filteredConjugations[Math.floor(Math.random() * filteredConjugations.length)]
@@ -487,20 +526,59 @@ class ExerciseGeneratorService {
       throw new Error('该动词没有变位数据')
     }
 
-    // 根据时态筛选
+    // 扩展的时态映射（支持所有18种时态）
+    const tenseMap = {
+      // 简单陈述式（5个）
+      'presente': '现在时',
+      'preterito': '简单过去时',
+      'imperfecto': '未完成过去时',
+      'futuro': '将来时',
+      'condicional': '条件式',
+      // 虚拟式（3个）
+      'subjuntivo_presente': '虚拟现在时',
+      'subjuntivo_imperfecto': '虚拟过去时',
+      'subjuntivo_futuro': '虚拟将来时',
+      // 命令式（2个）
+      'imperativo_afirmativo': '肯定命令式',
+      'imperativo_negativo': '否定命令式',
+      // 复合陈述式（5个）
+      'perfecto': '现在完成时',
+      'pluscuamperfecto': '过去完成时',
+      'futuro_perfecto': '将来完成时',
+      'condicional_perfecto': '条件完成时',
+      'preterito_anterior': '先过去时',
+      // 复合虚拟式（3个）
+      'subjuntivo_perfecto': '虚拟现在完成时',
+      'subjuntivo_pluscuamperfecto': '虚拟过去完成时',
+      'subjuntivo_futuro_perfecto': '虚拟将来完成时'
+    }
+
+    // 语气映射
+    const moodMap = {
+      'indicativo': '陈述式',
+      'subjuntivo': '虚拟式',
+      'imperativo': '命令式',
+      'indicativo_compuesto': '复合陈述式',
+      'subjuntivo_compuesto': '复合虚拟式'
+    }
+
+    // 根据时态和语气筛选
     let filteredConjugations = conjugations
+    
+    // 优先按语气筛选（如果指定了moods参数）
+    if (options.moods && options.moods.length > 0) {
+      const selectedMoodNames = options.moods.map(m => moodMap[m]).filter(Boolean)
+      filteredConjugations = filteredConjugations.filter(c => selectedMoodNames.includes(c.mood))
+    }
+    
+    // 再按时态筛选
     if (tenses && tenses.length > 0) {
-      const tenseMap = {
-        'presente': '现在时',
-        'preterito': '简单过去时',
-        'futuro': '将来时'
-      }
       const selectedTenseNames = tenses.map(t => tenseMap[t]).filter(Boolean)
-      filteredConjugations = conjugations.filter(c => selectedTenseNames.includes(c.tense))
+      filteredConjugations = filteredConjugations.filter(c => selectedTenseNames.includes(c.tense))
     }
 
     if (filteredConjugations.length === 0) {
-      throw new Error('没有符合所选时态的变位数据')
+      throw new Error('没有符合所选时态和语气的变位数据')
     }
 
     const randomConjugation = filteredConjugations[Math.floor(Math.random() * filteredConjugations.length)]
@@ -721,20 +799,59 @@ class ExerciseGeneratorService {
       throw new Error('该动词没有变位数据')
     }
 
-    // 根据时态筛选
+    // 扩展的时态映射（支持所有18种时态）
+    const tenseMap = {
+      // 简单陈述式（5个）
+      'presente': '现在时',
+      'preterito': '简单过去时',
+      'imperfecto': '未完成过去时',
+      'futuro': '将来时',
+      'condicional': '条件式',
+      // 虚拟式（3个）
+      'subjuntivo_presente': '虚拟现在时',
+      'subjuntivo_imperfecto': '虚拟过去时',
+      'subjuntivo_futuro': '虚拟将来时',
+      // 命令式（2个）
+      'imperativo_afirmativo': '肯定命令式',
+      'imperativo_negativo': '否定命令式',
+      // 复合陈述式（5个）
+      'perfecto': '现在完成时',
+      'pluscuamperfecto': '过去完成时',
+      'futuro_perfecto': '将来完成时',
+      'condicional_perfecto': '条件完成时',
+      'preterito_anterior': '先过去时',
+      // 复合虚拟式（3个）
+      'subjuntivo_perfecto': '虚拟现在完成时',
+      'subjuntivo_pluscuamperfecto': '虚拟过去完成时',
+      'subjuntivo_futuro_perfecto': '虚拟将来完成时'
+    }
+
+    // 语气映射
+    const moodMap = {
+      'indicativo': '陈述式',
+      'subjuntivo': '虚拟式',
+      'imperativo': '命令式',
+      'indicativo_compuesto': '复合陈述式',
+      'subjuntivo_compuesto': '复合虚拟式'
+    }
+
+    // 根据时态和语气筛选
     let filteredConjugations = conjugations
+    
+    // 优先按语气筛选（如果指定了moods参数）
+    if (options.moods && options.moods.length > 0) {
+      const selectedMoodNames = options.moods.map(m => moodMap[m]).filter(Boolean)
+      filteredConjugations = filteredConjugations.filter(c => selectedMoodNames.includes(c.mood))
+    }
+    
+    // 再按时态筛选
     if (tenses && tenses.length > 0) {
-      const tenseMap = {
-        'presente': '现在时',
-        'preterito': '简单过去时',
-        'futuro': '将来时'
-      }
       const selectedTenseNames = tenses.map(t => tenseMap[t]).filter(Boolean)
-      filteredConjugations = conjugations.filter(c => selectedTenseNames.includes(c.tense))
+      filteredConjugations = filteredConjugations.filter(c => selectedTenseNames.includes(c.tense))
     }
 
     if (filteredConjugations.length === 0) {
-      throw new Error('没有符合所选时态的变位数据')
+      throw new Error('没有符合所选时态和语气的变位数据')
     }
 
     const conjugationTypeMap = { 1: '第一变位', 2: '第二变位', 3: '第三变位' }
@@ -766,54 +883,17 @@ class ExerciseGeneratorService {
       return exercise
     }
 
-    // 组合填空题
+    // 组合填空题 - 任意6个随机变位组合（不限于同一语气）
     if (exerciseType === 'combo-fill') {
-      // 获取所有可用的语气
-      const availableMoods = [...new Set(filteredConjugations.map(c => c.mood))]
-      
-      if (availableMoods.length === 0) {
-        throw new Error('该动词没有可用的变位数据')
+      if (filteredConjugations.length < 6) {
+        throw new Error('该动词在所选范围内的变位数少于6个，无法生成组合填空题')
       }
       
-      // 尝试每个语气，找到一个有足够变位的
-      let selectedMood = null
-      let selectedConjugations = []
+      // 随机打乱所有可用变位
+      const shuffled = [...filteredConjugations].sort(() => Math.random() - 0.5)
       
-      for (const mood of availableMoods) {
-        // 获取该语气下的所有变位
-        const moodConjugations = filteredConjugations.filter(c => c.mood === mood)
-        
-        // 至少需要2个变位才能形成有意义的练习
-        if (moodConjugations.length >= 2) {
-          selectedMood = mood
-          
-          // 按人称排序（使用数据库中的实际人称值）
-          const personOrder = ['yo', 'tú', 'él/ella/usted', 'nosotros', 'vosotros', 'ellos/ellas/ustedes']
-          const sortedConjugations = []
-          
-          personOrder.forEach(person => {
-            const conj = moodConjugations.find(c => c.person === person)
-            if (conj) {
-              sortedConjugations.push(conj)
-            }
-          })
-          
-          // 随机选择最多6个不同的变位
-          if (sortedConjugations.length <= 6) {
-            selectedConjugations = sortedConjugations
-          } else {
-            const shuffled = [...sortedConjugations].sort(() => Math.random() - 0.5)
-            selectedConjugations = shuffled.slice(0, 6)
-          }
-          
-          break // 找到合适的语气就退出循环
-        }
-      }
-      
-      // 如果没有找到合适的语气
-      if (!selectedMood || selectedConjugations.length === 0) {
-        throw new Error('该动词在所选时态范围内没有足够的变位数据（至少需要2个变位）')
-      }
+      // 选择前6个
+      const selectedConjugations = shuffled.slice(0, 6)
       
       // 构建组合填空题目
       const comboItems = selectedConjugations.map(c => ({
@@ -827,7 +907,7 @@ class ExerciseGeneratorService {
         verbId: verb.id,
         infinitive: verb.infinitive,
         meaning: verb.meaning,
-        mood: selectedMood,
+        mood: '混合',  // 因为是任意组合，不再限制单一语气
         exerciseType: 'combo-fill',
         conjugationType: conjugationTypeMap[verb.conjugation_type] || '未知',
         isIrregular: verb.is_irregular === 1,
