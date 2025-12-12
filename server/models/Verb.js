@@ -89,6 +89,18 @@ class Verb {
       if (filters.onlyRegular === true) {
         query += ' AND is_irregular = 0'
       }
+      
+      // 是否只要不规则动词
+      if (filters.onlyIrregular === true) {
+        query += ' AND is_irregular = 1'
+      }
+      
+      // 排除指定的动词ID
+      if (filters.excludeVerbIds && filters.excludeVerbIds.length > 0) {
+        const placeholders = filters.excludeVerbIds.map(() => '?').join(',')
+        query += ` AND id NOT IN (${placeholders})`
+        params.push(...filters.excludeVerbIds)
+      }
     }
 
     query += ' ORDER BY RANDOM() LIMIT ?'

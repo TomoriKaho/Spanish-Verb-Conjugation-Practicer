@@ -78,13 +78,25 @@ class Question {
     params.push(limit * 3)
 
     const stmt = questionDb.prepare(query)
-    const candidates = stmt.all(...params)
+    const allCandidates = stmt.all(...params)
+    
+    // 去重：如果有重复的题目ID，只保留第一个
+    const seenIds = new Set()
+    const candidates = allCandidates.filter(q => {
+      if (seenIds.has(q.id)) {
+        console.warn(`发现重复题目ID: ${q.id}，已过滤`)
+        return false
+      }
+      seenIds.add(q.id)
+      return true
+    })
     
     console.log(`智能推荐 - 获取候选题目:`, {
       userId,
       questionType,
       limit,
-      candidateCount: candidates.length,
+      totalCandidates: allCandidates.length,
+      uniqueCandidates: candidates.length,
       candidateIds: candidates.map(c => c.id)
     })
     
@@ -127,8 +139,20 @@ class Question {
     // 第四步：按分数降序排序，返回前limit个题目
     scoredQuestions.sort((a, b) => b._score - a._score)
     
+    // 第四步半：再次去重（防止万一）
+    const uniqueScoredQuestions = []
+    const finalSeenIds = new Set()
+    for (const q of scoredQuestions) {
+      if (!finalSeenIds.has(q.id)) {
+        finalSeenIds.add(q.id)
+        uniqueScoredQuestions.push(q)
+      } else {
+        console.warn(`排序后发现重复题目ID: ${q.id}，已过滤`)
+      }
+    }
+    
     // 返回前N个结果（供调用方随机抽取）
-    const selectedQuestions = scoredQuestions.slice(0, Math.min(limit, scoredQuestions.length))
+    const selectedQuestions = uniqueScoredQuestions.slice(0, Math.min(limit, uniqueScoredQuestions.length))
 
     // 第五步：获取动词信息
     if (selectedQuestions.length > 0) {
@@ -157,6 +181,8 @@ class Question {
 
     console.log(`智能推荐 - 最终返回:`, {
       count: selectedQuestions.length,
+      questionIds: selectedQuestions.map(q => q.id),
+      hasDuplicateIds: selectedQuestions.length !== new Set(selectedQuestions.map(q => q.id)).size,
       questions: selectedQuestions.map(q => ({
         id: q.id,
         verb: q.infinitive,
@@ -171,7 +197,7 @@ class Question {
    * 从公共题库随机获取题目（旧方法，保留兼容性）
    */
   static getRandomFromPublic(filters = {}) {
-    const { questionType, tenses = [], conjugationTypes = [], includeIrregular = true, limit = 1 } = filters
+    const { questionType, tenses = [], conjugationTypes = [], includeRegular = true, limit = 1 } = filters
 
     let query = `SELECT * FROM public_questions WHERE 1=1`
     const params = []

@@ -15,7 +15,7 @@ router.post('/generate-batch', authMiddleware, async (req, res) => {
       count = 10,
       tenses = [],
       conjugationTypes = [],
-      includeIrregular = true,
+      includeRegular = true,
       practiceMode = 'normal'
     } = req.body
 
@@ -28,7 +28,7 @@ router.post('/generate-batch', authMiddleware, async (req, res) => {
       count,
       tenses,
       conjugationTypes,
-      includeIrregular,
+      includeRegular,
       practiceMode
     }
 
@@ -76,7 +76,7 @@ router.post('/generate-one', authMiddleware, async (req, res) => {
       exerciseType, 
       tenses = [],
       conjugationTypes = [],
-      includeIrregular = true,
+      includeRegular = true,
       practiceMode = 'normal'
     } = req.body
 
@@ -88,7 +88,7 @@ router.post('/generate-one', authMiddleware, async (req, res) => {
       exerciseType,
       tenses,
       conjugationTypes,
-      includeIrregular,
+      includeRegular,
       practiceMode
     }
 

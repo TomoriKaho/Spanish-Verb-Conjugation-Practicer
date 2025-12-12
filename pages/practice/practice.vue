@@ -383,16 +383,30 @@
           </view>
         </view>
 
-        <!-- 不规则动词选项 -->
+        <!-- 动词规则性与人称选项 -->
         <view class="theme-section">
-          <text class="theme-subtitle">动词规则性</text>
+          <text class="theme-subtitle">其他选项</text>
           <view class="checkbox-group">
             <view 
-              :class="['checkbox-item', includeIrregular ? 'checked' : '', isCourseMode ? 'disabled' : '']"
-              @click="!isCourseMode && toggleIrregular()"
+              :class="['checkbox-item', includeRegular ? 'checked' : '', isCourseMode ? 'disabled' : '']"
+              @click="!isCourseMode && toggleRegular()"
             >
-              <text class="checkbox-icon">{{ includeIrregular ? '☑' : '☐' }}</text>
-              <text class="checkbox-label">包含不规则动词</text>
+              <text class="checkbox-icon">{{ includeRegular ? '☑' : '☐' }}</text>
+              <text class="checkbox-label">包含规则变位动词</text>
+            </view>
+            <view 
+              :class="['checkbox-item', includeVos ? 'checked' : '', isCourseMode ? 'disabled' : '']"
+              @click="!isCourseMode && toggleVos()"
+            >
+              <text class="checkbox-icon">{{ includeVos ? '☑' : '☐' }}</text>
+              <text class="checkbox-label">包含 vos</text>
+            </view>
+            <view 
+              :class="['checkbox-item', includeVosotros ? 'checked' : '', isCourseMode ? 'disabled' : '']"
+              @click="!isCourseMode && toggleVosotros()"
+            >
+              <text class="checkbox-icon">{{ includeVosotros ? '☑' : '☐' }}</text>
+              <text class="checkbox-label">包含 vosotros</text>
             </view>
           </view>
         </view>
@@ -478,7 +492,11 @@ export default {
       ],
       selectedConjugationTypes: [],  // 从缓存或默认全选
       
-      includeIrregular: true,  // 是否包含不规则动词
+      includeRegular: true,  // 是否包含规则变位动词
+      
+      // 人称筛选（不显示UI，但通过开关控制）
+      includeVos: false,  // 是否包含vos（第二人称单数非正式，拉美）
+      includeVosotros: true,  // 是否包含vosotros/vosotras（第二人称复数，西班牙）
       
       // 专项练习折叠状态
       themeSettingsExpanded: false,  // 默认折叠
@@ -488,6 +506,7 @@ export default {
       wrongExercisesSet: new Set(),  // 已添加到错题队列的题目集合（避免重复）
       questionPool: [],  // 题目池（用于从题库题中随机抽取）
       usedPoolIndices: new Set(),  // 已使用的题目池索引
+      usedQuestionIds: new Set(),  // 已使用的题目ID（包括题库题和AI题）
       currentIndex: 0,
       userAnswer: '',
       selectedAnswer: '',
@@ -619,7 +638,9 @@ export default {
           this.selectedMoods = settings.selectedMoods || []
           this.selectedTenses = settings.selectedTenses || []
           this.selectedConjugationTypes = settings.selectedConjugationTypes || []
-          this.includeIrregular = settings.includeIrregular !== undefined ? settings.includeIrregular : true
+          this.includeRegular = settings.includeRegular !== undefined ? settings.includeRegular : true
+          this.includeVos = settings.includeVos !== undefined ? settings.includeVos : false
+          this.includeVosotros = settings.includeVosotros !== undefined ? settings.includeVosotros : true
         } else {
           // 没有缓存，默认全选
           this.selectAllThemes()
@@ -637,7 +658,9 @@ export default {
           selectedMoods: this.selectedMoods,
           selectedTenses: this.selectedTenses,
           selectedConjugationTypes: this.selectedConjugationTypes,
-          includeIrregular: this.includeIrregular
+          includeRegular: this.includeRegular,
+          includeVos: this.includeVos,
+          includeVosotros: this.includeVosotros
         }
         uni.setStorageSync('themeSettings', JSON.stringify(settings))
       } catch (e) {
@@ -694,8 +717,18 @@ export default {
       this.saveThemeSettings()
     },
     
-    toggleIrregular() {
-      this.includeIrregular = !this.includeIrregular
+    toggleRegular() {
+      this.includeRegular = !this.includeRegular
+      this.saveThemeSettings()
+    },
+    
+    toggleVos() {
+      this.includeVos = !this.includeVos
+      this.saveThemeSettings()
+    },
+    
+    toggleVosotros() {
+      this.includeVosotros = !this.includeVosotros
       this.saveThemeSettings()
     },
     
@@ -703,7 +736,9 @@ export default {
       this.selectedMoods = ['indicativo', 'subjuntivo', 'imperativo', 'indicativo_compuesto', 'subjuntivo_compuesto']
       this.selectedTenses = this.tenseOptions.map(t => t.value)
       this.selectedConjugationTypes = this.conjugationTypes.map(c => c.value)
-      this.includeIrregular = true
+      this.includeRegular = true
+      this.includeVos = false  // vos默认不勾选
+      this.includeVosotros = true  // vosotros默认勾选
       this.saveThemeSettings()
       showToast('已全选所有选项', 'success')
     },
@@ -712,7 +747,9 @@ export default {
       this.selectedMoods = []
       this.selectedTenses = []
       this.selectedConjugationTypes = []
-      this.includeIrregular = false
+      this.includeRegular = false
+      this.includeVos = false
+      this.includeVosotros = false
       this.saveThemeSettings()
       showToast('已清除所有选项', 'none')
     },
@@ -795,7 +832,9 @@ export default {
           tenses: this.selectedTenses,  // 具体时态（可选）
           moods: this.selectedMoods,     // 语气（新增）
           conjugationTypes: this.selectedConjugationTypes,
-          includeIrregular: this.includeIrregular,
+          includeRegular: this.includeRegular,
+          includeVos: this.includeVos,  // 是否包含vos
+          includeVosotros: this.includeVosotros,  // 是否包含vosotros
           practiceMode: this.practiceMode
         }
         
@@ -812,8 +851,29 @@ export default {
         if (res.success) {
           // 初始化练习
           this.exercises = res.exercises || []
-          this.questionPool = res.questionPool || []
+          
+          // 接收题目池并立即去重
+          const rawPool = res.questionPool || []
+          const poolQuestionIds = new Set()
+          this.questionPool = []
+          
+          for (const q of rawPool) {
+            if (q.questionId && !poolQuestionIds.has(q.questionId)) {
+              poolQuestionIds.add(q.questionId)
+              this.questionPool.push(q)
+            } else {
+              console.warn(`接收到重复题目ID: ${q.questionId}，已过滤`)
+            }
+          }
+          
+          console.log(`题目池接收完成:`, {
+            原始数量: rawPool.length,
+            去重后数量: this.questionPool.length,
+            题目IDs: Array.from(poolQuestionIds)
+          })
+          
           this.usedPoolIndices = new Set()
+          this.usedQuestionIds = new Set()  // 重置已使用的题目ID
           this.hasStarted = true
           this.currentIndex = 0
           this.correctCount = 0
@@ -887,10 +947,24 @@ export default {
           // 显示生成进度
           this.generatingCount = count - i
           
-          const res = await api.generateSingleAI({ aiOptions })
+          // 在每次循环中收集已使用的动词ID和题目ID，避免重复
+          const usedVerbIds = new Set(this.exercises.map(e => e.verbId).filter(id => id))
+          
+          // 将已使用的动诋ID传递给后端
+          const res = await api.generateSingleAI({ 
+            aiOptions: {
+              ...aiOptions,
+              excludeVerbIds: Array.from(usedVerbIds)
+            }
+          })
           
           if (res.success && res.exercise) {
             successCount++
+            
+            // 记录已使用的题目ID
+            if (res.exercise.questionId) {
+              this.usedQuestionIds.add(res.exercise.questionId)
+            }
             
             // 如果是第一批题目，按顺序添加；否则随机插入
             if (isFirstBatch && i === 0) {
@@ -906,16 +980,17 @@ export default {
               this.checkFavoriteStatus()
               this.checkQuestionFavoriteStatus()
             } else {
-              // 后续题目随机插入
-              const randomIndex = Math.floor(Math.random() * (this.exercises.length + 1))
+              // 后续题目插入到当前题目之后的位置（避免影响currentIndex）
+              // 计算插入位置：在当前题目后面到末尾之间随机选择
+              const insertStart = this.currentIndex + 1
+              const insertEnd = this.exercises.length + 1
+              const randomIndex = insertStart + Math.floor(Math.random() * (insertEnd - insertStart))
+              
               this.exercises.splice(randomIndex, 0, res.exercise)
               
-              console.log(`AI题目已插入到位置 ${randomIndex}, 当前题目总数: ${this.exercises.length}`)
+              console.log(`AI题目已插入到位置 ${randomIndex}, 当前位置: ${this.currentIndex}, 当前题目总数: ${this.exercises.length}`)
               
-              // 如果插入位置在当前题目之前，需要调整currentIndex
-              if (randomIndex <= this.currentIndex) {
-                this.currentIndex++
-              }
+              // 注意：因为插入位置在currentIndex之后，所以不需要调整currentIndex
             }
           } else {
             failCount++
@@ -966,10 +1041,16 @@ export default {
         return
       }
       
+      // 检查题目池是否有重复的题目ID
+      const poolQuestionIds = this.questionPool.map(q => q.questionId)
+      const uniquePoolIds = new Set(poolQuestionIds)
       console.log('题目池信息：', {
         poolSize: this.questionPool.length,
+        uniqueQuestions: uniquePoolIds.size,
+        hasDuplicates: this.questionPool.length !== uniquePoolIds.size,
         currentExercises: this.exercises.length,
-        targetCount: this.exerciseCount
+        targetCount: this.exerciseCount,
+        questionIds: poolQuestionIds
       })
       
       // 计算还需要多少题库题
@@ -984,19 +1065,36 @@ export default {
       console.log('准备从题目池抽取：', { bankNeeded, availableCount, toExtract })
       
       for (let i = 0; i < toExtract; i++) {
-        // 从未使用的题目中随机选择
-        let randomIndex
-        do {
-          randomIndex = Math.floor(Math.random() * this.questionPool.length)
-        } while (this.usedPoolIndices.has(randomIndex))
+        // 找出所有未使用的题目索引
+        const unusedIndices = []
+        for (let idx = 0; idx < this.questionPool.length; idx++) {
+          const q = this.questionPool[idx]
+          if (!this.usedPoolIndices.has(idx) && !this.usedQuestionIds.has(q.questionId)) {
+            unusedIndices.push(idx)
+          }
+        }
         
-        this.usedPoolIndices.add(randomIndex)
+        // 如果没有未使用的题目了，停止抽取
+        if (unusedIndices.length === 0) {
+          console.warn(`无法找到更多不重复的题目，已抽取 ${i}/${toExtract} 个`)
+          break
+        }
+        
+        // 从未使用的题目中随机选择一个
+        const randomIdx = Math.floor(Math.random() * unusedIndices.length)
+        const randomIndex = unusedIndices[randomIdx]
         const selectedQuestion = this.questionPool[randomIndex]
+        
+        // 标记为已使用
+        this.usedPoolIndices.add(randomIndex)
+        this.usedQuestionIds.add(selectedQuestion.questionId)
+        
         console.log(`抽取题目 ${i + 1}/${toExtract}:`, {
           index: randomIndex,
           questionId: selectedQuestion.questionId,
           infinitive: selectedQuestion.infinitive
         })
+        
         this.exercises.push(selectedQuestion)
       }
       
@@ -1006,11 +1104,23 @@ export default {
         ;[this.exercises[i], this.exercises[j]] = [this.exercises[j], this.exercises[i]]
       }
       
-      console.log('打乱后的题目列表：', this.exercises.map(e => ({
-        id: e.questionId,
-        verb: e.infinitive,
-        type: e.exerciseType
-      })))
+      // 验证打乱后没有重复的题目ID
+      const finalQuestionIds = this.exercises.map(e => e.questionId)
+      const uniqueFinalIds = new Set(finalQuestionIds)
+      console.log('打乱后的题目列表：', {
+        count: this.exercises.length,
+        uniqueCount: uniqueFinalIds.size,
+        hasDuplicates: this.exercises.length !== uniqueFinalIds.size,
+        exercises: this.exercises.map(e => ({
+          id: e.questionId,
+          verb: e.infinitive,
+          type: e.exerciseType
+        }))
+      })
+      
+      if (this.exercises.length !== uniqueFinalIds.size) {
+        console.error('警告：exercises数组中有重复的题目ID！', finalQuestionIds)
+      }
     },
     
     // 显示自定义消息提示

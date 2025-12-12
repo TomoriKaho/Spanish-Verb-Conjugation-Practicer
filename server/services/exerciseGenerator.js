@@ -30,7 +30,9 @@ class ExerciseGeneratorService {
       count = 10,
       tenses = [],
       conjugationTypes = [],
-      includeIrregular = true,
+      includeRegular = true,
+      includeVos = false,
+      includeVosotros = true,
       practiceMode = 'normal',
       verbIds = null
     } = options
@@ -94,7 +96,7 @@ class ExerciseGeneratorService {
           questionType: exerciseType,
           tenses,
           conjugationTypes,
-          includeIrregular
+          includeRegular
         }, bankCount)
 
         actualBankCount = smartQuestions.length
@@ -103,12 +105,25 @@ class ExerciseGeneratorService {
           questionIds: smartQuestions.map(q => q.id)
         })
 
-        // 将题库题目添加到题目池
-        questionPool.push(...smartQuestions.map(q => ({
+        // 将题库题目添加到题目池，使用Set确保题目ID不重复
+        const seenQuestionIds = new Set()
+        const uniqueQuestions = smartQuestions.filter(q => {
+          if (seenQuestionIds.has(q.id)) {
+            console.warn(`题目池构建时发现重复题目ID: ${q.id}，已过滤`)
+            return false
+          }
+          seenQuestionIds.add(q.id)
+          return true
+        })
+        
+        questionPool.push(...uniqueQuestions.map((q, index) => ({
           ...this.formatQuestionBankExercise(q, 'public'),
           _fromPool: true,
-          _poolIndex: questionPool.length
+          _poolIndex: questionPool.length + index
         })))
+        
+        actualBankCount = uniqueQuestions.length
+        console.log(`批量生成 - 题目池最终数量（去重后）: ${actualBankCount}`)
       }
 
       // 计算需要AI生成的数量：总数 - 实际从题库获取的数量
@@ -123,7 +138,7 @@ class ExerciseGeneratorService {
           tenses,
           userId,
           conjugationTypes,
-          includeIrregular,
+          includeRegular,
           verbIds
         }
         
@@ -156,7 +171,7 @@ class ExerciseGeneratorService {
    * 从题库获取题目（使用智能推荐算法）
    */
   static async getFromQuestionBank(options) {
-    const { userId, exerciseType, tenses, conjugationTypes, includeIrregular } = options
+    const { userId, exerciseType, tenses, conjugationTypes, includeRegular } = options
 
     try {
       // 使用智能推荐算法从公共题库获取
@@ -165,7 +180,7 @@ class ExerciseGeneratorService {
           questionType: exerciseType,
           tenses,
           conjugationTypes,
-          includeIrregular
+          includeRegular
         }, 1)
 
         if (smartQuestions.length > 0) {
@@ -177,7 +192,7 @@ class ExerciseGeneratorService {
           questionType: exerciseType,
           tenses,
           conjugationTypes,
-          includeIrregular,
+          includeRegular,
           limit: 1
         })
 
@@ -284,7 +299,7 @@ class ExerciseGeneratorService {
    * 使用AI生成新题目（带重试机制）
    */
   static async generateWithAI(options) {
-    const { userId, exerciseType, tenses, conjugationTypes, includeIrregular, verbIds } = options
+    const { userId, exerciseType, tenses, conjugationTypes, includeRegular, verbIds } = options
     const maxRetries = 3  // 最多重试3次
 
     // 获取动词
@@ -295,8 +310,8 @@ class ExerciseGeneratorService {
       if (conjugationTypes && conjugationTypes.length > 0) {
         queryOptions.conjugationTypes = conjugationTypes
       }
-      if (!includeIrregular) {
-        queryOptions.onlyRegular = true
+      if (!includeRegular) {
+        queryOptions.onlyIrregular = true
       }
     }
 
@@ -709,7 +724,7 @@ class ExerciseGeneratorService {
    * 单个AI题目异步生成（供前端调用）
    */
   static async generateSingleAI(options) {
-    const { exerciseType, tenses, userId, conjugationTypes, includeIrregular, verbIds } = options
+    const { exerciseType, tenses, userId, conjugationTypes, includeRegular, verbIds, excludeVerbIds = [] } = options
 
     // 准备动词查询选项
     const queryOptions = {}
@@ -719,8 +734,12 @@ class ExerciseGeneratorService {
       if (conjugationTypes && conjugationTypes.length > 0) {
         queryOptions.conjugationTypes = conjugationTypes
       }
-      if (!includeIrregular) {
-        queryOptions.onlyRegular = true
+      if (!includeRegular) {
+        queryOptions.onlyIrregular = true
+      }
+      // 排除已使用的动诋ID
+      if (excludeVerbIds && excludeVerbIds.length > 0) {
+        queryOptions.excludeVerbIds = excludeVerbIds
       }
     }
 
@@ -757,7 +776,7 @@ class ExerciseGeneratorService {
         questionType: exerciseType,
         tenses,
         conjugationTypes,
-        includeIrregular
+        includeRegular
       }, 1)
 
       if (supplementQuestions.length > 0) {
@@ -773,7 +792,7 @@ class ExerciseGeneratorService {
    * 注意：该方法为同步方法，不涉及AI，不需要await
    */
   static generateTraditionalExercise(options) {
-    const { exerciseType, tenses, conjugationTypes, includeIrregular, verbIds } = options
+    const { exerciseType, tenses, conjugationTypes, includeRegular, verbIds } = options
 
     // 获取动词
     const queryOptions = {}
@@ -783,8 +802,8 @@ class ExerciseGeneratorService {
       if (conjugationTypes && conjugationTypes.length > 0) {
         queryOptions.conjugationTypes = conjugationTypes
       }
-      if (!includeIrregular) {
-        queryOptions.onlyRegular = true
+      if (!includeRegular) {
+        queryOptions.onlyIrregular = true
       }
     }
 
@@ -848,6 +867,17 @@ class ExerciseGeneratorService {
     if (tenses && tenses.length > 0) {
       const selectedTenseNames = tenses.map(t => tenseMap[t]).filter(Boolean)
       filteredConjugations = filteredConjugations.filter(c => selectedTenseNames.includes(c.tense))
+    }
+    
+    // 根据人称选项筛选
+    if (options.includeVos === false) {
+      // 排除 vos 相关的变位
+      filteredConjugations = filteredConjugations.filter(c => !c.person.includes('vos') || c.person === 'nosotros' || c.person === 'vosotros')
+    }
+    
+    if (options.includeVosotros === false) {
+      // 排除 vosotros/vosotras
+      filteredConjugations = filteredConjugations.filter(c => c.person !== 'vosotros' && c.person !== 'vosotras')
     }
 
     if (filteredConjugations.length === 0) {
