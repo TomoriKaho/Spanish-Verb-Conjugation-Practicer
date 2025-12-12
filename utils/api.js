@@ -91,6 +91,7 @@ export default {
   
   // 单词本相关
   getVocabularyStats: () => request({ url: '/vocabulary/stats' }),
+  searchVerbs: (keyword) => request({ url: `/verb/search/${keyword}` }),
   
   // 收藏
   addFavorite: (data) => request({ url: '/vocabulary/favorite/add', method: 'POST', data }),

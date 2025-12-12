@@ -32,6 +32,12 @@
       }
     },
     {
+      "path": "pages/search/search",
+      "style": {
+        "navigationBarTitleText": "搜索单词"
+      }
+    },
+    {
       "path": "pages/question-bank/question-bank",
       "style": {
         "navigationBarTitleText": "我的题库"
