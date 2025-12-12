@@ -3,10 +3,15 @@
     <!-- 顶部动词信息卡片 -->
     <view class="verb-info-card card">
       <view class="verb-header">
-        <text class="verb-infinitive">{{ verbInfo.infinitive }}</text>
-        <view class="verb-badges">
-          <view class="badge badge-type">{{ verbInfo.conjugationType }}</view>
-          <view v-if="verbInfo.isIrregular" class="badge badge-irregular">不规则</view>
+        <view class="verb-left">
+          <text class="verb-infinitive">{{ verbInfo.infinitive }}</text>
+          <view class="verb-badges">
+            <view class="badge badge-type">{{ verbInfo.conjugationType }}</view>
+            <view v-if="verbInfo.isIrregular" class="badge badge-irregular">不规则</view>
+          </view>
+        </view>
+        <view class="favorite-icon" @click="toggleFavorite">
+          <text class="star-icon" :class="{ 'favorited': isFavorited }">★</text>
         </view>
       </view>
       <text class="verb-meaning">{{ verbInfo.meaning }}</text>
@@ -90,7 +95,8 @@ export default {
       conjugations: [],
       groupedConjugations: {},
       expandedMoods: {},  // 记录每个语气的展开状态
-      expandedTenses: {}  // 记录每个时态的展开状态 {moodKey: {tenseKey: true/false}}
+      expandedTenses: {},  // 记录每个时态的展开状态 {moodKey: {tenseKey: true/false}}
+      isFavorited: false  // 收藏状态
     }
   },
   onLoad(options) {
@@ -113,6 +119,8 @@ export default {
           this.verbInfo = res.verb
           this.conjugations = res.conjugations
           this.groupConjugations()
+          // 检查收藏状态
+          this.checkFavoriteStatus()
         } else {
           showToast('加载失败', 'none')
         }
@@ -322,6 +330,42 @@ export default {
       uni.navigateTo({
         url: `/pages/practice/practice?verbIds=${this.verbId}&practiceMode=custom`
       })
+    },
+
+    // 检查收藏状态
+    async checkFavoriteStatus() {
+      try {
+        const res = await api.checkFavorite(this.verbId)
+        if (res.success) {
+          this.isFavorited = res.isFavorited
+        }
+      } catch (error) {
+        console.error('检查收藏状态失败:', error)
+      }
+    },
+
+    // 切换收藏状态
+    async toggleFavorite() {
+      try {
+        if (this.isFavorited) {
+          // 取消收藏
+          const res = await api.removeFavorite({ verbId: this.verbId })
+          if (res.success) {
+            this.isFavorited = false
+            showToast('已取消收藏', 'success')
+          }
+        } else {
+          // 添加收藏
+          const res = await api.addFavorite({ verbId: this.verbId })
+          if (res.success) {
+            this.isFavorited = true
+            showToast('收藏成功', 'success')
+          }
+        }
+      } catch (error) {
+        console.error('收藏操作失败:', error)
+        showToast('操作失败', 'none')
+      }
     }
   }
 }
@@ -348,10 +392,34 @@ export default {
   margin-bottom: 15rpx;
 }
 
+.verb-left {
+  display: flex;
+  align-items: center;
+  gap: 15rpx;
+  flex: 1;
+}
+
 .verb-infinitive {
   font-size: 48rpx;
   font-weight: bold;
   color: #2c3e50;
+}
+
+.favorite-icon {
+  flex-shrink: 0;
+  padding: 10rpx;
+  cursor: pointer;
+}
+
+.star-icon {
+  font-size: 56rpx;
+  color: #d9d9d9;
+  transition: all 0.3s ease;
+}
+
+.star-icon.favorited {
+  color: #fadb14;
+  text-shadow: 0 0 10rpx rgba(250, 219, 20, 0.5);
 }
 
 .verb-badges {
