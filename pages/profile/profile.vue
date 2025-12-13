@@ -490,7 +490,7 @@ export default {
 }
 
 .user-tag.student {
-  background: #3c622c;
+  background: #66a64b;
   color: #fff;
 }
 
