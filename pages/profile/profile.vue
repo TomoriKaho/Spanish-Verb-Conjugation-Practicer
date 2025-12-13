@@ -300,7 +300,7 @@ export default {
       })
     },
     goToStatistics() {
-      uni.switchTab({
+      uni.navigateTo({
         url: '/pages/statistics/statistics'
       })
     },

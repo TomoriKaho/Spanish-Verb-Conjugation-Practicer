@@ -1,11 +1,5 @@
 <template>
   <view class="container">
-    <!-- 单词搜索入口 -->
-    <view class="search-entry card" @click="goToSearch">
-      <text class="search-icon">🔍</text>
-      <text class="search-placeholder">搜索单词原型或变位形式...</text>
-    </view>
-
     <!-- 统计卡片 -->
     <view class="card stats-card">
       <view class="stats-row">
@@ -250,13 +244,6 @@ export default {
       })
     },
 
-    // 跳转到搜索页面
-    goToSearch() {
-      uni.navigateTo({
-        url: '/pages/search/search'
-      })
-    },
-
     startFavoritePractice() {
       if (this.favoriteCount === 0) {
         showToast('还没有收藏单词', 'none')
@@ -303,34 +290,6 @@ export default {
   min-height: 100vh;
   padding: 40rpx;
   background: #f8f8f8;
-}
-
-/* 搜索入口 */
-.search-entry {
-  display: flex;
-  align-items: center;
-  padding: 25rpx 30rpx;
-  margin-bottom: 20rpx;
-  background: white;
-  border-radius: 20rpx;
-  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.08);
-  transition: all 0.3s;
-}
-
-.search-entry:active {
-  transform: scale(0.98);
-  background: #f9fafb;
-}
-
-.search-icon {
-  font-size: 40rpx;
-  margin-right: 15rpx;
-}
-
-.search-placeholder {
-  flex: 1;
-  font-size: 28rpx;
-  color: #999;
 }
 
 /* 统计卡片 */
