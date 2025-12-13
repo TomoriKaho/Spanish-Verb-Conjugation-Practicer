@@ -1,11 +1,6 @@
 const { vocabularyDb } = require('../database/db');
 
 class Textbook {
-  // 创建教材表（已在db.js中初始化，此方法保留用于兼容）
-  static createTable() {
-    // 表已在数据库初始化时创建
-  }
-
   // 获取所有教材
   static getAll() {
     const sql = 'SELECT * FROM textbooks ORDER BY order_index ASC, id ASC';

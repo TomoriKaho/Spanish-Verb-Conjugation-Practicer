@@ -27,9 +27,16 @@ router.get('/textbooks/:id/lessons', authMiddleware, (req, res) => {
   try {
     const { id } = req.params;
     const lessons = Lesson.getByTextbookId(id);
+    
+    // 为每个课程添加单词数量
+    const lessonsWithCount = lessons.map(lesson => ({
+      ...lesson,
+      vocabularyCount: Lesson.getVocabularyCount(lesson.id)
+    }));
+    
     res.json({
       success: true,
-      lessons
+      lessons: lessonsWithCount
     });
   } catch (error) {
     console.error('获取课程列表失败:', error);
@@ -72,6 +79,9 @@ router.get('/lessons/:id', authMiddleware, (req, res) => {
     }
 
     // 解析JSON字段
+    if (lesson.moods) {
+      lesson.moods = JSON.parse(lesson.moods);
+    }
     if (lesson.tenses) {
       lesson.tenses = JSON.parse(lesson.tenses);
     }

@@ -50,6 +50,7 @@ async function initSampleCourseData() {
         lessonData.number,
         lessonData.description,
         lessonData.grammarPoints || '现在时、陈述式',
+        JSON.stringify(lessonData.moods || ['indicativo']),
         JSON.stringify(lessonData.tenses || ['presente']),
         JSON.stringify(lessonData.conjugationTypes || ['ar', 'er', 'ir'])
       );

@@ -314,6 +314,12 @@
         <!-- 专项练习详细设置（可折叠） -->
         <view class="theme-details" v-show="themeSettingsExpanded || isCourseMode">
         
+        <!-- 课程模式提示 -->
+        <view v-if="isCourseMode" class="course-lock-tip">
+          <text class="lock-icon">🔒</text>
+          <text class="lock-text">课程练习中无法修改变位类型，以下为课程预设配置</text>
+        </view>
+        
         <!-- 语气分组选择 -->
         <view class="theme-section">
           <text class="theme-subtitle">语气选择</text>
@@ -770,15 +776,25 @@ export default {
           const lesson = lessonRes.lesson
           this.lessonConfig = lesson
           
-          // 如果课程配置了时态，使用课程的时态设置
+          // 使用课程的语气和时态设置（课程模式下无法修改）
+          if (lesson.moods && lesson.moods.length > 0) {
+            this.selectedMoods = lesson.moods
+          }
+          
           if (lesson.tenses && lesson.tenses.length > 0) {
             this.selectedTenses = lesson.tenses
           }
           
-          // 如果课程配置了变位类型，使用课程的变位类型设置
+          // 使用课程的变位类型设置（课程模式下无法修改）
           if (lesson.conjugation_types && lesson.conjugation_types.length > 0) {
             this.selectedConjugationTypes = lesson.conjugation_types
           }
+          
+          console.log('课程配置:', {
+            moods: this.selectedMoods,
+            tenses: this.selectedTenses,
+            conjugationTypes: this.selectedConjugationTypes
+          })
         }
         
         // 获取课程单词列表
@@ -789,13 +805,6 @@ export default {
         }
         
         hideLoading()
-        
-        // 自动开始练习
-        if (this.lessonVocabulary.length > 0) {
-          this.startPractice()
-        } else {
-          showToast('该课程暂无单词', 'none')
-        }
       } catch (error) {
         hideLoading()
         console.error('加载课程配置失败:', error)
@@ -2313,6 +2322,28 @@ export default {
   background: #f0f0f0;
   padding: 4rpx 12rpx;
   border-radius: 8rpx;
+}
+
+/* 课程锁定提示 */
+.course-lock-tip {
+  background: linear-gradient(135deg, #fff4e6 0%, #ffe6e6 100%);
+  border-radius: 12rpx;
+  padding: 20rpx;
+  margin-bottom: 24rpx;
+  display: flex;
+  align-items: center;
+  border-left: 4rpx solid #ff9800;
+}
+
+.lock-icon {
+  font-size: 32rpx;
+  margin-right: 12rpx;
+}
+
+.lock-text {
+  font-size: 24rpx;
+  color: #d84315;
+  line-height: 1.5;
 }
 
 .checkbox-item.disabled {

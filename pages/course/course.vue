@@ -36,7 +36,7 @@
                 <button 
                   class="btn-small btn-expand" 
                   @click.stop="toggleLesson(lesson.id)"
-                  v-if="lesson.vocabulary && lesson.vocabulary.length > 0"
+                  v-if="lesson.vocabularyCount > 0"
                 >
                   {{ expandedLessonId === lesson.id ? '收起' : '展开' }}
                 </button>
@@ -52,7 +52,7 @@
             <!-- 单词列表 -->
             <view v-if="expandedLessonId === lesson.id" class="vocabulary-list">
               <view class="vocab-header">
-                <text class="vocab-title">本课单词 ({{ lesson.vocabulary.length }}个)</text>
+                <text class="vocab-title">本课单词 ({{ lesson.vocabulary ? lesson.vocabulary.length : lesson.vocabularyCount }}个)</text>
               </view>
               <view 
                 v-for="(word, index) in lesson.vocabulary" 
@@ -63,7 +63,10 @@
                   <text class="vocab-spanish">{{ word.infinitive }}</text>
                   <text class="vocab-chinese">{{ word.chinese }}</text>
                 </view>
-                <text class="vocab-type">{{ word.type || '动词' }}</text>
+                <view class="vocab-actions">
+                  <text class="vocab-type">{{ word.type || '动词' }}</text>
+                  <text class="vocab-detail-btn" @click="viewConjugations(word.id)">查看全变位</text>
+                </view>
               </view>
             </view>
           </view>
@@ -171,6 +174,13 @@ export default {
       
       uni.navigateTo({
         url: `/pages/practice/practice?mode=course&lessonId=${lesson.id}&lessonTitle=${encodeURIComponent(lesson.title)}`
+      })
+    },
+    
+    // 查看动词完整变位
+    viewConjugations(verbId) {
+      uni.navigateTo({
+        url: `/pages/conjugation-detail/conjugation-detail?verbId=${verbId}`
       })
     }
   }
@@ -354,12 +364,28 @@ export default {
   color: #999;
 }
 
+.vocab-actions {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
 .vocab-type {
   font-size: 22rpx;
   color: #667eea;
   background: #f0f2ff;
   padding: 4rpx 12rpx;
   border-radius: 8rpx;
+}
+
+.vocab-detail-btn {
+  font-size: 22rpx;
+  color: #667eea;
+  background: #fff;
+  border: 1rpx solid #667eea;
+  padding: 4rpx 12rpx;
+  border-radius: 8rpx;
+  white-space: nowrap;
 }
 
 .empty-lessons {

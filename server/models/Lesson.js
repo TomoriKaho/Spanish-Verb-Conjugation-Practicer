@@ -1,11 +1,6 @@
 const { vocabularyDb } = require('../database/db');
 
 class Lesson {
-  // 创建课程表（已在db.js中初始化，此方法保留用于兼容）
-  static createTable() {
-    // 表已在数据库初始化时创建
-  }
-
   // 获取教材的所有课程
   static getByTextbookId(textbookId) {
     const sql = `
@@ -23,22 +18,22 @@ class Lesson {
   }
 
   // 创建课程
-  static create(textbookId, title, lessonNumber, description = null, grammarPoints = null, tenses = null, conjugationTypes = null) {
+  static create(textbookId, title, lessonNumber, description = null, grammarPoints = null, moods = null, tenses = null, conjugationTypes = null) {
     const sql = `
-      INSERT INTO lessons (textbook_id, title, lesson_number, description, grammar_points, tenses, conjugation_types)
-      VALUES (?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO lessons (textbook_id, title, lesson_number, description, grammar_points, moods, tenses, conjugation_types)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     `;
-    return vocabularyDb.prepare(sql).run(textbookId, title, lessonNumber, description, grammarPoints, tenses, conjugationTypes);
+    return vocabularyDb.prepare(sql).run(textbookId, title, lessonNumber, description, grammarPoints, moods, tenses, conjugationTypes);
   }
 
   // 更新课程
-  static update(id, title, description = null, grammarPoints = null, tenses = null, conjugationTypes = null) {
+  static update(id, title, description = null, grammarPoints = null, moods = null, tenses = null, conjugationTypes = null) {
     const sql = `
       UPDATE lessons 
-      SET title = ?, description = ?, grammar_points = ?, tenses = ?, conjugation_types = ?
+      SET title = ?, description = ?, grammar_points = ?, moods = ?, tenses = ?, conjugation_types = ?
       WHERE id = ?
     `;
-    return vocabularyDb.prepare(sql).run(title, description, grammarPoints, tenses, conjugationTypes, id);
+    return vocabularyDb.prepare(sql).run(title, description, grammarPoints, moods, tenses, conjugationTypes, id);
   }
 
   // 删除课程
@@ -57,6 +52,17 @@ class Lesson {
       ORDER BY lv.order_index ASC
     `;
     return vocabularyDb.prepare(sql).all(lessonId);
+  }
+
+  // 获取课程的单词数量
+  static getVocabularyCount(lessonId) {
+    const sql = `
+      SELECT COUNT(*) as count
+      FROM lesson_verbs
+      WHERE lesson_id = ?
+    `;
+    const result = vocabularyDb.prepare(sql).get(lessonId);
+    return result ? result.count : 0;
   }
 }
 

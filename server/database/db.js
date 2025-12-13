@@ -236,6 +236,7 @@ function initVocabularyDatabase() {
       lesson_number INTEGER NOT NULL,
       description TEXT,
       grammar_points TEXT,
+      moods TEXT,
       tenses TEXT,
       conjugation_types TEXT,
       created_at TEXT DEFAULT (datetime('now', 'localtime')),

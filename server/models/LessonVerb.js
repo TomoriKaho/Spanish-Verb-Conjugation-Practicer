@@ -1,11 +1,6 @@
 const { vocabularyDb } = require('../database/db');
 
 class LessonVerb {
-  // 创建课程-单词关联表（已在db.js中初始化，此方法保留用于兼容）
-  static createTable() {
-    // 表已在数据库初始化时创建
-  }
-
   // 添加单词到课程
   static add(lessonId, verbId, orderIndex = 0) {
     const sql = `
