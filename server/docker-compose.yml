@@ -1,0 +1,38 @@
+services:
+  spanish-verb-api:
+    build:
+      context: ..
+      dockerfile: server/Dockerfile
+    container_name: spanish-verb-api
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - JWT_SECRET=${JWT_SECRET:-change-this-secret-in-production}
+      - EMAIL_HOST=${EMAIL_HOST:-smtp.qq.com}
+      - EMAIL_PORT=${EMAIL_PORT:-587}
+      - EMAIL_USER=${EMAIL_USER}
+      - EMAIL_PASS=${EMAIL_PASS}
+      - DEEPSEEK_API_KEY=${DEEPSEEK_API_KEY}
+      - DEEPSEEK_API_URL=${DEEPSEEK_API_URL:-https://api.deepseek.com/v1/chat/completions}
+    volumes:
+      # 持久化数据库文件
+      - ./vocabulary.db:/app/server/vocabulary.db
+      - ./user_data.db:/app/server/user_data.db
+      - ./questions.db:/app/server/questions.db
+      # 如果需要持久化日志
+      - ./logs:/app/server/logs
+    networks:
+      - spanish-verb-network
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000/api/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+
+networks:
+  spanish-verb-network:
+    driver: bridge
