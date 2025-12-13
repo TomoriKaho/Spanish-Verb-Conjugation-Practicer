@@ -6,20 +6,9 @@
       <text class="page-subtitle">{{ totalCount }} 道已收藏的题目</text>
     </view>
 
-    <!-- Tab切换 -->
-    <view class="tabs">
-      <view 
-        :class="['tab-item', activeTab === 'fill' ? 'active' : '']" 
-        @click="switchTab('fill')"
-      >
-        <text>填空题 ({{ fillCount }})</text>
-      </view>
-      <view 
-        :class="['tab-item', activeTab === 'sentence' ? 'active' : '']" 
-        @click="switchTab('sentence')"
-      >
-        <text>例句填空 ({{ sentenceCount }})</text>
-      </view>
+    <!-- 题目类型标题 -->
+    <view class="type-header">
+      <text class="type-title">例句填空题</text>
     </view>
 
     <!-- 题目列表 -->
@@ -27,8 +16,8 @@
       <!-- 空状态 -->
       <view v-if="currentList.length === 0" class="empty-placeholder">
         <text class="empty-icon">📚</text>
-        <text class="empty-text">还没有收藏{{ activeTab === 'fill' ? '填空题' : '例句填空' }}</text>
-        <text class="empty-hint">在练习时点击题目收藏按钮</text>
+        <text class="empty-text">还没有收藏例句填空题</text>
+        <text class="empty-hint">在练习时点击题目收藏按钮（📌）</text>
       </view>
 
       <!-- 题目卡片 -->
@@ -100,19 +89,16 @@ import { showToast, showLoading, hideLoading, showModal } from '@/utils/common.j
 export default {
   data() {
     return {
-      activeTab: 'fill', // 'fill' 或 'sentence'
-      fillQuestions: [],
       sentenceQuestions: [],
-      fillCount: 0,
       sentenceCount: 0
     }
   },
   computed: {
     currentList() {
-      return this.activeTab === 'fill' ? this.fillQuestions : this.sentenceQuestions
+      return this.sentenceQuestions
     },
     totalCount() {
-      return this.fillCount + this.sentenceCount
+      return this.sentenceCount
     }
   },
   onLoad() {
@@ -131,16 +117,13 @@ export default {
 
         console.log('获取题目列表响应:', res)
         if (res.success) {
-          // 按题目类型分类
-          this.fillQuestions = res.questions.filter(q => q.question_type === 'fill')
+          // 只保留例句填空题
           this.sentenceQuestions = res.questions.filter(q => q.question_type === 'sentence')
-          this.fillCount = this.fillQuestions.length
           this.sentenceCount = this.sentenceQuestions.length
           
-          console.log('填空题数量:', this.fillCount)
-          console.log('例句数量:', this.sentenceCount)
-          if (res.questions.length > 0) {
-            console.log('第一道题示例:', res.questions[0])
+          console.log('例句填空题数量:', this.sentenceCount)
+          if (this.sentenceQuestions.length > 0) {
+            console.log('第一道题示例:', this.sentenceQuestions[0])
           }
         }
       } catch (error) {
@@ -148,10 +131,6 @@ export default {
         console.error('加载题目失败:', error)
         showToast('加载失败', 'none')
       }
-    },
-
-    switchTab(tab) {
-      this.activeTab = tab
     },
 
     async deleteQuestion(questionId) {
@@ -222,30 +201,20 @@ export default {
   color: #999;
 }
 
-/* Tab切换 */
-.tabs {
-  display: flex;
+/* 题目类型标题 */
+.type-header {
   background: #fff;
   border-radius: 12rpx;
-  padding: 8rpx;
+  padding: 24rpx;
   margin-bottom: 30rpx;
   box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.05);
-}
-
-.tab-item {
-  flex: 1;
   text-align: center;
-  padding: 20rpx;
-  font-size: 28rpx;
-  color: #666;
-  border-radius: 8rpx;
-  transition: all 0.3s;
 }
 
-.tab-item.active {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: #fff;
+.type-title {
+  font-size: 32rpx;
   font-weight: bold;
+  color: #667eea;
 }
 
 /* 题目列表 */
