@@ -35,8 +35,8 @@ function importFromVerbsJson(filePath) {
   
   const verbsData = JSON.parse(fs.readFileSync(filePath, 'utf8'))
   
-  // 时态映射
-  const tenseMapping = {
+  // 简单陈述式时态映射
+  const indicativeTenseMapping = {
     'present': '现在时',
     'imperfect': '未完成过去时',
     'preterite': '简单过去时',
@@ -44,29 +44,34 @@ function importFromVerbsJson(filePath) {
     'conditional': '条件式'
   }
 
-  // 复合时态映射
-  const compoundTenseMapping = {
-    // 复合陈述式
-    'preterite_perfect': '现在完成时',      // pretérito perfecto
-    'pluperfect': '过去完成时',              // pluscuamperfecto
-    'future_perfect': '将来完成时',          // futuro perfecto
-    'conditional_perfect': '条件完成时',      // condicional perfecto
-    'preterite_anterior': '先过去时'         // pretérito anterior
+  // 复合陈述式时态映射
+  const compoundIndicativeTenseMapping = {
+    'preterite_perfect': '现在完成时',      // he hablado
+    'pluperfect': '过去完成时',             // había hablado
+    'future_perfect': '将来完成时',         // habré hablado
+    'conditional_perfect': '条件完成时',    // habría hablado
+    'preterite_anterior': '先过去时'        // hube hablado
   }
 
-  // 语气映射
-  const moodMapping = {
-    'indicative': '陈述式',
-    'subjunctive': '虚拟式',
-    'imperative': '命令式',
-    'compound_indicative': '复合陈述式',
-    'compound_subjunctive': '复合虚拟式'
+  // 虚拟式时态映射
+  const subjunctiveTenseMapping = {
+    'present': '虚拟现在时',
+    'imperfect': '虚拟过去时',
+    'future': '虚拟将来时'
   }
 
-  // 人称映射
+  // 复合虚拟式时态映射
+  const compoundSubjunctiveTenseMapping = {
+    'preterite_perfect': '虚拟现在完成时',   // haya hablado
+    'pluperfect': '虚拟过去完成时',          // hubiera/hubiese hablado
+    'future_perfect': '虚拟将来完成时'       // hubiere hablado
+  }
+
+  // 七个人称映射（含vos）
   const personMapping = {
     'first_singular': 'yo',
     'second_singular': 'tú',
+    'second_singular_vos_form': 'vos',
     'third_singular': 'él/ella/usted',
     'first_plural': 'nosotros',
     'second_plural': 'vosotros',
@@ -210,12 +215,19 @@ function importFromVerbsJson(filePath) {
     'querer', 'llegar', 'pasar', 'deber', 'poner', 'hablar', 'conocer', 'vivir', 'trabajar', 'estudiar'
   ]
 
-  let verbCount = 0
-  let conjugationCount = 0
+  let stats = {
+    verbCount: 0,
+    totalConjugations: 0,
+    indicative: 0,
+    subjunctive: 0,
+    imperative: 0,
+    compoundIndicative: 0,
+    compoundSubjunctive: 0
+  }
 
   const insertVerb = db.prepare(`
-    INSERT INTO verbs (infinitive, meaning, conjugation_type, is_irregular, is_reflexive, frequency_level)
-    VALUES (?, ?, ?, ?, ?, ?)
+    INSERT INTO verbs (infinitive, meaning, conjugation_type, is_irregular, is_reflexive, gerund, participle, frequency_level, textbook_volume)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1)
   `)
 
   const insertConjugation = db.prepare(`
@@ -229,7 +241,7 @@ function importFromVerbsJson(filePath) {
       const baseInfinitive = infinitive.replace(/se$/, '')
       const meaning = verbMeanings[infinitive] || verbMeanings[baseInfinitive] || infinitive
       
-      // 判断变位类型
+      // 判断变位类型：-ar=1, -er=2, -ir=3
       let conjugationType = 1
       if (baseInfinitive.endsWith('er')) conjugationType = 2
       else if (baseInfinitive.endsWith('ir')) conjugationType = 3
@@ -245,138 +257,179 @@ function importFromVerbsJson(filePath) {
         }
       }
       
-      // 判断是否为反身动词
+      // 是否自反动词
       const isReflexive = verbData.is_reflexive ? 1 : 0
+      
+      // 副动词（gerund）
+      const gerund = verbData.gerund || null
+      
+      // 过去分词（participle）- 可能有多个形式，取第一个
+      const participle = Array.isArray(verbData.participle) && verbData.participle.length > 0 
+        ? verbData.participle[0] 
+        : (verbData.participle || null)
       
       const frequency = highFrequencyVerbs.includes(infinitive) || highFrequencyVerbs.includes(baseInfinitive) ? 1 : 2
 
       // 插入动词
-      const result = insertVerb.run(infinitive, meaning, conjugationType, isIrregular, isReflexive, frequency)
+      const result = insertVerb.run(
+        infinitive, 
+        meaning, 
+        conjugationType, 
+        isIrregular, 
+        isReflexive, 
+        gerund, 
+        participle, 
+        frequency
+      )
       const verbId = result.lastInsertRowid
-      verbCount++
+      stats.verbCount++
 
-      // 插入变位 - 陈述式（indicative）
+      // ========== 1. 简单陈述式（indicative） ==========
       if (verbData.indicative) {
-        const indicative = verbData.indicative
-        for (const tenseKey in indicative) {
-          if (!tenseMapping[tenseKey]) continue
-          
-          const tenseData = indicative[tenseKey]
+        for (const tenseKey in verbData.indicative) {
+          if (!indicativeTenseMapping[tenseKey]) continue
+          const tenseData = verbData.indicative[tenseKey]
           if (!tenseData) continue
 
-          const tenseName = tenseMapping[tenseKey]
+          const tenseName = indicativeTenseMapping[tenseKey]
           const isIrregularTense = tenseData.regular === false ? 1 : 0
 
           for (const personKey in personMapping) {
             const personName = personMapping[personKey]
             const forms = tenseData[personKey]
             
-            if (forms && Array.isArray(forms) && forms[0]) {
-              insertConjugation.run(verbId, tenseName, '陈述式', personName, forms[0], isIrregularTense)
-              conjugationCount++
+            if (forms && Array.isArray(forms)) {
+              // 将多个变位形式合并为一条记录，用 | 分隔
+              const validForms = forms.filter(form => form && form.length > 0)
+              if (validForms.length > 0) {
+                const mergedForm = validForms.join(' | ')
+                insertConjugation.run(verbId, tenseName, '陈述式', personName, mergedForm, isIrregularTense)
+                stats.totalConjugations++
+                stats.indicative++
+              }
             }
           }
         }
       }
 
-      // 插入变位 - 虚拟式（subjunctive）
+      // ========== 2. 虚拟式（subjunctive） ==========
       if (verbData.subjunctive) {
-        const subjunctive = verbData.subjunctive
-        for (const tenseKey in subjunctive) {
-          if (!tenseMapping[tenseKey]) continue
-          
-          const tenseData = subjunctive[tenseKey]
+        for (const tenseKey in verbData.subjunctive) {
+          if (!subjunctiveTenseMapping[tenseKey]) continue
+          const tenseData = verbData.subjunctive[tenseKey]
           if (!tenseData) continue
 
-          const tenseName = tenseMapping[tenseKey]
+          const tenseName = subjunctiveTenseMapping[tenseKey]
           const isIrregularTense = tenseData.regular === false ? 1 : 0
 
           for (const personKey in personMapping) {
             const personName = personMapping[personKey]
             const forms = tenseData[personKey]
             
-            if (forms && Array.isArray(forms) && forms[0]) {
-              insertConjugation.run(verbId, tenseName, '虚拟式', personName, forms[0], isIrregularTense)
-              conjugationCount++
+            if (forms && Array.isArray(forms)) {
+              // 将多个变位形式合并为一条记录，用 | 分隔
+              const validForms = forms.filter(form => form && form.length > 0)
+              if (validForms.length > 0) {
+                const mergedForm = validForms.join(' | ')
+                insertConjugation.run(verbId, tenseName, '虚拟式', personName, mergedForm, isIrregularTense)
+                stats.totalConjugations++
+                stats.subjunctive++
+              }
             }
           }
         }
       }
 
-      // 插入变位 - 命令式（imperative）
+      // ========== 3. 命令式（imperative） ==========
       if (verbData.imperative) {
-        const imperative = verbData.imperative
-        // 肯定命令式
-        if (imperative.affirmative) {
-          const isIrregularTense = imperative.affirmative.regular === false ? 1 : 0
+        // 3.1 肯定命令式
+        if (verbData.imperative.affirmative) {
+          const isIrregularTense = verbData.imperative.affirmative.regular === false ? 1 : 0
           for (const personKey in personMapping) {
             const personName = personMapping[personKey]
-            const forms = imperative.affirmative[personKey]
+            const forms = verbData.imperative.affirmative[personKey]
             
-            if (forms && Array.isArray(forms) && forms[0] && forms[0].length > 0) {
-              insertConjugation.run(verbId, '肯定命令式', '命令式', personName, forms[0], isIrregularTense)
-              conjugationCount++
+            if (forms && Array.isArray(forms)) {
+              const validForms = forms.filter(form => form && form.length > 0)
+              if (validForms.length > 0) {
+                const mergedForm = validForms.join(' | ')
+                insertConjugation.run(verbId, '肯定命令式', '命令式', personName, mergedForm, isIrregularTense)
+                stats.totalConjugations++
+                stats.imperative++
+              }
             }
           }
         }
-        // 否定命令式
-        if (imperative.negative) {
-          const isIrregularTense = imperative.negative.regular === false ? 1 : 0
+        
+        // 3.2 否定命令式
+        if (verbData.imperative.negative) {
+          const isIrregularTense = verbData.imperative.negative.regular === false ? 1 : 0
           for (const personKey in personMapping) {
             const personName = personMapping[personKey]
-            const forms = imperative.negative[personKey]
+            const forms = verbData.imperative.negative[personKey]
             
-            if (forms && Array.isArray(forms) && forms[0] && forms[0].length > 0) {
-              insertConjugation.run(verbId, '否定命令式', '命令式', personName, forms[0], isIrregularTense)
-              conjugationCount++
+            if (forms && Array.isArray(forms)) {
+              const validForms = forms.filter(form => form && form.length > 0)
+              if (validForms.length > 0) {
+                const mergedForm = validForms.join(' | ')
+                insertConjugation.run(verbId, '否定命令式', '命令式', personName, mergedForm, isIrregularTense)
+                stats.totalConjugations++
+                stats.imperative++
+              }
             }
           }
         }
       }
 
-      // 插入变位 - 复合陈述式（compound_indicative）
+      // ========== 4. 复合陈述式（compound_indicative） ==========
       if (verbData.compound_indicative) {
-        const compoundIndicative = verbData.compound_indicative
-        for (const tenseKey in compoundIndicative) {
-          if (!compoundTenseMapping[tenseKey]) continue
-          
-          const tenseData = compoundIndicative[tenseKey]
+        for (const tenseKey in verbData.compound_indicative) {
+          if (!compoundIndicativeTenseMapping[tenseKey]) continue
+          const tenseData = verbData.compound_indicative[tenseKey]
           if (!tenseData) continue
 
-          const tenseName = compoundTenseMapping[tenseKey]
+          const tenseName = compoundIndicativeTenseMapping[tenseKey]
           const isIrregularTense = tenseData.regular === false ? 1 : 0
 
           for (const personKey in personMapping) {
             const personName = personMapping[personKey]
             const forms = tenseData[personKey]
             
-            if (forms && Array.isArray(forms) && forms[0]) {
-              insertConjugation.run(verbId, tenseName, '复合陈述式', personName, forms[0], isIrregularTense)
-              conjugationCount++
+            if (forms && Array.isArray(forms)) {
+              const validForms = forms.filter(form => form && form.length > 0)
+              if (validForms.length > 0) {
+                const mergedForm = validForms.join(' | ')
+                insertConjugation.run(verbId, tenseName, '复合陈述式', personName, mergedForm, isIrregularTense)
+                stats.totalConjugations++
+                stats.compoundIndicative++
+              }
             }
           }
         }
       }
 
-      // 插入变位 - 复合虚拟式（compound_subjunctive）
+      // ========== 5. 复合虚拟式（compound_subjunctive） ==========
       if (verbData.compound_subjunctive) {
-        const compoundSubjunctive = verbData.compound_subjunctive
-        for (const tenseKey in compoundSubjunctive) {
-          if (!compoundTenseMapping[tenseKey]) continue
-          
-          const tenseData = compoundSubjunctive[tenseKey]
+        for (const tenseKey in verbData.compound_subjunctive) {
+          if (!compoundSubjunctiveTenseMapping[tenseKey]) continue
+          const tenseData = verbData.compound_subjunctive[tenseKey]
           if (!tenseData) continue
 
-          const tenseName = compoundTenseMapping[tenseKey]
+          const tenseName = compoundSubjunctiveTenseMapping[tenseKey]
           const isIrregularTense = tenseData.regular === false ? 1 : 0
 
           for (const personKey in personMapping) {
             const personName = personMapping[personKey]
             const forms = tenseData[personKey]
             
-            if (forms && Array.isArray(forms) && forms[0]) {
-              insertConjugation.run(verbId, tenseName, '复合虚拟式', personName, forms[0], isIrregularTense)
-              conjugationCount++
+            if (forms && Array.isArray(forms)) {
+              const validForms = forms.filter(form => form && form.length > 0)
+              if (validForms.length > 0) {
+                const mergedForm = validForms.join(' | ')
+                insertConjugation.run(verbId, tenseName, '复合虚拟式', personName, mergedForm, isIrregularTense)
+                stats.totalConjugations++
+                stats.compoundSubjunctive++
+              }
             }
           }
         }
@@ -386,7 +439,15 @@ function importFromVerbsJson(filePath) {
 
   transaction()
 
-  console.log(`\x1b[32m   ✓ 词库数据初始化完成\x1b[0m，共导入 \x1b[33m${verbCount}\x1b[0m 个动词，\x1b[33m${conjugationCount}\x1b[0m 个变位\n`)
+  console.log(`\x1b[32m   ✓ 词库数据初始化完成\x1b[0m`)
+  console.log(`   📊 统计信息：`)
+  console.log(`      • 动词总数: \x1b[33m${stats.verbCount}\x1b[0m 个`)
+  console.log(`      • 变位总数: \x1b[33m${stats.totalConjugations}\x1b[0m 个`)
+  console.log(`      • 简单陈述式: \x1b[36m${stats.indicative}\x1b[0m 个`)
+  console.log(`      • 虚拟式: \x1b[36m${stats.subjunctive}\x1b[0m 个`)
+  console.log(`      • 命令式: \x1b[36m${stats.imperative}\x1b[0m 个`)
+  console.log(`      • 复合陈述式: \x1b[36m${stats.compoundIndicative}\x1b[0m 个`)
+  console.log(`      • 复合虚拟式: \x1b[36m${stats.compoundSubjunctive}\x1b[0m 个\n`)
 }
 
 module.exports = {
