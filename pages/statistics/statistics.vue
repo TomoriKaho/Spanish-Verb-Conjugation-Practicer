@@ -135,16 +135,17 @@
         </view>
         <view class="records-list">
           <view 
-            class="record-item" 
+            class="record-item record-clickable" 
             v-for="record in recentRecords.slice(0, 10)" 
             :key="record.id"
+            @click="viewVerbDetail(record)"
           >
             <view class="record-icon" :class="record.is_correct ? 'correct' : 'wrong'">
               <text>{{ record.is_correct ? '✓' : '✗' }}</text>
             </view>
             <view class="record-content">
-              <text class="record-verb">{{ record.infinitive }}</text>
-              <text class="record-details">{{ record.mood }} {{ record.tense }} · {{ record.person }}</text>
+              <text class="record-verb">{{ record.infinitive || '未知动词' }}</text>
+              <text class="record-details">{{ record.mood || '' }} {{ record.tense || '' }}{{ record.person ? ' · ' + record.person : '' }}</text>
             </view>
             <view class="record-time">{{ formatTime(record.created_at) }}</view>
           </view>
@@ -262,7 +263,12 @@ export default {
     },
     switchTimeFilter(filter) {
       this.activeTimeFilter = filter
-      // 这里可以加载对应时间范围的数据
+      uni.showToast({
+        title: `已切换到${filter === 'week' ? '本周' : filter === 'month' ? '本月' : '全部'}数据`,
+        icon: 'none',
+        duration: 1500
+      })
+      // TODO: 未来可以加载对应时间范围的详细趋势数据
     },
     getVerbColor(level) {
       const colors = [
@@ -280,9 +286,19 @@ export default {
       return `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`
     },
     viewAllMastered() {
-      // 跳转到详细掌握动词页面
+      uni.showModal({
+        title: '已掌握动词',
+        content: `共掌握 ${this.masteredVerbs.length} 个动词\n\n包括：${this.masteredVerbs.slice(0, 5).map(v => v.infinitive).join('、')}${this.masteredVerbs.length > 5 ? ' 等' : ''}`,
+        showCancel: false
+      })
+    },
+    viewVerbDetail(record) {
+      if (!record || !record.verb_id) {
+        showToast('动词信息不完整')
+        return
+      }
       uni.navigateTo({
-        url: '/pages/mastered-verbs/mastered-verbs'
+        url: `/pages/conjugation-detail/conjugation-detail?verbId=${record.verb_id}`
       })
     },
     generateSuggestion() {
@@ -728,6 +744,25 @@ export default {
 
 .record-item:last-child {
   border-bottom: none;
+}
+
+.record-clickable {
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-radius: 12rpx;
+  margin: 0 -15rpx;
+  padding: 20rpx 15rpx;
+}
+
+.record-clickable:hover {
+  background: rgba(102, 126, 234, 0.05);
+  transform: translateX(5rpx);
+}
+
+.record-clickable:active {
+  background: rgba(102, 126, 234, 0.1);
+  transform: scale(0.98);
+  transition: all 0.1s ease;
 }
 
 .record-icon {
