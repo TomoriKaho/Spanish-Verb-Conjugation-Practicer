@@ -33,7 +33,7 @@ class User {
 
   // 根据ID查找用户
   static findById(id) {
-    const stmt = db.prepare('SELECT id, username, email, school, enrollment_year, user_type, subscription_end_date, created_at FROM users WHERE id = ?')
+    const stmt = db.prepare('SELECT id, username, email, school, enrollment_year, user_type, subscription_end_date, avatar, created_at FROM users WHERE id = ?')
     return stmt.get(id)
   }
 
@@ -61,6 +61,16 @@ class User {
       WHERE id = ?
     `)
     return stmt.run(endDate, id)
+  }
+
+  // 更新头像
+  static updateAvatar(id, avatarBase64) {
+    const stmt = db.prepare(`
+      UPDATE users 
+      SET avatar = ?, updated_at = datetime('now', 'localtime')
+      WHERE id = ?
+    `)
+    return stmt.run(avatarBase64, id)
   }
 
   // 检查订阅状态

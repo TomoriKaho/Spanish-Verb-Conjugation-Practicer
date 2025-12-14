@@ -39,6 +39,7 @@ function initUserDatabase() {
       enrollment_year INTEGER,
       user_type TEXT DEFAULT 'student',
       subscription_end_date TEXT,
+      avatar TEXT,
       created_at TEXT DEFAULT (datetime('now', 'localtime')),
       updated_at TEXT DEFAULT (datetime('now', 'localtime'))
     )

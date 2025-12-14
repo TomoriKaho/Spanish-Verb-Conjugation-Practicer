@@ -65,6 +65,7 @@ export default {
   login: (data) => request({ url: '/user/login', method: 'POST', data }),
   getUserInfo: () => request({ url: '/user/info' }),
   updateProfile: (data) => request({ url: '/user/profile', method: 'PUT', data }),
+  uploadAvatar: (data) => request({ url: '/user/avatar', method: 'POST', data }),
   
   // 动词相关
   getVerbList: (params) => request({ url: '/verb/list', data: params }),
@@ -85,6 +86,7 @@ export default {
   // 打卡
   checkIn: () => request({ url: '/checkin', method: 'POST' }),
   getCheckInHistory: () => request({ url: '/checkin/history' }),
+  getUserRank: () => request({ url: '/checkin/rank' }),
   
   // 排行榜
   getLeaderboard: (type) => request({ url: `/leaderboard/${type}` }),

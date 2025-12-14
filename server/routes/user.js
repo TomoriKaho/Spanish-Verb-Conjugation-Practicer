@@ -229,12 +229,46 @@ router.get('/info', require('../middleware/auth').authMiddleware, (req, res) => 
         enrollmentYear: user.enrollment_year,
         userType: user.user_type,
         subscriptionEndDate: user.subscription_end_date,
+        avatar: user.avatar,
         created_at: user.created_at
       }
     })
   } catch (error) {
     console.error('获取用户信息错误:', error)
     res.status(500).json({ error: '获取用户信息失败' })
+  }
+})
+
+// 更新头像
+router.post('/avatar', require('../middleware/auth').authMiddleware, (req, res) => {
+  try {
+    const { avatar } = req.body
+
+    if (!avatar) {
+      return res.status(400).json({ error: '头像数据不能为空' })
+    }
+
+    // 验证是否为有效的 Base64 图片
+    if (!avatar.startsWith('data:image/')) {
+      return res.status(400).json({ error: '无效的图片格式' })
+    }
+
+    // 限制大小（Base64 字符串长度，约等于原文件大小的 1.37 倍）
+    // 100KB * 1.37 ≈ 137000 字符
+    if (avatar.length > 200000) {
+      return res.status(400).json({ error: '头像文件过大，请上传小于100KB的图片' })
+    }
+
+    User.updateAvatar(req.userId, avatar)
+
+    res.json({
+      success: true,
+      message: '头像更新成功',
+      avatar
+    })
+  } catch (error) {
+    console.error('更新头像错误:', error)
+    res.status(500).json({ error: '更新头像失败' })
   }
 })
 

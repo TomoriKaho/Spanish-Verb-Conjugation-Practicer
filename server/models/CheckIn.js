@@ -93,6 +93,36 @@ class CheckIn {
     return result.count > 0
   }
 
+  // 获取总学习天数（实际打卡的天数）
+  static getTotalStudyDays(userId) {
+    const stmt = db.prepare(`
+      SELECT COUNT(DISTINCT check_in_date) as study_days
+      FROM check_ins
+      WHERE user_id = ?
+    `)
+    const result = stmt.get(userId)
+    return result ? result.study_days : 0
+  }
+
+  // 获取用户排名（基于总榜）
+  static getUserRank(userId) {
+    const stmt = db.prepare(`
+      WITH RankedUsers AS (
+        SELECT 
+          u.id,
+          COUNT(c.id) as check_in_days,
+          SUM(c.exercise_count) as total_exercises,
+          ROW_NUMBER() OVER (ORDER BY COUNT(c.id) DESC, SUM(c.exercise_count) DESC) as rank
+        FROM users u
+        JOIN check_ins c ON u.id = c.user_id
+        GROUP BY u.id
+      )
+      SELECT rank FROM RankedUsers WHERE id = ?
+    `)
+    const result = stmt.get(userId)
+    return result ? result.rank : 0
+  }
+
   // 获取打卡排行榜
   static getLeaderboard(type = 'month', limit = 50) {
     let dateFilter = ''
@@ -114,6 +144,7 @@ class CheckIn {
         u.id,
         u.username,
         u.school,
+        u.avatar,
         COUNT(c.id) as check_in_days,
         SUM(c.exercise_count) as total_exercises,
         SUM(c.correct_count) as total_correct

@@ -32,7 +32,8 @@
       <view class="podium" v-if="leaderboard.length >= 3">
         <view class="podium-item second">
           <view class="podium-avatar">
-            <text class="avatar-text">{{ getAvatarText(leaderboard[1].username) }}</text>
+            <image v-if="leaderboard[1].avatar" :src="leaderboard[1].avatar" class="avatar-image" mode="aspectFill"></image>
+            <text v-else class="avatar-text">{{ getAvatarText(leaderboard[1].username) }}</text>
           </view>
           <view class="podium-medal">🥈</view>
           <text class="podium-name">{{ leaderboard[1].username }}</text>
@@ -42,7 +43,8 @@
 
         <view class="podium-item first">
           <view class="podium-avatar champion">
-            <text class="avatar-text">{{ getAvatarText(leaderboard[0].username) }}</text>
+            <image v-if="leaderboard[0].avatar" :src="leaderboard[0].avatar" class="avatar-image" mode="aspectFill"></image>
+            <text v-else class="avatar-text">{{ getAvatarText(leaderboard[0].username) }}</text>
             <view class="crown">👑</view>
           </view>
           <view class="podium-medal">🥇</view>
@@ -53,7 +55,8 @@
 
         <view class="podium-item third">
           <view class="podium-avatar">
-            <text class="avatar-text">{{ getAvatarText(leaderboard[2].username) }}</text>
+            <image v-if="leaderboard[2].avatar" :src="leaderboard[2].avatar" class="avatar-image" mode="aspectFill"></image>
+            <text v-else class="avatar-text">{{ getAvatarText(leaderboard[2].username) }}</text>
           </view>
           <view class="podium-medal">🥉</view>
           <text class="podium-name">{{ leaderboard[2].username }}</text>
@@ -76,7 +79,8 @@
           </view>
 
           <view class="user-avatar">
-            <text class="avatar-text">{{ getAvatarText(user.username) }}</text>
+            <image v-if="user.avatar" :src="user.avatar" class="avatar-image" mode="aspectFill"></image>
+            <text v-else class="avatar-text">{{ getAvatarText(user.username) }}</text>
           </view>
 
           <view class="user-info">
@@ -350,6 +354,7 @@ export default {
   font-weight: bold;
   color: #fff;
   position: relative;
+  overflow: hidden;
 }
 
 .podium-item.first .podium-avatar {
@@ -369,6 +374,12 @@ export default {
 
 .champion {
   background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+}
+
+.avatar-image {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
 }
 
 .crown {
@@ -488,6 +499,7 @@ export default {
   font-size: 28rpx;
   font-weight: bold;
   color: #fff;
+  overflow: hidden;
 }
 
 .user-info {

@@ -8,11 +8,12 @@
       <view class="profile-content">
         <view class="user-avatar-section">
           <view class="avatar-container">
-            <view class="avatar-wrapper">
-              <text class="avatar-text">{{ avatarText }}</text>
+            <view class="avatar-wrapper" @click="chooseAvatar">
+              <image v-if="userInfo && userInfo.avatar" :src="userInfo.avatar" class="avatar-image" mode="aspectFill" />
+              <text v-else class="avatar-text">{{ avatarText }}</text>
               <view class="avatar-badge" v-if="userInfo && userInfo.isVIP">VIP</view>
             </view>
-            <view class="camera-icon" @click="changeAvatar">📷</view>
+            <view class="camera-icon" @click="chooseAvatar">📷</view>
           </view>
           <view class="user-info">
             <text class="username">{{ userInfo && userInfo.username }}</text>
@@ -70,7 +71,7 @@
       <view class="info-card">
         <view class="card-header">
           <text class="card-title">个人信息</text>
-          <text class="edit-button" @click="editProfile">编辑</text>
+          <text class="edit-button" @click="showEditProfile">编辑</text>
         </view>
         <view class="info-list">
           <view class="info-item" v-if="userInfo && userInfo.email">
@@ -176,6 +177,58 @@
         <text class="fab-icon">📝</text>
       </view>
     </view>
+    
+    <!-- 隐藏的 Canvas 用于图片转换 -->
+    <canvas canvas-id="avatarCanvas" style="position: fixed; left: -9999px; width: 200px; height: 200px;"></canvas>
+    
+    <!-- 编辑个人信息弹窗 -->
+    <view class="modal" v-if="showEditModal" @click="closeEditModal">
+      <view class="modal-content edit-modal" @click.stop>
+        <view class="modal-header">
+          <text class="modal-title">编辑个人信息</text>
+          <text class="modal-close" @click="closeEditModal">×</text>
+        </view>
+        
+        <view class="modal-body">
+          <view class="form-item">
+            <text class="form-label">学校</text>
+            <input 
+              class="form-input" 
+              v-model="editForm.school" 
+              placeholder="请输入学校名称"
+              maxlength="50"
+            />
+          </view>
+          
+          <view class="form-item">
+            <text class="form-label">入学年份</text>
+            <picker 
+              mode="date" 
+              :value="editForm.enrollmentYear" 
+              fields="year"
+              :start="startYear"
+              :end="currentYear"
+              @change="onYearChange"
+            >
+              <view class="picker-input">
+                <text v-if="editForm.enrollmentYear">{{ editForm.enrollmentYear }}</text>
+                <text v-else class="placeholder">请选择入学年份</text>
+              </view>
+            </picker>
+          </view>
+          
+          <view class="form-note">
+            <text class="note-icon">ℹ️</text>
+            <text class="note-text">邮箱和注册时间不可修改</text>
+          </view>
+        </view>
+        
+        <view class="modal-footer">
+          <button class="modal-btn cancel-btn" @click="closeEditModal">取消</button>
+          <button class="modal-btn confirm-btn" @click="saveProfile">保存</button>
+        </view>
+      </view>
+    </view>
   </view>
 </template>
 
@@ -191,7 +244,12 @@ export default {
       studyDays: 0,
       totalExercises: 0,
       masteredCount: 0,
-      rank: 0
+      rank: 0,
+      showEditModal: false,
+      editForm: {
+        school: '',
+        enrollmentYear: ''
+      }
     }
   },
   computed: {
@@ -220,6 +278,12 @@ export default {
     isSubscriptionValid() {
       if (!this.userInfo || !this.userInfo.subscriptionEndDate) return false
       return new Date(this.userInfo.subscriptionEndDate) > new Date()
+    },
+    currentYear() {
+      return new Date().getFullYear().toString()
+    },
+    startYear() {
+      return '1990'
     }
   },
   onShow() {
@@ -258,40 +322,256 @@ export default {
           this.masteredCount = stats.masteredVerbsCount || 0
         }
 
-        // 获取打卡信息
+        // 获取打卡信息（包括连续天数和总学习天数）
         const checkInRes = await api.getCheckInHistory()
         if (checkInRes.success) {
           this.streakDays = checkInRes.streakDays || 0
+          this.studyDays = checkInRes.totalStudyDays || 0
         }
 
-        // 模拟学习天数
-        if (this.userInfo && this.userInfo.created_at) {
-          const start = new Date(this.userInfo.created_at)
-          const now = new Date()
-          const days = Math.floor((now - start) / (1000 * 60 * 60 * 24))
-          this.studyDays = Math.max(1, days + 1)
+        // 获取用户排名
+        const rankRes = await api.getUserRank()
+        if (rankRes.success) {
+          this.rank = rankRes.rank || 0
         }
-
-        // 模拟排名
-        this.rank =  1
       } catch (error) {
         console.error('加载用户统计失败:', error)
       }
     },
-    changeAvatar() {
-      uni.showModal({
-        title: '更换头像',
-        content: '头像更换功能开发中，敬请期待',
-        showCancel: false
+    async chooseAvatar() {
+      uni.chooseImage({
+        count: 1,
+        sizeType: ['compressed'],
+        sourceType: ['album', 'camera'],
+        success: (res) => {
+          const tempFilePath = res.tempFilePaths[0]
+          
+          // 使用 Canvas 转换为 Base64（跨平台方案）
+          this.imageToBase64(tempFilePath)
+        }
       })
     },
-    editProfile() {
-      uni.showModal({
-        title: '编辑个人信息',
-        content: '编辑功能开发中，敬请期待',
-        showCancel: false
+    
+    imageToBase64(imagePath) {
+      // 获取图片信息
+      uni.getImageInfo({
+        src: imagePath,
+        success: (imageInfo) => {
+          // 创建 Canvas 上下文
+          const canvas = uni.createCanvasContext('avatarCanvas', this)
+          
+          // 计算压缩后的尺寸（最大200x200）
+          let width = imageInfo.width
+          let height = imageInfo.height
+          const maxSize = 200
+          
+          if (width > maxSize || height > maxSize) {
+            if (width > height) {
+              height = (height / width) * maxSize
+              width = maxSize
+            } else {
+              width = (width / height) * maxSize
+              height = maxSize
+            }
+          }
+          
+          // 绘制图片
+          canvas.drawImage(imagePath, 0, 0, width, height)
+          canvas.draw(false, () => {
+            // 导出为 Base64
+            uni.canvasToTempFilePath({
+              canvasId: 'avatarCanvas',
+              width: width,
+              height: height,
+              destWidth: width,
+              destHeight: height,
+              fileType: 'jpg',
+              quality: 0.8,
+              success: (canvasRes) => {
+                // 将临时文件转换为 Base64
+                this.uploadBase64Avatar(canvasRes.tempFilePath)
+              },
+              fail: (error) => {
+                console.error('Canvas 导出失败:', error)
+                uni.showToast({
+                  title: '图片处理失败',
+                  icon: 'none'
+                })
+              }
+            }, this)
+          })
+        },
+        fail: (error) => {
+          console.error('获取图片信息失败:', error)
+          uni.showToast({
+            title: '图片读取失败',
+            icon: 'none'
+          })
+        }
       })
     },
+    
+    uploadBase64Avatar(tempFilePath) {
+      // #ifdef H5
+      // H5 环境下直接使用 FileReader
+      fetch(tempFilePath)
+        .then(res => res.blob())
+        .then(blob => {
+          const reader = new FileReader()
+          reader.onload = async (e) => {
+            const base64 = e.target.result
+            await this.sendAvatarToServer(base64)
+          }
+          reader.readAsDataURL(blob)
+        })
+      // #endif
+      
+      // #ifndef H5
+      // 非 H5 环境使用 plus.io (APP) 或其他方式
+      // #ifdef APP-PLUS
+      plus.io.resolveLocalFileSystemURL(tempFilePath, (entry) => {
+        entry.file((file) => {
+          const reader = new plus.io.FileReader()
+          reader.onloadend = async (e) => {
+            const base64 = e.target.result
+            await this.sendAvatarToServer(base64)
+          }
+          reader.readAsDataURL(file)
+        })
+      }, (error) => {
+        console.error('读取文件失败:', error)
+        uni.showToast({
+          title: '读取图片失败',
+          icon: 'none'
+        })
+      })
+      // #endif
+      
+      // #ifdef MP
+      // 小程序环境
+      uni.getFileSystemManager().readFile({
+        filePath: tempFilePath,
+        encoding: 'base64',
+        success: async (fileRes) => {
+          const base64 = 'data:image/jpeg;base64,' + fileRes.data
+          await this.sendAvatarToServer(base64)
+        },
+        fail: (error) => {
+          console.error('读取文件失败:', error)
+          uni.showToast({
+            title: '读取图片失败',
+            icon: 'none'
+          })
+        }
+      })
+      // #endif
+      // #endif
+    },
+    
+    async sendAvatarToServer(base64) {
+      // 检查大小
+      if (base64.length > 200000) {
+        uni.showToast({
+          title: '图片过大，请选择小于100KB的图片',
+          icon: 'none'
+        })
+        return
+      }
+      
+      uni.showLoading({ title: '上传中...' })
+      
+      try {
+        const res = await api.uploadAvatar({ avatar: base64 })
+        uni.hideLoading()
+        
+        if (res.success) {
+          this.userInfo.avatar = base64
+          uni.setStorageSync('userInfo', this.userInfo)
+          
+          uni.showToast({
+            title: '头像更新成功',
+            icon: 'success'
+          })
+        }
+      } catch (error) {
+        uni.hideLoading()
+        console.error('上传头像失败:', error)
+        uni.showToast({
+          title: '上传失败',
+          icon: 'none'
+        })
+      }
+    },
+    
+    showEditProfile() {
+      // 初始化编辑表单
+      this.editForm = {
+        school: this.userInfo.school || '',
+        enrollmentYear: this.userInfo.enrollmentYear || ''
+      }
+      this.showEditModal = true
+    },
+    
+    closeEditModal() {
+      this.showEditModal = false
+    },
+    
+    onYearChange(e) {
+      this.editForm.enrollmentYear = e.detail.value
+    },
+    
+    async saveProfile() {
+      // 验证
+      if (!this.editForm.school || !this.editForm.school.trim()) {
+        uni.showToast({
+          title: '请输入学校名称',
+          icon: 'none'
+        })
+        return
+      }
+      
+      if (!this.editForm.enrollmentYear) {
+        uni.showToast({
+          title: '请选择入学年份',
+          icon: 'none'
+        })
+        return
+      }
+      
+      uni.showLoading({ title: '保存中...' })
+      
+      try {
+        const res = await api.updateProfile({
+          email: this.userInfo.email,
+          school: this.editForm.school.trim(),
+          enrollmentYear: parseInt(this.editForm.enrollmentYear)
+        })
+        
+        uni.hideLoading()
+        
+        if (res.success) {
+          // 更新本地用户信息
+          this.userInfo.school = this.editForm.school.trim()
+          this.userInfo.enrollmentYear = parseInt(this.editForm.enrollmentYear)
+          uni.setStorageSync('userInfo', this.userInfo)
+          
+          this.showEditModal = false
+          
+          uni.showToast({
+            title: '保存成功',
+            icon: 'success'
+          })
+        }
+      } catch (error) {
+        uni.hideLoading()
+        console.error('保存个人信息失败:', error)
+        uni.showToast({
+          title: '保存失败',
+          icon: 'none'
+        })
+      }
+    },
+    
     renewSubscription() {
       uni.showModal({
         title: '续费订阅',
@@ -429,8 +709,12 @@ export default {
   color: #667eea;
   box-shadow: 0 8rpx 20rpx rgba(0, 0, 0, 0.1);
   position: relative;
-  border: 3rpx solid #f0f0f0;
+  border: 3rpx solid #f0f0f0;  overflow: hidden;
 }
+
+.avatar-image {
+  width: 100%;
+  height: 100%;}
 
 .avatar-badge {
   position: absolute;
@@ -825,6 +1109,140 @@ export default {
 
 .fab-icon {
   font-size: 40rpx;
+  color: #fff;
+}
+
+/* 编辑弹窗 */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content.edit-modal {
+  width: 600rpx;
+  background: #fff;
+  border-radius: 25rpx;
+  overflow: hidden;
+  box-shadow: 0 20rpx 40rpx rgba(0, 0, 0, 0.2);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 30rpx 40rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.modal-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.modal-close {
+  font-size: 48rpx;
+  color: #999;
+  line-height: 1;
+}
+
+.modal-body {
+  padding: 40rpx;
+}
+
+.form-item {
+  margin-bottom: 30rpx;
+}
+
+.form-label {
+  display: block;
+  font-size: 28rpx;
+  color: #333;
+  margin-bottom: 15rpx;
+  font-weight: 500;
+}
+
+.form-input {
+  width: 100%;
+  height: 80rpx;
+  background: #f8f9fa;
+  border-radius: 15rpx;
+  padding: 0 25rpx;
+  font-size: 28rpx;
+  color: #333;
+  border: 1rpx solid #e0e0e0;
+  box-sizing: border-box;
+}
+
+.picker-input {
+  width: 100%;
+  height: 80rpx;
+  background: #f8f9fa;
+  border-radius: 15rpx;
+  padding: 0 25rpx;
+  font-size: 28rpx;
+  color: #333;
+  border: 1rpx solid #e0e0e0;
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+.picker-input .placeholder {
+  color: #999;
+}
+
+.form-note {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+  padding: 20rpx;
+  background: rgba(102, 126, 234, 0.05);
+  border-radius: 15rpx;
+  margin-top: 10rpx;
+}
+
+.note-icon {
+  font-size: 28rpx;
+}
+
+.note-text {
+  font-size: 24rpx;
+  color: #666;
+  line-height: 1.5;
+}
+
+.modal-footer {
+  display: flex;
+  gap: 20rpx;
+  padding: 30rpx 40rpx;
+  border-top: 1rpx solid #f0f0f0;
+}
+
+.modal-btn {
+  flex: 1;
+  height: 80rpx;
+  border-radius: 20rpx;
+  font-size: 28rpx;
+  font-weight: bold;
+  border: none;
+}
+
+.cancel-btn {
+  background: #f8f9fa;
+  color: #666;
+}
+
+.confirm-btn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: #fff;
 }
 </style>

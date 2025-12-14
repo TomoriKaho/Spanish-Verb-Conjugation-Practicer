@@ -35,16 +35,33 @@ router.get('/history', authMiddleware, (req, res) => {
     const history = CheckIn.getByUserId(req.userId)
     const streakDays = CheckIn.getStreakDays(req.userId)
     const hasCheckedInToday = CheckIn.hasCheckedInToday(req.userId)
+    const totalStudyDays = CheckIn.getTotalStudyDays(req.userId)
 
     res.json({
       success: true,
       history,
       streakDays,
-      hasCheckedInToday
+      hasCheckedInToday,
+      totalStudyDays
     })
   } catch (error) {
     console.error('获取打卡历史错误:', error)
     res.status(500).json({ error: '获取打卡历史失败' })
+  }
+})
+
+// 获取用户排名
+router.get('/rank', authMiddleware, (req, res) => {
+  try {
+    const rank = CheckIn.getUserRank(req.userId)
+    
+    res.json({
+      success: true,
+      rank
+    })
+  } catch (error) {
+    console.error('获取用户排名错误:', error)
+    res.status(500).json({ error: '获取用户排名失败' })
   }
 })
 
