@@ -3,7 +3,12 @@ const { userDb: db } = require('../database/db')
 class CheckIn {
   // 打卡
   static create(userId) {
-    const today = new Date().toISOString().split('T')[0]
+    // 使用本地时区的日期
+    const today = new Date()
+    const year = today.getFullYear()
+    const month = String(today.getMonth() + 1).padStart(2, '0')
+    const day = String(today.getDate()).padStart(2, '0')
+    const todayStr = `${year}-${month}-${day}`
     
     const stmt = db.prepare(`
       INSERT INTO check_ins (user_id, check_in_date)
@@ -11,13 +16,18 @@ class CheckIn {
       ON CONFLICT(user_id, check_in_date) DO NOTHING
     `)
     
-    const result = stmt.run(userId, today)
+    const result = stmt.run(userId, todayStr)
     return result.changes > 0
   }
 
   // 更新打卡统计
   static updateStats(userId, exerciseCount, correctCount) {
-    const today = new Date().toISOString().split('T')[0]
+    // 使用本地时区的日期
+    const today = new Date()
+    const year = today.getFullYear()
+    const month = String(today.getMonth() + 1).padStart(2, '0')
+    const day = String(today.getDate()).padStart(2, '0')
+    const todayStr = `${year}-${month}-${day}`
     
     const stmt = db.prepare(`
       UPDATE check_ins 
@@ -26,7 +36,7 @@ class CheckIn {
       WHERE user_id = ? AND check_in_date = ?
     `)
     
-    stmt.run(exerciseCount, correctCount, userId, today)
+    stmt.run(exerciseCount, correctCount, userId, todayStr)
   }
 
   // 获取用户打卡记录
@@ -82,14 +92,19 @@ class CheckIn {
 
   // 检查今天是否已打卡
   static hasCheckedInToday(userId) {
-    const today = new Date().toISOString().split('T')[0]
+    // 使用本地时区的日期
+    const today = new Date()
+    const year = today.getFullYear()
+    const month = String(today.getMonth() + 1).padStart(2, '0')
+    const day = String(today.getDate()).padStart(2, '0')
+    const todayStr = `${year}-${month}-${day}`
     
     const stmt = db.prepare(`
       SELECT COUNT(*) as count FROM check_ins
       WHERE user_id = ? AND check_in_date = ?
     `)
     
-    const result = stmt.get(userId, today)
+    const result = stmt.get(userId, todayStr)
     return result.count > 0
   }
 

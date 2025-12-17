@@ -3,6 +3,16 @@ const { userDb, vocabularyDb } = require('../database/db')
 class WrongVerb {
   // 添加或更新错题记录
   static addOrUpdate(userId, verbId) {
+    // 获取当前本地时间
+    const now = new Date()
+    const year = now.getFullYear()
+    const month = String(now.getMonth() + 1).padStart(2, '0')
+    const day = String(now.getDate()).padStart(2, '0')
+    const hour = String(now.getHours()).padStart(2, '0')
+    const minute = String(now.getMinutes()).padStart(2, '0')
+    const second = String(now.getSeconds()).padStart(2, '0')
+    const lastWrongAt = `${year}-${month}-${day} ${hour}:${minute}:${second}`
+    
     // 先检查是否存在
     const existing = userDb.prepare(`
       SELECT id, wrong_count FROM wrong_verbs
@@ -14,18 +24,18 @@ class WrongVerb {
       const stmt = userDb.prepare(`
         UPDATE wrong_verbs
         SET wrong_count = wrong_count + 1,
-            last_wrong_at = datetime('now', 'localtime')
+            last_wrong_at = ?
         WHERE user_id = ? AND verb_id = ?
       `)
-      stmt.run(userId, verbId)
+      stmt.run(lastWrongAt, userId, verbId)
       return existing.wrong_count + 1
     } else {
       // 新增错题记录
       const stmt = userDb.prepare(`
-        INSERT INTO wrong_verbs (user_id, verb_id, wrong_count)
-        VALUES (?, ?, 1)
+        INSERT INTO wrong_verbs (user_id, verb_id, wrong_count, last_wrong_at)
+        VALUES (?, ?, 1, ?)
       `)
-      stmt.run(userId, verbId)
+      stmt.run(userId, verbId, lastWrongAt)
       return 1
     }
   }

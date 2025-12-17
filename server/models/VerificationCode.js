@@ -8,14 +8,22 @@ class VerificationCode {
    * @param {number} expiresIn - 过期时间（分钟）
    */
   static create(email, code, expiresIn = 2) {
-    const expiresAt = new Date(Date.now() + expiresIn * 60 * 1000).toISOString()
+    // 使用本地时间计算过期时间
+    const expiresAt = new Date(Date.now() + expiresIn * 60 * 1000)
+    const year = expiresAt.getFullYear()
+    const month = String(expiresAt.getMonth() + 1).padStart(2, '0')
+    const day = String(expiresAt.getDate()).padStart(2, '0')
+    const hour = String(expiresAt.getHours()).padStart(2, '0')
+    const minute = String(expiresAt.getMinutes()).padStart(2, '0')
+    const second = String(expiresAt.getSeconds()).padStart(2, '0')
+    const expiresAtStr = `${year}-${month}-${day} ${hour}:${minute}:${second}`
     
     const stmt = userDb.prepare(`
       INSERT INTO verification_codes (email, code, expires_at)
       VALUES (?, ?, ?)
     `)
     
-    const result = stmt.run(email.toLowerCase(), code, expiresAt)
+    const result = stmt.run(email.toLowerCase(), code, expiresAtStr)
     return result.lastInsertRowid
   }
 
@@ -39,9 +47,13 @@ class VerificationCode {
       return { valid: false, message: '验证码不正确' }
     }
 
-    // 检查是否过期
+    // 检查是否过期 - 需要正确解析本地时间字符串
     const now = new Date()
-    const expiresAt = new Date(record.expires_at)
+    // 解析格式：'2025-12-17 21:30:00'
+    const [datePart, timePart] = record.expires_at.split(' ')
+    const [year, month, day] = datePart.split('-').map(Number)
+    const [hour, minute, second] = timePart.split(':').map(Number)
+    const expiresAt = new Date(year, month - 1, day, hour, minute, second)
     
     if (now > expiresAt) {
       return { valid: false, message: '验证码已过期，请重新获取' }

@@ -5,12 +5,22 @@ class PracticeRecord {
   static create(recordData) {
     const { userId, verbId, exerciseType, isCorrect, answer, correctAnswer, tense, mood, person } = recordData
     
+    // 获取当前本地时间（Node.js运行环境的本地时间）
+    const now = new Date()
+    const year = now.getFullYear()
+    const month = String(now.getMonth() + 1).padStart(2, '0')
+    const day = String(now.getDate()).padStart(2, '0')
+    const hour = String(now.getHours()).padStart(2, '0')
+    const minute = String(now.getMinutes()).padStart(2, '0')
+    const second = String(now.getSeconds()).padStart(2, '0')
+    const createdAt = `${year}-${month}-${day} ${hour}:${minute}:${second}`
+    
     const stmt = userDb.prepare(`
-      INSERT INTO practice_records (user_id, verb_id, exercise_type, is_correct, answer, correct_answer, tense, mood, person)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO practice_records (user_id, verb_id, exercise_type, is_correct, answer, correct_answer, tense, mood, person, created_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `)
     
-    const result = stmt.run(userId, verbId, exerciseType, isCorrect, answer, correctAnswer, tense, mood, person)
+    const result = stmt.run(userId, verbId, exerciseType, isCorrect, answer, correctAnswer, tense, mood, person, createdAt)
     
     // 更新用户进度
     this.updateUserProgress(userId, verbId, isCorrect)
@@ -20,9 +30,19 @@ class PracticeRecord {
 
   // 更新用户进度
   static updateUserProgress(userId, verbId, isCorrect) {
+    // 获取当前本地时间
+    const now = new Date()
+    const year = now.getFullYear()
+    const month = String(now.getMonth() + 1).padStart(2, '0')
+    const day = String(now.getDate()).padStart(2, '0')
+    const hour = String(now.getHours()).padStart(2, '0')
+    const minute = String(now.getMinutes()).padStart(2, '0')
+    const second = String(now.getSeconds()).padStart(2, '0')
+    const lastPracticedAt = `${year}-${month}-${day} ${hour}:${minute}:${second}`
+    
     const stmt = userDb.prepare(`
       INSERT INTO user_progress (user_id, verb_id, practice_count, correct_count, mastery_level, last_practiced_at)
-      VALUES (?, ?, 1, ?, 0, datetime('now', 'localtime'))
+      VALUES (?, ?, 1, ?, 0, ?)
       ON CONFLICT(user_id, verb_id) DO UPDATE SET
         practice_count = practice_count + 1,
         correct_count = correct_count + ?,
@@ -33,11 +53,11 @@ class PracticeRecord {
           WHEN (correct_count + ?) * 1.0 / (practice_count + 1) >= 0.5 THEN 2
           ELSE 1
         END,
-        last_practiced_at = datetime('now', 'localtime')
+        last_practiced_at = ?
     `)
     
     const correctValue = isCorrect ? 1 : 0
-    stmt.run(userId, verbId, correctValue, correctValue, correctValue, correctValue, correctValue, correctValue)
+    stmt.run(userId, verbId, correctValue, lastPracticedAt, correctValue, correctValue, correctValue, correctValue, correctValue, lastPracticedAt)
   }
 
   // 获取用户练习记录

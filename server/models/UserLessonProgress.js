@@ -25,6 +25,16 @@ class UserLessonProgress {
   // 标记课程完成（增加完成次数）
   // type: 'study' 表示普通学习, 'review' 表示滚动复习
   static markCompleted(userId, lessonId, type = 'study') {
+    // 获取当前本地时间
+    const now = new Date()
+    const year = now.getFullYear()
+    const month = String(now.getMonth() + 1).padStart(2, '0')
+    const day = String(now.getDate()).padStart(2, '0')
+    const hour = String(now.getHours()).padStart(2, '0')
+    const minute = String(now.getMinutes()).padStart(2, '0')
+    const second = String(now.getSeconds()).padStart(2, '0')
+    const currentTime = `${year}-${month}-${day} ${hour}:${minute}:${second}`
+    
     // 先检查是否存在记录
     const existing = this.getProgress(userId, lessonId);
     
@@ -35,20 +45,20 @@ class UserLessonProgress {
         UPDATE user_lesson_progress
         SET completed_count = completed_count + 1,
             ${countField} = ${countField} + 1,
-            last_completed_at = datetime('now', 'localtime'),
-            updated_at = datetime('now', 'localtime')
+            last_completed_at = ?,
+            updated_at = ?
         WHERE user_id = ? AND lesson_id = ?
       `;
-      return userDb.prepare(sql).run(userId, lessonId);
+      return userDb.prepare(sql).run(currentTime, currentTime, userId, lessonId);
     } else {
       // 创建新记录
       const studyCount = type === 'study' ? 1 : 0;
       const reviewCount = type === 'review' ? 1 : 0;
       const sql = `
         INSERT INTO user_lesson_progress (user_id, lesson_id, completed_count, study_completed_count, review_completed_count, last_completed_at)
-        VALUES (?, ?, 1, ?, ?, datetime('now', 'localtime'))
+        VALUES (?, ?, 1, ?, ?, ?)
       `;
-      return userDb.prepare(sql).run(userId, lessonId, studyCount, reviewCount);
+      return userDb.prepare(sql).run(userId, lessonId, studyCount, reviewCount, currentTime);
     }
   }
 

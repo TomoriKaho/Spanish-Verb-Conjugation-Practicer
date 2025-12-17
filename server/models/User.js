@@ -50,33 +50,60 @@ class User {
 
   // 更新用户信息
   static update(id, userData) {
+    const now = new Date()
+    const year = now.getFullYear()
+    const month = String(now.getMonth() + 1).padStart(2, '0')
+    const day = String(now.getDate()).padStart(2, '0')
+    const hour = String(now.getHours()).padStart(2, '0')
+    const minute = String(now.getMinutes()).padStart(2, '0')
+    const second = String(now.getSeconds()).padStart(2, '0')
+    const updatedAt = `${year}-${month}-${day} ${hour}:${minute}:${second}`
+    
     const { email, school, enrollmentYear } = userData
     const stmt = db.prepare(`
       UPDATE users 
-      SET email = ?, school = ?, enrollment_year = ?, updated_at = datetime('now', 'localtime')
+      SET email = ?, school = ?, enrollment_year = ?, updated_at = ?
       WHERE id = ?
     `)
-    return stmt.run(email, school, enrollmentYear, id)
+    return stmt.run(email, school, enrollmentYear, updatedAt, id)
   }
 
   // 更新订阅
   static updateSubscription(id, endDate) {
+    const now = new Date()
+    const year = now.getFullYear()
+    const month = String(now.getMonth() + 1).padStart(2, '0')
+    const day = String(now.getDate()).padStart(2, '0')
+    const hour = String(now.getHours()).padStart(2, '0')
+    const minute = String(now.getMinutes()).padStart(2, '0')
+    const second = String(now.getSeconds()).padStart(2, '0')
+    const updatedAt = `${year}-${month}-${day} ${hour}:${minute}:${second}`
+    
     const stmt = db.prepare(`
       UPDATE users 
-      SET subscription_end_date = ?, updated_at = datetime('now', 'localtime')
+      SET subscription_end_date = ?, updated_at = ?
       WHERE id = ?
     `)
-    return stmt.run(endDate, id)
+    return stmt.run(endDate, updatedAt, id)
   }
 
   // 更新头像
   static updateAvatar(id, avatarBase64) {
+    const now = new Date()
+    const year = now.getFullYear()
+    const month = String(now.getMonth() + 1).padStart(2, '0')
+    const day = String(now.getDate()).padStart(2, '0')
+    const hour = String(now.getHours()).padStart(2, '0')
+    const minute = String(now.getMinutes()).padStart(2, '0')
+    const second = String(now.getSeconds()).padStart(2, '0')
+    const updatedAt = `${year}-${month}-${day} ${hour}:${minute}:${second}`
+    
     const stmt = db.prepare(`
       UPDATE users 
-      SET avatar = ?, updated_at = datetime('now', 'localtime')
+      SET avatar = ?, updated_at = ?
       WHERE id = ?
     `)
-    return stmt.run(avatarBase64, id)
+    return stmt.run(avatarBase64, updatedAt, id)
   }
 
   // 检查订阅状态

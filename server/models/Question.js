@@ -503,17 +503,27 @@ class Question {
    * @param {boolean} isCorrect - 是否答对
    */
   static recordPractice(userId, questionId, questionType, isCorrect) {
+    // 获取当前本地时间
+    const now = new Date()
+    const year = now.getFullYear()
+    const month = String(now.getMonth() + 1).padStart(2, '0')
+    const day = String(now.getDate()).padStart(2, '0')
+    const hour = String(now.getHours()).padStart(2, '0')
+    const minute = String(now.getMinutes()).padStart(2, '0')
+    const second = String(now.getSeconds()).padStart(2, '0')
+    const lastPracticedAt = `${year}-${month}-${day} ${hour}:${minute}:${second}`
+    
     const stmt = userDb.prepare(`
       INSERT INTO user_question_records (user_id, question_id, question_type, practice_count, correct_count, last_practiced_at)
-      VALUES (?, ?, ?, 1, ?, datetime('now', 'localtime'))
+      VALUES (?, ?, ?, 1, ?, ?)
       ON CONFLICT(user_id, question_id, question_type) 
       DO UPDATE SET 
         practice_count = practice_count + 1,
         correct_count = correct_count + ?,
-        last_practiced_at = datetime('now', 'localtime')
+        last_practiced_at = ?
     `)
     const correctIncrement = isCorrect ? 1 : 0
-    const result = stmt.run(userId, questionId, questionType, correctIncrement, correctIncrement)
+    const result = stmt.run(userId, questionId, questionType, correctIncrement, lastPracticedAt, correctIncrement, lastPracticedAt)
     return result.changes > 0
   }
 

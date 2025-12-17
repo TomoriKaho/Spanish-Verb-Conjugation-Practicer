@@ -282,7 +282,19 @@ export default {
     },
     formatTime(timeStr) {
       if (!timeStr) return ''
-      const date = new Date(timeStr)
+      // 正确解析本地时间字符串 '2025-12-17 21:30:45'
+      // 不能直接用 new Date(timeStr)，因为它会当作UTC时间
+      let date
+      if (timeStr.includes(' ')) {
+        // 格式：'2025-12-17 21:30:45'
+        const [datePart, timePart] = timeStr.split(' ')
+        const [year, month, day] = datePart.split('-').map(Number)
+        const [hour, minute, second] = timePart.split(':').map(Number)
+        date = new Date(year, month - 1, day, hour, minute, second)
+      } else {
+        // 其他格式尝试直接解析
+        date = new Date(timeStr)
+      }
       return `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`
     },
     viewAllMastered() {
