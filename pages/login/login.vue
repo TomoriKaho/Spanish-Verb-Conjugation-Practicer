@@ -538,6 +538,9 @@ export default {
   font-size: 24rpx;
   white-space: nowrap;
   flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .code-button[disabled] {
