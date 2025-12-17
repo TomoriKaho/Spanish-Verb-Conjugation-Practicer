@@ -243,6 +243,7 @@ class ExerciseGeneratorService {
       exerciseType: question.question_type,
       conjugationType: conjugationTypeMap[question.conjugation_type] || '未知',
       isIrregular: question.is_irregular === 1,
+      isReflexive: question.is_reflexive === 1,
       fromQuestionBank: true
     }
 
@@ -511,8 +512,7 @@ class ExerciseGeneratorService {
       correctAnswer: aiResult.answer || randomConjugation.conjugated_form,
       exerciseType: exerciseType,
       conjugationType: conjugationTypeMap[verb.conjugation_type] || '未知',
-      isIrregular: verb.is_irregular === 1,
-      fromQuestionBank: false,
+      isIrregular: verb.is_irregular === 1,      isReflexive: randomVerb.is_reflexive === 1,      fromQuestionBank: false,
       aiGenerated: true
     }
 
@@ -703,6 +703,7 @@ class ExerciseGeneratorService {
       exerciseType: exerciseType,
       conjugationType: conjugationTypeMap[verb.conjugation_type] || '未知',
       isIrregular: verb.is_irregular === 1,
+      isReflexive: verb.is_reflexive === 1,
       fromQuestionBank: false,
       aiGenerated: true
     }

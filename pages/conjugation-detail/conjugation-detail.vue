@@ -4,7 +4,7 @@
     <view class="verb-info-card card">
       <view class="verb-header">
         <view class="verb-left">
-          <text class="verb-infinitive">{{ verbInfo.infinitive }}{{ verbInfo.isReflexive ? ' (se)' : '' }}</text>
+          <text class="verb-infinitive">{{ verbInfo.infinitive }}{{ verbInfo.isReflexive ? '(se)' : '' }}</text>
           <view class="verb-badges">
             <view class="badge badge-type">{{ verbInfo.conjugationType }}</view>
             <view v-if="verbInfo.isIrregular" class="badge badge-irregular">不规则</view>

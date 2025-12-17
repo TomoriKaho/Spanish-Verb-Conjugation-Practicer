@@ -51,7 +51,7 @@
       </view>
 
       <view class="verb-info">
-        <text class="infinitive">{{ currentExercise.infinitive }}</text>
+        <text class="infinitive">{{ currentExercise.infinitive }}{{ currentExercise.isReflexive ? '(se)' : '' }}</text>
         <text class="meaning">{{ currentExercise.meaning }}</text>
       </view>
 

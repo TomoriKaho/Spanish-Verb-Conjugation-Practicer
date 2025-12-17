@@ -235,22 +235,22 @@
       "negative": {
         "first_singular": [],
         "second_singular": [
-          "no seas"
+          "seas"
         ],
         "second_singular_vos_form": [
-          "no seas"
+          "seas"
         ],
         "third_singular": [
-          "no sea"
+          "sea"
         ],
         "first_plural": [
-          "no seamos"
+          "seamos"
         ],
         "second_plural": [
-          "no seáis"
+          "seáis"
         ],
         "third_plural": [
-          "no sean"
+          "sean"
         ],
         "regular": false
       }
@@ -460,7 +460,7 @@
     }
   },
   {
-    "infinitive": "llamarse",
+    "infinitive": "llamar",
     "gerund": "llamando",
     "participle": [
       "llamado"
@@ -604,7 +604,7 @@
           "llame"
         ],
         "first_plural": [
-          "llemos"
+          "llamemos"
         ],
         "second_plural": [
           "llaméis"
@@ -682,7 +682,7 @@
           "llame"
         ],
         "first_plural": [
-          "llemos"
+          "llamemos"
         ],
         "second_plural": [
           "llamad"
@@ -695,22 +695,22 @@
       "negative": {
         "first_singular": [],
         "second_singular": [
-          "no llames"
+          "llames"
         ],
         "second_singular_vos_form": [
-          "no llamés"
+          "llamés"
         ],
         "third_singular": [
-          "no llame"
+          "llame"
         ],
         "first_plural": [
-          "no llemos"
+          "llamemos"
         ],
         "second_plural": [
-          "no llaméis"
+          "llaméis"
         ],
         "third_plural": [
-          "no llamen"
+          "llamen"
         ],
         "regular": false
       }
@@ -1990,7 +1990,7 @@
           "enseñéis"
         ],
         "third_plural": [
-          "ensenen"
+          "enseñen"
         ]
       },
       "imperfect": {
@@ -2068,7 +2068,7 @@
           "enseñad"
         ],
         "third_plural": [
-          "ensenen"
+          "enseñen"
         ],
         "regular": false
       },
@@ -2090,7 +2090,7 @@
           "enseñéis"
         ],
         "third_plural": [
-          "ensenen"
+          "enseñen"
         ],
         "regular": false
       }
@@ -2461,11 +2461,11 @@
         ],
         "second_singular": [
           "estudiaras",
-          "estudieses"
+          "estudiases"
         ],
         "second_singular_vos_form": [
           "estudiaras",
-          "estudieses"
+          "estudiases"
         ],
         "third_singular": [
           "estudiara",
@@ -3458,7 +3458,7 @@
           "trabajes"
         ],
         "second_singular_vos_form": [
-          "no trabajés"
+          "trabajés"
         ],
         "third_singular": [
           "trabaje"
@@ -4375,22 +4375,22 @@
       "negative": {
         "first_singular": [],
         "second_singular": [
-          "no tengas"
+          "tengas"
         ],
         "second_singular_vos_form": [
-          "no tengás"
+          "tengás"
         ],
         "third_singular": [
-          "no tenga"
+          "tenga"
         ],
         "first_plural": [
-          "no tengamos"
+          "tengamos"
         ],
         "second_plural": [
-          "no tengáis"
+          "tengáis"
         ],
         "third_plural": [
-          "no tengan"
+          "tengan"
         ],
         "regular": false
       }
@@ -4600,7 +4600,7 @@
     }
   },
   {
-    "infinitive": "encargarse",
+    "infinitive": "encargar",
     "gerund": "encargando",
     "participle": [
       "encargado"
@@ -5520,7 +5520,7 @@
     }
   },
   {
-    "infinitive": "irse",
+    "infinitive": "ir",
     "gerund": "yendo",
     "participle": [
       "ido"
@@ -5980,7 +5980,7 @@
     }
   },
   {
-    "infinitive": "levantarse",
+    "infinitive": "levantar",
     "gerund": "levantando",
     "participle": [
       "levantado"
@@ -6440,7 +6440,7 @@
     }
   },
   {
-    "infinitive": "bañarse",
+    "infinitive": "bañar",
     "gerund": "bañando",
     "participle": [
       "bañado"
@@ -6900,7 +6900,7 @@
     }
   },
   {
-    "infinitive": "cepillarse",
+    "infinitive": "cepillar",
     "gerund": "cepillando",
     "participle": [
       "cepillado"
@@ -7135,22 +7135,22 @@
       "negative": {
         "first_singular": [],
         "second_singular": [
-          "no cepilles"
+          "cepilles"
         ],
         "second_singular_vos_form": [
-          "no cepillés"
+          "cepillés"
         ],
         "third_singular": [
-          "no cepille"
+          "cepille"
         ],
         "first_plural": [
-          "no cepillemos"
+          "cepillemos"
         ],
         "second_plural": [
-          "no cepilléis"
+          "cepilléis"
         ],
         "third_plural": [
-          "no cepillen"
+          "cepillen"
         ],
         "regular": false
       }
@@ -7360,7 +7360,7 @@
     }
   },
   {
-    "infinitive": "peinarse",
+    "infinitive": "peinar",
     "gerund": "peinando",
     "participle": [
       "peinado"
@@ -7595,22 +7595,22 @@
       "negative": {
         "first_singular": [],
         "second_singular": [
-          "no peines"
+          "peines"
         ],
         "second_singular_vos_form": [
-          "no peinés"
+          "peinés"
         ],
         "third_singular": [
-          "no peine"
+          "peine"
         ],
         "first_plural": [
-          "no peinemos"
+          "peinemos"
         ],
         "second_plural": [
-          "no peinéis"
+          "peinéis"
         ],
         "third_plural": [
-          "no peinen"
+          "peinen"
         ],
         "regular": false
       }
@@ -8055,22 +8055,22 @@
       "negative": {
         "first_singular": [],
         "second_singular": [
-          "no desayunes"
+          "desayunes"
         ],
         "second_singular_vos_form": [
-          "no desayunés"
+          "desayunés"
         ],
         "third_singular": [
-          "no desayune"
+          "desayune"
         ],
         "first_plural": [
-          "no desayunemos"
+          "desayunemos"
         ],
         "second_plural": [
-          "no desayunéis"
+          "desayunéis"
         ],
         "third_plural": [
-          "no desayunen"
+          "desayunen"
         ],
         "regular": false
       }
@@ -8280,7 +8280,7 @@
     }
   },
   {
-    "infinitive": "llevarse",
+    "infinitive": "llevar",
     "gerund": "llevando",
     "participle": [
       "llevado"
@@ -8515,22 +8515,22 @@
       "negative": {
         "first_singular": [],
         "second_singular": [
-          "no lleves"
+          "lleves"
         ],
         "second_singular_vos_form": [
-          "no llevés"
+          "llevés"
         ],
         "third_singular": [
-          "no lleve"
+          "lleve"
         ],
         "first_plural": [
-          "no llevemos"
+          "llevemos"
         ],
         "second_plural": [
-          "no llevéis"
+          "llevéis"
         ],
         "third_plural": [
-          "no lleven"
+          "lleven"
         ],
         "regular": false
       }
@@ -8740,7 +8740,7 @@
     }
   },
   {
-    "infinitive": "tomarse",
+    "infinitive": "tomar",
     "gerund": "tomando",
     "participle": [
       "tomado"
@@ -8975,22 +8975,22 @@
       "negative": {
         "first_singular": [],
         "second_singular": [
-          "no tomes"
+          "tomes"
         ],
         "second_singular_vos_form": [
-          "no tomés"
+          "tomés"
         ],
         "third_singular": [
-          "no tome"
+          "tome"
         ],
         "first_plural": [
-          "no tomemos"
+          "tomemos"
         ],
         "second_plural": [
-          "no toméis"
+          "toméis"
         ],
         "third_plural": [
-          "no tomen"
+          "tomen"
         ],
         "regular": false
       }
@@ -9895,22 +9895,22 @@
       "negative": {
         "first_singular": [],
         "second_singular": [
-          "no parezcas"
+          "parezcas"
         ],
         "second_singular_vos_form": [
-          "no parecés"
+          "parecés"
         ],
         "third_singular": [
-          "no parezca"
+          "parezca"
         ],
         "first_plural": [
-          "no parezcamos"
+          "parezcamos"
         ],
         "second_plural": [
-          "no parezcáis"
+          "parezcáis"
         ],
         "third_plural": [
-          "no parezcan"
+          "parezcan"
         ],
         "regular": false
       }
@@ -10355,22 +10355,22 @@
       "negative": {
         "first_singular": [],
         "second_singular": [
-          "no supongas"
+          "supongas"
         ],
         "second_singular_vos_form": [
-          "no supongás"
+          "supongás"
         ],
         "third_singular": [
-          "no suponga"
+          "suponga"
         ],
         "first_plural": [
-          "no supongamos"
+          "supongamos"
         ],
         "second_plural": [
-          "no supongáis"
+          "supongáis"
         ],
         "third_plural": [
-          "no supongan"
+          "supongan"
         ],
         "regular": false
       }
@@ -10815,22 +10815,22 @@
       "negative": {
         "first_singular": [],
         "second_singular": [
-          "no hables"
+          "hables"
         ],
         "second_singular_vos_form": [
-          "no hablés"
+          "hablés"
         ],
         "third_singular": [
-          "no hable"
+          "hable"
         ],
         "first_plural": [
-          "no hablemos"
+          "hablemos"
         ],
         "second_plural": [
-          "no habléis"
+          "habléis"
         ],
         "third_plural": [
-          "no hablen"
+          "hablen"
         ],
         "regular": false
       }
@@ -12195,22 +12195,22 @@
       "negative": {
         "first_singular": [],
         "second_singular": [
-          "no descanses"
+          "descanses"
         ],
         "second_singular_vos_form": [
-          "no descansés"
+          "descansés"
         ],
         "third_singular": [
-          "no descanse"
+          "descanse"
         ],
         "first_plural": [
-          "no descansemos"
+          "descansemos"
         ],
         "second_plural": [
-          "no descanséis"
+          "descanséis"
         ],
         "third_plural": [
-          "no descansen"
+          "descansen"
         ],
         "regular": false
       }
@@ -13115,22 +13115,22 @@
       "negative": {
         "first_singular": [],
         "second_singular": [
-          "no comiences"
+          "comiences"
         ],
         "second_singular_vos_form": [
-          "no comenzés"
+          "comenzés"
         ],
         "third_singular": [
-          "no comience"
+          "comience"
         ],
         "first_plural": [
-          "no comencemos"
+          "comencemos"
         ],
         "second_plural": [
-          "no comencéis"
+          "comencéis"
         ],
         "third_plural": [
-          "no comiencen"
+          "comiencen"
         ],
         "regular": false
       }
@@ -14035,22 +14035,22 @@
       "negative": {
         "first_singular": [],
         "second_singular": [
-          "no hagas"
+          "hagas"
         ],
         "second_singular_vos_form": [
-          "no hagás"
+          "hagás"
         ],
         "third_singular": [
-          "no haga"
+          "haga"
         ],
         "first_plural": [
-          "no hagamos"
+          "hagamos"
         ],
         "second_plural": [
-          "no hagáis"
+          "hagáis"
         ],
         "third_plural": [
-          "no hagan"
+          "hagan"
         ],
         "regular": false
       }
@@ -14495,22 +14495,22 @@
       "negative": {
         "first_singular": [],
         "second_singular": [
-          "no salgas"
+          "salgas"
         ],
         "second_singular_vos_form": [
-          "no salgás"
+          "salgás"
         ],
         "third_singular": [
-          "no salga"
+          "salga"
         ],
         "first_plural": [
-          "no salgamos"
+          "salgamos"
         ],
         "second_plural": [
-          "no salgáis"
+          "salgáis"
         ],
         "third_plural": [
-          "no salgan"
+          "salgan"
         ],
         "regular": false
       }
@@ -15415,22 +15415,22 @@
       "negative": {
         "first_singular": [],
         "second_singular": [
-          "no vuelvas"
+          "vuelvas"
         ],
         "second_singular_vos_form": [
-          "no volvás"
+          "volvás"
         ],
         "third_singular": [
-          "no vuelva"
+          "vuelva"
         ],
         "first_plural": [
-          "no volvamos"
+          "volvamos"
         ],
         "second_plural": [
-          "no volváis"
+          "volváis"
         ],
         "third_plural": [
-          "no vuelvan"
+          "vuelvan"
         ],
         "regular": false
       }
@@ -15875,22 +15875,22 @@
       "negative": {
         "first_singular": [],
         "second_singular": [
-          "no almuerces"
+          "almuerces"
         ],
         "second_singular_vos_form": [
-          "no almuencés"
+          "almuencés"
         ],
         "third_singular": [
-          "no almuerce"
+          "almuerce"
         ],
         "first_plural": [
-          "no almorzemos"
+          "almorzemos"
         ],
         "second_plural": [
-          "no almorcéis"
+          "almorcéis"
         ],
         "third_plural": [
-          "no almuercen"
+          "almuercen"
         ],
         "regular": false
       }
@@ -16100,7 +16100,7 @@
     }
   },
   {
-    "infinitive": "prepararse",
+    "infinitive": "preparar",
     "gerund": "preparando",
     "participle": [
       "preparado"
@@ -16560,7 +16560,7 @@
     }
   },
   {
-    "infinitive": "quedarse",
+    "infinitive": "quedar",
     "gerund": "quedando",
     "participle": [
       "quedado"
@@ -16795,22 +16795,22 @@
       "negative": {
         "first_singular": [],
         "second_singular": [
-          "no quedes"
+          "quedes"
         ],
         "second_singular_vos_form": [
-          "no quedés"
+          "quedés"
         ],
         "third_singular": [
-          "no quede"
+          "quede"
         ],
         "first_plural": [
-          "no quedemos"
+          "quedemos"
         ],
         "second_plural": [
-          "no quedéis"
+          "quedéis"
         ],
         "third_plural": [
-          "no queden"
+          "queden"
         ],
         "regular": false
       }
@@ -17020,7 +17020,7 @@
     }
   },
   {
-    "infinitive": "acostarse",
+    "infinitive": "acostar",
     "gerund": "acostando",
     "participle": [
       "acostado"
@@ -17255,22 +17255,22 @@
       "negative": {
         "first_singular": [],
         "second_singular": [
-          "no acuestes"
+          "acuestes"
         ],
         "second_singular_vos_form": [
-          "no acuestés"
+          "acuestés"
         ],
         "third_singular": [
-          "no acueste"
+          "acueste"
         ],
         "first_plural": [
-          "no acostemos"
+          "acostemos"
         ],
         "second_plural": [
-          "no acostéis"
+          "acostéis"
         ],
         "third_plural": [
-          "no acuesten"
+          "acuesten"
         ],
         "regular": false
       }
@@ -17715,22 +17715,22 @@
       "negative": {
         "first_singular": [],
         "second_singular": [
-          "no invites"
+          "invites"
         ],
         "second_singular_vos_form": [
-          "no invités"
+          "invités"
         ],
         "third_singular": [
-          "no invite"
+          "invite"
         ],
         "first_plural": [
-          "no invitemos"
+          "invitemos"
         ],
         "second_plural": [
-          "no invitéis"
+          "invitéis"
         ],
         "third_plural": [
-          "no inviten"
+          "inviten"
         ],
         "regular": false
       }
@@ -18175,22 +18175,22 @@
       "negative": {
         "first_singular": [],
         "second_singular": [
-          "no cenes"
+          "cenes"
         ],
         "second_singular_vos_form": [
-          "no cenés"
+          "cenés"
         ],
         "third_singular": [
-          "no cene"
+          "cene"
         ],
         "first_plural": [
-          "no cenemos"
+          "cenemos"
         ],
         "second_plural": [
-          "no cenéis"
+          "cenéis"
         ],
         "third_plural": [
-          "no cenen"
+          "cenen"
         ],
         "regular": false
       }
@@ -18635,22 +18635,22 @@
       "negative": {
         "first_singular": [],
         "second_singular": [
-          "no compres"
+          "compres"
         ],
         "second_singular_vos_form": [
-          "no comprés"
+          "comprés"
         ],
         "third_singular": [
-          "no compre"
+          "compre"
         ],
         "first_plural": [
-          "no compremos"
+          "compremos"
         ],
         "second_plural": [
-          "no compréis"
+          "compréis"
         ],
         "third_plural": [
-          "no compren"
+          "compren"
         ],
         "regular": false
       }
@@ -20015,22 +20015,22 @@
       "negative": {
         "first_singular": [],
         "second_singular": [
-          "no cierres"
+          "cierres"
         ],
         "second_singular_vos_form": [
-          "no cerrés"
+          "cerrés"
         ],
         "third_singular": [
-          "no cierre"
+          "cierre"
         ],
         "first_plural": [
-          "no cerremos"
+          "cerremos"
         ],
         "second_plural": [
-          "no cerréis"
+          "cerréis"
         ],
         "third_plural": [
-          "no cierren"
+          "cierren"
         ],
         "regular": false
       }
@@ -20475,22 +20475,22 @@
       "negative": {
         "first_singular": [],
         "second_singular": [
-          "no puedas"
+          "puedas"
         ],
         "second_singular_vos_form": [
-          "no podás"
+          "podás"
         ],
         "third_singular": [
-          "no pueda"
+          "pueda"
         ],
         "first_plural": [
-          "no podamos"
+          "podamos"
         ],
         "second_plural": [
-          "no podáis"
+          "podáis"
         ],
         "third_plural": [
-          "no puedan"
+          "puedan"
         ],
         "regular": false
       }
@@ -20935,22 +20935,22 @@
       "negative": {
         "first_singular": [],
         "second_singular": [
-          "no quieras"
+          "quieras"
         ],
         "second_singular_vos_form": [
-          "no querás"
+          "querás"
         ],
         "third_singular": [
-          "no quiera"
+          "quiera"
         ],
         "first_plural": [
-          "no queramos"
+          "queramos"
         ],
         "second_plural": [
-          "no queráis"
+          "queráis"
         ],
         "third_plural": [
-          "no quieran"
+          "quieran"
         ],
         "regular": false
       }
@@ -21160,7 +21160,7 @@
     }
   },
   {
-    "infinitive": "alegrarse",
+    "infinitive": "alegrar",
     "gerund": "alegrando",
     "participle": [
       "alegrado"
@@ -21395,22 +21395,22 @@
       "negative": {
         "first_singular": [],
         "second_singular": [
-          "no alegres"
+          "alegres"
         ],
         "second_singular_vos_form": [
-          "no alegrés"
+          "alegrés"
         ],
         "third_singular": [
-          "no alegre"
+          "alegre"
         ],
         "first_plural": [
-          "no alegremos"
+          "alegremos"
         ],
         "second_plural": [
-          "no alegréis"
+          "alegréis"
         ],
         "third_plural": [
-          "no alegren"
+          "alegren"
         ],
         "regular": false
       }
@@ -21855,22 +21855,22 @@
       "negative": {
         "first_singular": [],
         "second_singular": [
-          "no celebres"
+          "celebres"
         ],
         "second_singular_vos_form": [
-          "no celebrés"
+          "celebrés"
         ],
         "third_singular": [
-          "no celebre"
+          "celebre"
         ],
         "first_plural": [
-          "no celebremos"
+          "celebremos"
         ],
         "second_plural": [
-          "no celebréis"
+          "celebréis"
         ],
         "third_plural": [
-          "no celebren"
+          "celebren"
         ],
         "regular": false
       }
@@ -22315,22 +22315,22 @@
       "negative": {
         "first_singular": [],
         "second_singular": [
-          "no entres"
+          "entres"
         ],
         "second_singular_vos_form": [
-          "no entrés"
+          "entrés"
         ],
         "third_singular": [
-          "no entre"
+          "entre"
         ],
         "first_plural": [
-          "no entremos"
+          "entremos"
         ],
         "second_plural": [
-          "no entréis"
+          "entréis"
         ],
         "third_plural": [
-          "no entren"
+          "entren"
         ],
         "regular": false
       }
@@ -22540,7 +22540,7 @@
     }
   },
   {
-    "infinitive": "sentarse",
+    "infinitive": "sentar",
     "gerund": "sentando",
     "participle": [
       "sentado"
@@ -22775,22 +22775,22 @@
       "negative": {
         "first_singular": [],
         "second_singular": [
-          "no sientes"
+          "sientes"
         ],
         "second_singular_vos_form": [
-          "no sentés"
+          "sentés"
         ],
         "third_singular": [
-          "no siente"
+          "siente"
         ],
         "first_plural": [
-          "no sentemos"
+          "sentemos"
         ],
         "second_plural": [
-          "no sentéis"
+          "sentéis"
         ],
         "third_plural": [
-          "no sienten"
+          "sienten"
         ],
         "regular": false
       }
@@ -23235,22 +23235,22 @@
       "negative": {
         "first_singular": [],
         "second_singular": [
-          "no recomiendes"
+          "recomiendes"
         ],
         "second_singular_vos_form": [
-          "no recomendés"
+          "recomendés"
         ],
         "third_singular": [
-          "no recomiende"
+          "recomiende"
         ],
         "first_plural": [
-          "no recomendemos"
+          "recomendemos"
         ],
         "second_plural": [
-          "no recomendéis"
+          "recomendéis"
         ],
         "third_plural": [
-          "no recomienden"
+          "recomienden"
         ],
         "regular": false
       }
@@ -23695,22 +23695,22 @@
       "negative": {
         "first_singular": [],
         "second_singular": [
-          "no pidas"
+          "pidas"
         ],
         "second_singular_vos_form": [
-          "no pidás"
+          "pidás"
         ],
         "third_singular": [
-          "no pida"
+          "pida"
         ],
         "first_plural": [
-          "no pidamos"
+          "pidamos"
         ],
         "second_plural": [
-          "no pidáis"
+          "pidáis"
         ],
         "third_plural": [
-          "no pidan"
+          "pidan"
         ],
         "regular": false
       }
@@ -24615,22 +24615,22 @@
       "negative": {
         "first_singular": [],
         "second_singular": [
-          "no cumplas"
+          "cumplas"
         ],
         "second_singular_vos_form": [
-          "no cumplés"
+          "cumplés"
         ],
         "third_singular": [
-          "no cumpla"
+          "cumpla"
         ],
         "first_plural": [
-          "no cumplamos"
+          "cumplamos"
         ],
         "second_plural": [
-          "no cumpláis"
+          "cumpláis"
         ],
         "third_plural": [
-          "no cumplan"
+          "cumplan"
         ],
         "regular": false
       }
@@ -25075,22 +25075,22 @@
       "negative": {
         "first_singular": [],
         "second_singular": [
-          "no empieces"
+          "empieces"
         ],
         "second_singular_vos_form": [
-          "no empezés"
+          "empezés"
         ],
         "third_singular": [
-          "no empiece"
+          "empiece"
         ],
         "first_plural": [
-          "no empecemos"
+          "empecemos"
         ],
         "second_plural": [
-          "no empecéis"
+          "empecéis"
         ],
         "third_plural": [
-          "no empiecen"
+          "empiecen"
         ],
         "regular": false
       }
@@ -25300,7 +25300,7 @@
     }
   },
   {
-    "infinitive": "ayudarse",
+    "infinitive": "ayudar",
     "gerund": "ayudando",
     "participle": [
       "ayudado"
@@ -25535,22 +25535,22 @@
       "negative": {
         "first_singular": [],
         "second_singular": [
-          "no ayudes"
+          "ayudes"
         ],
         "second_singular_vos_form": [
-          "no ayudés"
+          "ayudés"
         ],
         "third_singular": [
-          "no ayude"
+          "ayude"
         ],
         "first_plural": [
-          "no ayudemos"
+          "ayudemos"
         ],
         "second_plural": [
-          "no ayudéis"
+          "ayudéis"
         ],
         "third_plural": [
-          "no ayuden"
+          "ayuden"
         ],
         "regular": false
       }
@@ -25995,22 +25995,22 @@
       "negative": {
         "first_singular": [],
         "second_singular": [
-          "no recibas"
+          "recibas"
         ],
         "second_singular_vos_form": [
-          "no recibás"
+          "recibás"
         ],
         "third_singular": [
-          "no reciba"
+          "reciba"
         ],
         "first_plural": [
-          "no recibamos"
+          "recibamos"
         ],
         "second_plural": [
-          "no recibáis"
+          "recibáis"
         ],
         "third_plural": [
-          "no reciban"
+          "reciban"
         ],
         "regular": false
       }
@@ -26221,7 +26221,7 @@
   },
   {
     "infinitive": "felicitar",
-    "gerund": "felicitanado",
+    "gerund": "felicitando",
     "participle": [
       "felicitado"
     ],
@@ -26230,70 +26230,70 @@
       "present": {
         "regular": true,
         "first_singular": [
-          "felizito"
+          "felicito"
         ],
         "second_singular": [
-          "felizitas"
+          "felicitas"
         ],
         "second_singular_vos_form": [
-          "felizitas"
+          "felicitás"
         ],
         "third_singular": [
-          "felizita"
+          "felicita"
         ],
         "first_plural": [
-          "felizitamos"
+          "felicitamos"
         ],
         "second_plural": [
-          "felizitáis"
+          "felicitáis"
         ],
         "third_plural": [
-          "felizitan"
+          "felicitan"
         ]
       },
       "imperfect": {
         "regular": true,
         "first_singular": [
-          "felicitéba"
+          "felicitaba"
         ],
         "second_singular": [
-          "felicitébas"
+          "felicitabas"
         ],
         "second_singular_vos_form": [
-          "felicitébas"
+          "felicitabas"
         ],
         "third_singular": [
-          "felicitéba"
+          "felicitaba"
         ],
         "first_plural": [
-          "felicítábamos"
+          "felicitábamos"
         ],
         "second_plural": [
-          "felicitébais"
+          "felicitabais"
         ],
         "third_plural": [
-          "felicitéban"
+          "felicitaban"
         ]
       },
       "preterite": {
         "regular": true,
         "first_singular": [
-          "felicié"
+          "felicité"
         ],
         "second_singular": [
-          "feliciaste"
+          "felicitaste"
         ],
         "second_singular_vos_form": [
-          "feliciaste"
+          "felicitaste"
         ],
         "third_singular": [
-          "felicíto"
+          "felicitó"
         ],
         "first_plural": [
-          "felicítamos"
+          "felicitamos"
         ],
         "second_plural": [
-          "feliciasteis"
+          "felicitasteis"
         ],
         "third_plural": [
           "felicitaron"
@@ -26314,7 +26314,7 @@
           "felicitará"
         ],
         "first_plural": [
-          "feliciteremos"
+          "felicitaremos"
         ],
         "second_plural": [
           "felicitaréis"
@@ -26352,80 +26352,80 @@
       "present": {
         "regular": true,
         "first_singular": [
-          "felizite"
+          "felicite"
         ],
         "second_singular": [
-          "felizites"
+          "felicites"
         ],
         "second_singular_vos_form": [
-          "felizites"
+          "felicites"
         ],
         "third_singular": [
-          "felizite"
+          "felicite"
         ],
         "first_plural": [
-          "felizitemos"
+          "felicitemos"
         ],
         "second_plural": [
-          "felizitéis"
+          "felicitéis"
         ],
         "third_plural": [
-          "feliziten"
+          "feliciten"
         ]
       },
       "imperfect": {
         "regular": true,
         "first_singular": [
-          "felicitéra",
-          "felicitése"
+          "felicitara",
+          "felicitase"
         ],
         "second_singular": [
-          "felicitéras",
-          "felicitéses"
+          "felicitaras",
+          "felicitases"
         ],
         "second_singular_vos_form": [
-          "felicitéras",
-          "felicitéses"
+          "felicitaras",
+          "felicitases"
         ],
         "third_singular": [
-          "felicitéra",
-          "felicitése"
+          "felicitara",
+          "felicitase"
         ],
         "first_plural": [
-          "felicítéramos",
-          "felicítése"
+          "felicitáramos",
+          "felicitásemos"
         ],
         "second_plural": [
-          "felicitérais",
-          "felicitéseis"
+          "felicitarais",
+          "felicitaseis"
         ],
         "third_plural": [
-          "felicitéran",
-          "felicitésen"
+          "felicitaran",
+          "felicitasen"
         ]
       },
       "future": {
         "regular": true,
         "first_singular": [
-          "felicitaré"
+          "felicitare"
         ],
         "second_singular": [
-          "felicitarés"
+          "felicitares"
         ],
         "second_singular_vos_form": [
-          "felicitarés"
+          "felicitares"
         ],
         "third_singular": [
-          "felicitará"
+          "felicitare"
         ],
         "first_plural": [
-          "feliciteremos"
+          "felicitáremos"
         ],
         "second_plural": [
-          "felicitaréis"
+          "felicitareis"
         ],
         "third_plural": [
-          "felicitarán"
+          "felicitaren"
         ]
       }
     },
@@ -26433,44 +26433,44 @@
       "affirmative": {
         "first_singular": [],
         "second_singular": [
-          "felizita"
+          "felicita"
         ],
         "second_singular_vos_form": [
-          "felizitá"
+          "felicitá"
         ],
         "third_singular": [
-          "felizite"
+          "felicite"
         ],
         "first_plural": [
-          "felizitemos"
+          "felicitemos"
         ],
         "second_plural": [
-          "feliziten"
+          "felicitad"
         ],
         "third_plural": [
-          "felizitad"
+          "feliciten"
         ],
         "regular": false
       },
       "negative": {
         "first_singular": [],
         "second_singular": [
-          "felizites"
+          "felicites"
         ],
         "second_singular_vos_form": [
-          "no felizites"
+          "felicites"
         ],
         "third_singular": [
-          "felizite"
+          "felicite"
         ],
         "first_plural": [
-          "felizitemos"
+          "felicitemos"
         ],
         "second_plural": [
-          "felizitéis"
+          "felicitéis"
         ],
         "third_plural": [
-          "feliziten"
+          "feliciten"
         ],
         "regular": false
       }
@@ -27835,22 +27835,22 @@
       "negative": {
         "first_singular": [],
         "second_singular": [
-          "no comas"
+          "comas"
         ],
         "second_singular_vos_form": [
-          "no comas"
+          "comas"
         ],
         "third_singular": [
-          "no coma"
+          "coma"
         ],
         "first_plural": [
-          "no comamos"
+          "comamos"
         ],
         "second_plural": [
-          "no comáis"
+          "comáis"
         ],
         "third_plural": [
-          "no coman"
+          "coman"
         ],
         "regular": false
       }
@@ -28295,22 +28295,22 @@
       "negative": {
         "first_singular": [],
         "second_singular": [
-          "no gustes"
+          "gustes"
         ],
         "second_singular_vos_form": [
-          "no gustés"
+          "gustés"
         ],
         "third_singular": [
-          "no gusto"
+          "gusto"
         ],
         "first_plural": [
-          "no gustemos"
+          "gustemos"
         ],
         "second_plural": [
-          "no gustéis"
+          "gustéis"
         ],
         "third_plural": [
-          "no gusten"
+          "gusten"
         ],
         "regular": false
       }
@@ -28755,22 +28755,22 @@
       "negative": {
         "first_singular": [],
         "second_singular": [
-          "no encantes"
+          "encantes"
         ],
         "second_singular_vos_form": [
-          "no encantés"
+          "encantés"
         ],
         "third_singular": [
-          "no encante"
+          "encante"
         ],
         "first_plural": [
-          "no encantemos"
+          "encantemos"
         ],
         "second_plural": [
-          "no encantéis"
+          "encantéis"
         ],
         "third_plural": [
-          "no encanten"
+          "encanten"
         ],
         "regular": false
       }
@@ -29215,22 +29215,22 @@
       "negative": {
         "first_singular": [],
         "second_singular": [
-          "no mires"
+          "mires"
         ],
         "second_singular_vos_form": [
-          "no mirés"
+          "mirés"
         ],
         "third_singular": [
-          "no mire"
+          "mire"
         ],
         "first_plural": [
-          "no miremos"
+          "miremos"
         ],
         "second_plural": [
-          "no miréis"
+          "miréis"
         ],
         "third_plural": [
-          "no paren"
+          "paren"
         ],
         "regular": false
       }
@@ -30135,22 +30135,22 @@
       "negative": {
         "first_singular": [],
         "second_singular": [
-          "no acabes"
+          "acabes"
         ],
         "second_singular_vos_form": [
-          "no acabés"
+          "acabés"
         ],
         "third_singular": [
-          "no acabe"
+          "acabe"
         ],
         "first_plural": [
-          "no acabemos"
+          "acabemos"
         ],
         "second_plural": [
-          "no acabéis"
+          "acabéis"
         ],
         "third_plural": [
-          "no acaben"
+          "acaben"
         ],
         "regular": false
       }
@@ -31055,22 +31055,22 @@
       "negative": {
         "first_singular": [],
         "second_singular": [
-          "no laves"
+          "laves"
         ],
         "second_singular_vos_form": [
-          "no lavés"
+          "lavés"
         ],
         "third_singular": [
-          "no lave"
+          "lave"
         ],
         "first_plural": [
-          "no lavemos"
+          "lavemos"
         ],
         "second_plural": [
-          "no lavéis"
+          "lavéis"
         ],
         "third_plural": [
-          "no laven"
+          "laven"
         ],
         "regular": false
       }
@@ -31470,10 +31470,10 @@
           "barrere"
         ],
         "second_singular": [
-          "barReres"
+          "barreres"
         ],
         "second_singular_vos_form": [
-          "barReres"
+          "barreres"
         ],
         "third_singular": [
           "barrere"
@@ -31485,7 +31485,7 @@
           "barrereis"
         ],
         "third_plural": [
-          "barReren"
+          "barreren"
         ]
       }
     },
@@ -31515,22 +31515,22 @@
       "negative": {
         "first_singular": [],
         "second_singular": [
-          "no barres"
+          "barres"
         ],
         "second_singular_vos_form": [
-          "no barrés"
+          "barrés"
         ],
         "third_singular": [
-          "no barra"
+          "barra"
         ],
         "first_plural": [
-          "no barramos"
+          "barramos"
         ],
         "second_plural": [
-          "no barréis"
+          "barréis"
         ],
         "third_plural": [
-          "no barren"
+          "barren"
         ],
         "regular": false
       }
@@ -31975,22 +31975,22 @@
       "negative": {
         "first_singular": [],
         "second_singular": [
-          "no saques"
+          "saques"
         ],
         "second_singular_vos_form": [
-          "no sacás"
+          "sacás"
         ],
         "third_singular": [
-          "no saque"
+          "saque"
         ],
         "first_plural": [
-          "no saquemos"
+          "saquemos"
         ],
         "second_plural": [
-          "no saquéis"
+          "saquéis"
         ],
         "third_plural": [
-          "no saquen"
+          "saquen"
         ],
         "regular": false
       }
@@ -33580,7 +33580,7 @@
     }
   },
   {
-    "infinitive": "ponerse",
+    "infinitive": "poner",
     "gerund": "poniendo",
     "participle": [
       "puesto"
@@ -34275,22 +34275,22 @@
       "negative": {
         "first_singular": [],
         "second_singular": [
-          "no friegues"
+          "friegues"
         ],
         "second_singular_vos_form": [
-          "no fregués"
+          "fregués"
         ],
         "third_singular": [
-          "no friegue"
+          "friegue"
         ],
         "first_plural": [
-          "no frieguemos"
+          "frieguemos"
         ],
         "second_plural": [
-          "no freguéis"
+          "freguéis"
         ],
         "third_plural": [
-          "no frieguen"
+          "frieguen"
         ],
         "regular": false
       }
@@ -34500,7 +34500,7 @@
     }
   },
   {
-    "infinitive": "encontrarse",
+    "infinitive": "encontrar",
     "gerund": "encontrando",
     "participle": [
       "encontrado"
@@ -34735,22 +34735,22 @@
       "negative": {
         "first_singular": [],
         "second_singular": [
-          "no encuentres"
+          "encuentres"
         ],
         "second_singular_vos_form": [
-          "no encontrés"
+          "encontrés"
         ],
         "third_singular": [
-          "no encuentre"
+          "encuentre"
         ],
         "first_plural": [
-          "no encontremos"
+          "encontremos"
         ],
         "second_plural": [
-          "no encontréis"
+          "encontréis"
         ],
         "third_plural": [
-          "no encuentren"
+          "encuentren"
         ],
         "regular": false
       }
@@ -35195,22 +35195,22 @@
       "negative": {
         "first_singular": [],
         "second_singular": [
-          "no veas"
+          "veas"
         ],
         "second_singular_vos_form": [
-          "no veas"
+          "veas"
         ],
         "third_singular": [
-          "no vea"
+          "vea"
         ],
         "first_plural": [
-          "no veamos"
+          "veamos"
         ],
         "second_plural": [
-          "no vayáis"
+          "vayáis"
         ],
         "third_plural": [
-          "no vean"
+          "vean"
         ],
         "regular": false
       }
@@ -35420,7 +35420,7 @@
     }
   },
   {
-    "infinitive": "sentirse",
+    "infinitive": "sentir",
     "gerund": "sintiendo",
     "participle": [
       "sentido"
@@ -35655,22 +35655,22 @@
       "negative": {
         "first_singular": [],
         "second_singular": [
-          "no sientas"
+          "sientas"
         ],
         "second_singular_vos_form": [
-          "no sintás"
+          "sintás"
         ],
         "third_singular": [
-          "no sienta"
+          "sienta"
         ],
         "first_plural": [
-          "no sintamos"
+          "sintamos"
         ],
         "second_plural": [
-          "no sintáis"
+          "sintáis"
         ],
         "third_plural": [
-          "no sientan"
+          "sientan"
         ],
         "regular": false
       }
@@ -35880,7 +35880,7 @@
     }
   },
   {
-    "infinitive": "despedirse",
+    "infinitive": "despedir",
     "gerund": "despidiendo",
     "participle": [
       "despedido"
@@ -36575,22 +36575,22 @@
       "negative": {
         "first_singular": [],
         "second_singular": [
-          "no molestes"
+          "molestes"
         ],
         "second_singular_vos_form": [
-          "no molestés"
+          "molestés"
         ],
         "third_singular": [
-          "no moleste"
+          "moleste"
         ],
         "first_plural": [
-          "no molestemos"
+          "molestemos"
         ],
         "second_plural": [
-          "no molestéis"
+          "molestéis"
         ],
         "third_plural": [
-          "no molesten"
+          "molesten"
         ],
         "regular": false
       }
@@ -37035,22 +37035,22 @@
       "negative": {
         "first_singular": [],
         "second_singular": [
-          "no pienses"
+          "pienses"
         ],
         "second_singular_vos_form": [
-          "no pensés"
+          "pensés"
         ],
         "third_singular": [
-          "no piense"
+          "piense"
         ],
         "first_plural": [
-          "no pensemos"
+          "pensemos"
         ],
         "second_plural": [
-          "no penséis"
+          "penséis"
         ],
         "third_plural": [
-          "no piensen"
+          "piensen"
         ],
         "regular": false
       }
@@ -37495,22 +37495,22 @@
       "negative": {
         "first_singular": [],
         "second_singular": [
-          "no prestes"
+          "prestes"
         ],
         "second_singular_vos_form": [
-          "no prestés"
+          "prestés"
         ],
         "third_singular": [
-          "no preste"
+          "preste"
         ],
         "first_plural": [
-          "no prestemos"
+          "prestemos"
         ],
         "second_plural": [
-          "no prestéis"
+          "prestéis"
         ],
         "third_plural": [
-          "no presten"
+          "presten"
         ],
         "regular": false
       }
@@ -38415,22 +38415,22 @@
       "negative": {
         "first_singular": [],
         "second_singular": [
-          "no necesites"
+          "necesites"
         ],
         "second_singular_vos_form": [
-          "no necesités"
+          "necesités"
         ],
         "third_singular": [
-          "no necesite"
+          "necesite"
         ],
         "first_plural": [
-          "no necesitemos"
+          "necesitemos"
         ],
         "second_plural": [
-          "no necesitéis"
+          "necesitéis"
         ],
         "third_plural": [
-          "no necesiten"
+          "necesiten"
         ],
         "regular": false
       }
@@ -38875,22 +38875,22 @@
       "negative": {
         "first_singular": [],
         "second_singular": [
-          "no ganes"
+          "ganes"
         ],
         "second_singular_vos_form": [
-          "no ganés"
+          "ganés"
         ],
         "third_singular": [
-          "no gane"
+          "gane"
         ],
         "first_plural": [
-          "no ganhemos"
+          "ganhemos"
         ],
         "second_plural": [
-          "no ganéis"
+          "ganéis"
         ],
         "third_plural": [
-          "no ganen"
+          "ganen"
         ],
         "regular": false
       }
@@ -40255,22 +40255,22 @@
       "negative": {
         "first_singular": [],
         "second_singular": [
-          "no pagues"
+          "pagues"
         ],
         "second_singular_vos_form": [
-          "no pagués"
+          "pagués"
         ],
         "third_singular": [
-          "no pague"
+          "pague"
         ],
         "first_plural": [
-          "no paguemos"
+          "paguemos"
         ],
         "second_plural": [
-          "no paguéis"
+          "paguéis"
         ],
         "third_plural": [
-          "no paguen"
+          "paguen"
         ],
         "regular": false
       }
@@ -40480,7 +40480,7 @@
     }
   },
   {
-    "infinitive": "resistirse",
+    "infinitive": "resistir",
     "gerund": "resistiendo",
     "participle": [
       "resistido"
@@ -40715,22 +40715,22 @@
       "negative": {
         "first_singular": [],
         "second_singular": [
-          "no resistas"
+          "resistas"
         ],
         "second_singular_vos_form": [
-          "no resistás"
+          "resistás"
         ],
         "third_singular": [
-          "no resista"
+          "resista"
         ],
         "first_plural": [
-          "no resistamos"
+          "resistamos"
         ],
         "second_plural": [
-          "no resistáis"
+          "resistáis"
         ],
         "third_plural": [
-          "no resistan"
+          "resistan"
         ],
         "regular": false
       }
@@ -42562,22 +42562,22 @@
       "negative": {
         "first_singular": [],
         "second_singular": [
-          "no sirvas"
+          "sirvas"
         ],
         "second_singular_vos_form": [
-          "no sirvás"
+          "sirvás"
         ],
         "third_singular": [
-          "no sirva"
+          "sirva"
         ],
         "first_plural": [
-          "no sirvamos"
+          "sirvamos"
         ],
         "second_plural": [
-          "no sirváis"
+          "sirváis"
         ],
         "third_plural": [
-          "no sirvan"
+          "sirvan"
         ],
         "regular": false
       }
@@ -43942,22 +43942,22 @@
       "negative": {
         "first_singular": [],
         "second_singular": [
-          "no sueles"
+          "sueles"
         ],
         "second_singular_vos_form": [
-          "no solés"
+          "solés"
         ],
         "third_singular": [
-          "no suela"
+          "suela"
         ],
         "first_plural": [
-          "no sulemos"
+          "sulemos"
         ],
         "second_plural": [
-          "no soléis"
+          "soléis"
         ],
         "third_plural": [
-          "no suelan"
+          "suelan"
         ],
         "regular": false
       }
@@ -44402,22 +44402,22 @@
       "negative": {
         "first_singular": [],
         "second_singular": [
-          "no devuelvas"
+          "devuelvas"
         ],
         "second_singular_vos_form": [
-          "no devuelvas"
+          "devuelvas"
         ],
         "third_singular": [
-          "no devuelva"
+          "devuelva"
         ],
         "first_plural": [
-          "no devolvamos"
+          "devolvamos"
         ],
         "second_plural": [
-          "no devolváis"
+          "devolváis"
         ],
         "third_plural": [
-          "no devuelvan"
+          "devuelvan"
         ],
         "regular": false
       }
@@ -44627,7 +44627,7 @@
     }
   },
   {
-    "infinitive": "perderse",
+    "infinitive": "perder",
     "gerund": "perdiendo",
     "participle": [
       "perdido"
@@ -44869,22 +44869,22 @@
       "negative": {
         "first_singular": [],
         "second_singular": [
-          "no pierdas"
+          "pierdas"
         ],
         "second_singular_vos_form": [
-          "no perdés"
+          "perdés"
         ],
         "third_singular": [
-          "no pierda"
+          "pierda"
         ],
         "first_plural": [
-          "no perdamos"
+          "perdamos"
         ],
         "second_plural": [
-          "no perdáis"
+          "perdáis"
         ],
         "third_plural": [
-          "no pierdan"
+          "pierdan"
         ],
         "regular": false
       }
@@ -48089,22 +48089,22 @@
       "negative": {
         "first_singular": [],
         "second_singular": [
-          "no bajes"
+          "bajes"
         ],
         "second_singular_vos_form": [
-          "no bajés"
+          "bajés"
         ],
         "third_singular": [
-          "no baje"
+          "baje"
         ],
         "first_plural": [
-          "no bajemos"
+          "bajemos"
         ],
         "second_plural": [
-          "no bajéis"
+          "bajéis"
         ],
         "third_plural": [
-          "no bajen"
+          "bajen"
         ],
         "regular": false
       }
@@ -49009,22 +49009,22 @@
       "negative": {
         "first_singular": [],
         "second_singular": [
-          "no des"
+          "des"
         ],
         "second_singular_vos_form": [
-          "no dés"
+          "dés"
         ],
         "third_singular": [
-          "no dé"
+          "dé"
         ],
         "first_plural": [
-          "no demos"
+          "demos"
         ],
         "second_plural": [
-          "no deis"
+          "deis"
         ],
         "third_plural": [
-          "no den"
+          "den"
         ],
         "regular": false
       }
@@ -49929,22 +49929,22 @@
       "negative": {
         "first_singular": [],
         "second_singular": [
-          "no indiques"
+          "indiques"
         ],
         "second_singular_vos_form": [
-          "no indicás"
+          "indicás"
         ],
         "third_singular": [
-          "no indique"
+          "indique"
         ],
         "first_plural": [
-          "no indiquemos"
+          "indiquemos"
         ],
         "second_plural": [
-          "no indicáis"
+          "indicáis"
         ],
         "third_plural": [
-          "no indiquen"
+          "indiquen"
         ],
         "regular": false
       }
@@ -50389,22 +50389,22 @@
       "negative": {
         "first_singular": [],
         "second_singular": [
-          "no dejes"
+          "dejes"
         ],
         "second_singular_vos_form": [
-          "no dejés"
+          "dejés"
         ],
         "third_singular": [
-          "no deje"
+          "deje"
         ],
         "first_plural": [
-          "no dejemos"
+          "dejemos"
         ],
         "second_plural": [
-          "no dejéis"
+          "dejéis"
         ],
         "third_plural": [
-          "no dejen"
+          "dejen"
         ],
         "regular": false
       }
@@ -51309,22 +51309,22 @@
       "negative": {
         "first_singular": [],
         "second_singular": [
-          "no apagues"
+          "apagues"
         ],
         "second_singular_vos_form": [
-          "no apagás"
+          "apagás"
         ],
         "third_singular": [
-          "no apague"
+          "apague"
         ],
         "first_plural": [
-          "no apaguemos"
+          "apaguemos"
         ],
         "second_plural": [
-          "no apaguéis"
+          "apaguéis"
         ],
         "third_plural": [
-          "no apaguen"
+          "apaguen"
         ],
         "regular": false
       }
@@ -52229,22 +52229,22 @@
       "negative": {
         "first_singular": [],
         "second_singular": [
-          "no alcances"
+          "alcances"
         ],
         "second_singular_vos_form": [
-          "no alcanzés"
+          "alcanzés"
         ],
         "third_singular": [
-          "no alcance"
+          "alcance"
         ],
         "first_plural": [
-          "no alcancemos"
+          "alcancemos"
         ],
         "second_plural": [
-          "no alcancéis"
+          "alcancéis"
         ],
         "third_plural": [
-          "no alcancen"
+          "alcancen"
         ],
         "regular": false
       }
@@ -52454,7 +52454,7 @@
     }
   },
   {
-    "infinitive": "apearse",
+    "infinitive": "apear",
     "gerund": "apeando",
     "participle": [
       "apeado"
@@ -53609,22 +53609,22 @@
       "negative": {
         "first_singular": [],
         "second_singular": [
-          "no descuides"
+          "descuides"
         ],
         "second_singular_vos_form": [
-          "no descuidés"
+          "descuidés"
         ],
         "third_singular": [
-          "no descuide"
+          "descuide"
         ],
         "first_plural": [
-          "no descuidemos"
+          "descuidemos"
         ],
         "second_plural": [
-          "no descuidéis"
+          "descuidéis"
         ],
         "third_plural": [
-          "no descuiden"
+          "descuiden"
         ],
         "regular": false
       }
@@ -54069,22 +54069,22 @@
       "negative": {
         "first_singular": [],
         "second_singular": [
-          "no avances"
+          "avances"
         ],
         "second_singular_vos_form": [
-          "no avanzés"
+          "avanzés"
         ],
         "third_singular": [
-          "no avance"
+          "avance"
         ],
         "first_plural": [
-          "no avancemos"
+          "avancemos"
         ],
         "second_plural": [
-          "no avancéis"
+          "avancéis"
         ],
         "third_plural": [
-          "no avancen"
+          "avancen"
         ],
         "regular": false
       }
@@ -54529,22 +54529,22 @@
       "negative": {
         "first_singular": [],
         "second_singular": [
-          "no sigas"
+          "sigas"
         ],
         "second_singular_vos_form": [
-          "no sigás"
+          "sigás"
         ],
         "third_singular": [
-          "no siga"
+          "siga"
         ],
         "first_plural": [
-          "no sigamos"
+          "sigamos"
         ],
         "second_plural": [
-          "no sigáis"
+          "sigáis"
         ],
         "third_plural": [
-          "no sigan"
+          "sigan"
         ],
         "regular": false
       }
@@ -54989,22 +54989,22 @@
       "negative": {
         "first_singular": [],
         "second_singular": [
-          "no utilices"
+          "utilices"
         ],
         "second_singular_vos_form": [
-          "no utilicés"
+          "utilicés"
         ],
         "third_singular": [
-          "no utilice"
+          "utilice"
         ],
         "first_plural": [
-          "no utilicemos"
+          "utilicemos"
         ],
         "second_plural": [
-          "no utilicéis"
+          "utilicéis"
         ],
         "third_plural": [
-          "no utilicen"
+          "utilicen"
         ],
         "regular": false
       }
@@ -55214,7 +55214,7 @@
     }
   },
   {
-    "infinitive": "limpiarse",
+    "infinitive": "limpiar",
     "gerund": "limpiando",
     "participle": [
       "limpiado"
@@ -55909,22 +55909,22 @@
       "negative": {
         "first_singular": [],
         "second_singular": [
-          "no debas"
+          "debas"
         ],
         "second_singular_vos_form": [
-          "no dabás"
+          "dabás"
         ],
         "third_singular": [
-          "no daba"
+          "daba"
         ],
         "first_plural": [
-          "no debamos"
+          "debamos"
         ],
         "second_plural": [
-          "no debáis"
+          "debáis"
         ],
         "third_plural": [
-          "no deban"
+          "deban"
         ],
         "regular": false
       }
@@ -56829,22 +56829,22 @@
       "negative": {
         "first_singular": [],
         "second_singular": [
-          "no muestres"
+          "muestres"
         ],
         "second_singular_vos_form": [
-          "no mostrés"
+          "mostrés"
         ],
         "third_singular": [
-          "no muestre"
+          "muestre"
         ],
         "first_plural": [
-          "no mostremos"
+          "mostremos"
         ],
         "second_plural": [
-          "no mostréis"
+          "mostréis"
         ],
         "third_plural": [
-          "no muestren"
+          "muestren"
         ],
         "regular": false
       }
@@ -57529,18 +57529,18 @@
     "is_reflexive": false,
     "indicative": {
       "present": {
-        "regular": true,
+        "regular": false,
         "first_singular": [
-          "suono"
+          "sueno"
         ],
         "second_singular": [
-          "suonas"
+          "suenas"
         ],
         "second_singular_vos_form": [
           "sonás"
         ],
         "third_singular": [
-          "suona"
+          "suena"
         ],
         "first_plural": [
           "sonamos"
@@ -57549,7 +57549,7 @@
           "sonáis"
         ],
         "third_plural": [
-          "suonan"
+          "suenan"
         ]
       },
       "imperfect": {
@@ -57651,18 +57651,18 @@
     },
     "subjunctive": {
       "present": {
-        "regular": true,
+        "regular": false,
         "first_singular": [
-          "suone"
+          "suene"
         ],
         "second_singular": [
-          "suones"
+          "suenes"
         ],
         "second_singular_vos_form": [
-          "suones"
+          "suenes"
         ],
         "third_singular": [
-          "suone"
+          "suene"
         ],
         "first_plural": [
           "sonemos"
@@ -57671,7 +57671,7 @@
           "sonéis"
         ],
         "third_plural": [
-          "suonen"
+          "suenen"
         ]
       },
       "imperfect": {
@@ -57734,13 +57734,13 @@
       "affirmative": {
         "first_singular": [],
         "second_singular": [
-          "suona"
+          "suena"
         ],
         "second_singular_vos_form": [
           "soná"
         ],
         "third_singular": [
-          "suone"
+          "suene"
         ],
         "first_plural": [
           "sonemos"
@@ -57749,20 +57749,20 @@
           "sonad"
         ],
         "third_plural": [
-          "suonen"
+          "suenen"
         ],
         "regular": false
       },
       "negative": {
         "first_singular": [],
         "second_singular": [
-          "suones"
+          "suenes"
         ],
         "second_singular_vos_form": [
-          "sonés"
+          "suenes"
         ],
         "third_singular": [
-          "suone"
+          "suene"
         ],
         "first_plural": [
           "sonemos"
@@ -57771,7 +57771,7 @@
           "sonéis"
         ],
         "third_plural": [
-          "suonen"
+          "suenen"
         ],
         "regular": false
       }
@@ -58441,7 +58441,7 @@
     }
   },
   {
-    "infinitive": "abrigarse",
+    "infinitive": "abrigar",
     "gerund": "abrigando",
     "participle": [
       "abrigado"
@@ -58901,7 +58901,7 @@
     }
   },
   {
-    "infinitive": "probarse",
+    "infinitive": "probar",
     "gerund": "probando",
     "participle": [
       "probado"
@@ -59136,22 +59136,22 @@
       "negative": {
         "first_singular": [],
         "second_singular": [
-          "no pruebes"
+          "pruebes"
         ],
         "second_singular_vos_form": [
-          "no pruebes"
+          "pruebes"
         ],
         "third_singular": [
-          "no pruebe"
+          "pruebe"
         ],
         "first_plural": [
-          "no probemos"
+          "probemos"
         ],
         "second_plural": [
-          "no probéis"
+          "probéis"
         ],
         "third_plural": [
-          "no prueben"
+          "prueben"
         ],
         "regular": false
       }
@@ -59361,7 +59361,7 @@
     }
   },
   {
-    "infinitive": "precipitarse",
+    "infinitive": "precipitar",
     "gerund": "precipitando",
     "participle": [
       "precipitado"
@@ -62356,22 +62356,22 @@
       "negative": {
         "first_singular": [],
         "second_singular": [
-          "no signifiques"
+          "signifiques"
         ],
         "second_singular_vos_form": [
-          "no significás"
+          "significás"
         ],
         "third_singular": [
-          "no signifique"
+          "signifique"
         ],
         "first_plural": [
-          "no signifiquemos"
+          "signifiquemos"
         ],
         "second_plural": [
-          "no significuéis"
+          "significuéis"
         ],
         "third_plural": [
-          "no signifiquen"
+          "signifiquen"
         ],
         "regular": false
       }
@@ -62816,22 +62816,22 @@
       "negative": {
         "first_singular": [],
         "second_singular": [
-          "no confundas"
+          "confundas"
         ],
         "second_singular_vos_form": [
-          "no confundás"
+          "confundás"
         ],
         "third_singular": [
-          "no confunda"
+          "confunda"
         ],
         "first_plural": [
-          "no confundamos"
+          "confundamos"
         ],
         "second_plural": [
-          "no confundáis"
+          "confundáis"
         ],
         "third_plural": [
-          "no confundan"
+          "confundan"
         ],
         "regular": false
       }
@@ -64656,22 +64656,22 @@
       "negative": {
         "first_singular": [],
         "second_singular": [
-          "no busques"
+          "busques"
         ],
         "second_singular_vos_form": [
-          "no buscás"
+          "buscás"
         ],
         "third_singular": [
-          "no busque"
+          "busque"
         ],
         "first_plural": [
-          "no busquemos"
+          "busquemos"
         ],
         "second_plural": [
-          "no busquéis"
+          "busquéis"
         ],
         "third_plural": [
-          "no busquen"
+          "busquen"
         ],
         "regular": false
       }
@@ -65576,22 +65576,22 @@
       "negative": {
         "first_singular": [],
         "second_singular": [
-          "no juegues"
+          "juegues"
         ],
         "second_singular_vos_form": [
-          "no jugués"
+          "jugués"
         ],
         "third_singular": [
-          "no juegue"
+          "juegue"
         ],
         "first_plural": [
-          "no juguemos"
+          "juguemos"
         ],
         "second_plural": [
-          "no juguéis"
+          "juguéis"
         ],
         "third_plural": [
-          "no jueguen"
+          "jueguen"
         ],
         "regular": false
       }
@@ -66261,7 +66261,7 @@
     }
   },
   {
-    "infinitive": "ensuciarse",
+    "infinitive": "ensuciar",
     "gerund": "ensuciando",
     "participle": [
       "ensuciado"
@@ -69256,22 +69256,22 @@
       "negative": {
         "first_singular": [],
         "second_singular": [
-          "no resultes"
+          "resultes"
         ],
         "second_singular_vos_form": [
-          "no resultés"
+          "resultés"
         ],
         "third_singular": [
-          "no resulte"
+          "resulte"
         ],
         "first_plural": [
-          "no resultemos"
+          "resultemos"
         ],
         "second_plural": [
-          "no resultéis"
+          "resultéis"
         ],
         "third_plural": [
-          "no resulten"
+          "resulten"
         ],
         "regular": false
       }
@@ -70176,22 +70176,22 @@
       "negative": {
         "first_singular": [],
         "second_singular": [
-          "no telefonees"
+          "telefonees"
         ],
         "second_singular_vos_form": [
-          "no telefoneés"
+          "telefoneés"
         ],
         "third_singular": [
-          "no telefonee"
+          "telefonee"
         ],
         "first_plural": [
-          "no telefoneemos"
+          "telefoneemos"
         ],
         "second_plural": [
-          "no telefoneéis"
+          "telefoneéis"
         ],
         "third_plural": [
-          "no telefoneen"
+          "telefoneen"
         ],
         "regular": false
       }
@@ -73396,22 +73396,22 @@
       "negative": {
         "first_singular": [],
         "second_singular": [
-          "no arrojes"
+          "arrojes"
         ],
         "second_singular_vos_form": [
-          "no arrojés"
+          "arrojés"
         ],
         "third_singular": [
-          "no arroje"
+          "arroje"
         ],
         "first_plural": [
-          "no arrojemos"
+          "arrojemos"
         ],
         "second_plural": [
-          "no arrojéis"
+          "arrojéis"
         ],
         "third_plural": [
-          "no arrojen"
+          "arrojen"
         ],
         "regular": false
       }
@@ -75461,7 +75461,7 @@
     }
   },
   {
-    "infinitive": "limitarse",
+    "infinitive": "limitar",
     "gerund": "limitando",
     "participle": [
       "limitado"
@@ -75921,7 +75921,7 @@
     }
   },
   {
-    "infinitive": "acercarse",
+    "infinitive": "acercar",
     "gerund": "acercando",
     "participle": [
       "acercado"
@@ -76381,7 +76381,7 @@
     }
   },
   {
-    "infinitive": "asomarse",
+    "infinitive": "asomar",
     "gerund": "asomando",
     "participle": [
       "asomado"
@@ -76841,7 +76841,7 @@
     }
   },
   {
-    "infinitive": "detenerse",
+    "infinitive": "detener",
     "gerund": "deteniendo",
     "participle": [
       "detenido"
@@ -78221,7 +78221,7 @@
     }
   },
   {
-    "infinitive": "caracterizarse",
+    "infinitive": "caracterizar",
     "gerund": "caracterizando",
     "participle": [
       "caracterizado"
@@ -79383,22 +79383,22 @@
       "negative": {
         "first_singular": [],
         "second_singular": [
-          "no sobrepases"
+          "sobrepases"
         ],
         "second_singular_vos_form": [
-          "no sobrepasés"
+          "sobrepasés"
         ],
         "third_singular": [
-          "no sobrepase"
+          "sobrepase"
         ],
         "first_plural": [
-          "no sobrepasemos"
+          "sobrepasemos"
         ],
         "second_plural": [
-          "no sobrepaséis"
+          "sobrepaséis"
         ],
         "third_plural": [
-          "no sobrepasen"
+          "sobrepasen"
         ],
         "regular": false
       }
@@ -80303,22 +80303,22 @@
       "negative": {
         "first_singular": [],
         "second_singular": [
-          "no informes"
+          "informes"
         ],
         "second_singular_vos_form": [
-          "no informés"
+          "informés"
         ],
         "third_singular": [
-          "no informe"
+          "informe"
         ],
         "first_plural": [
-          "no informemos"
+          "informemos"
         ],
         "second_plural": [
-          "no informéis"
+          "informéis"
         ],
         "third_plural": [
-          "no informen"
+          "informen"
         ],
         "regular": false
       }
@@ -80998,121 +80998,121 @@
       "present": {
         "regular": true,
         "first_singular": [
-          "hablo"
+          "converso"
         ],
         "second_singular": [
-          "hablas"
+          "conversas"
         ],
         "second_singular_vos_form": [
-          "hablas"
+          "conversás"
         ],
         "third_singular": [
-          "habla"
+          "conversa"
         ],
         "first_plural": [
-          "hablamos"
+          "conversamos"
         ],
         "second_plural": [
-          "habláis"
+          "conversáis"
         ],
         "third_plural": [
-          "hablan"
+          "conversan"
         ]
       },
       "imperfect": {
         "regular": true,
         "first_singular": [
-          "hablaba"
+          "conversaba"
         ],
         "second_singular": [
-          "hablabas"
+          "conversabas"
         ],
         "second_singular_vos_form": [
-          "hablabas"
+          "conversabas"
         ],
         "third_singular": [
-          "hablaba"
+          "conversaba"
         ],
         "first_plural": [
-          "hablábamos"
+          "conversábamos"
         ],
         "second_plural": [
-          "hablabais"
+          "conversabais"
         ],
         "third_plural": [
-          "hablaban"
+          "conversaban"
         ]
       },
       "preterite": {
         "regular": true,
         "first_singular": [
-          "hablé"
+          "conversé"
         ],
         "second_singular": [
-          "hablaste"
+          "conversaste"
         ],
         "second_singular_vos_form": [
-          "hablaste"
+          "conversaste"
         ],
         "third_singular": [
-          "habló"
+          "conversó"
         ],
         "first_plural": [
-          "hablamos"
+          "conversamos"
         ],
         "second_plural": [
-          "hablasteis"
+          "conversasteis"
         ],
         "third_plural": [
-          "hablaron"
+          "conversaron"
         ]
       },
       "future": {
         "regular": true,
         "first_singular": [
-          "hablaré"
+          "conversaré"
         ],
         "second_singular": [
-          "hablarás"
+          "conversarás"
         ],
         "second_singular_vos_form": [
-          "hablarás"
+          "conversarás"
         ],
         "third_singular": [
-          "hablará"
+          "conversará"
         ],
         "first_plural": [
-          "hablaremos"
+          "conversaremos"
         ],
         "second_plural": [
-          "hablaréis"
+          "conversaréis"
         ],
         "third_plural": [
-          "hablarán"
+          "conversarán"
         ]
       },
       "conditional": {
         "regular": true,
         "first_singular": [
-          "hablaría"
+          "conversaría"
         ],
         "second_singular": [
-          "hablarías"
+          "conversarías"
         ],
         "second_singular_vos_form": [
-          "hablarías"
+          "conversarías"
         ],
         "third_singular": [
-          "hablaría"
+          "conversaría"
         ],
         "first_plural": [
-          "hablaríamos"
+          "conversaríamos"
         ],
         "second_plural": [
-          "hablaríais"
+          "conversaríais"
         ],
         "third_plural": [
-          "hablarían"
+          "conversarían"
         ]
       }
     },
@@ -81120,80 +81120,80 @@
       "present": {
         "regular": true,
         "first_singular": [
-          "hable"
+          "converse"
         ],
         "second_singular": [
-          "hables"
+          "converses"
         ],
         "second_singular_vos_form": [
-          "hables"
+          "conversés"
         ],
         "third_singular": [
-          "hable"
+          "converse"
         ],
         "first_plural": [
-          "hablemos"
+          "conversemos"
         ],
         "second_plural": [
-          "habléis"
+          "converséis"
         ],
         "third_plural": [
-          "hablen"
+          "conversen"
         ]
       },
       "imperfect": {
         "regular": true,
         "first_singular": [
-          "hablara",
-          "hablase"
+          "conversara",
+          "conversase"
         ],
         "second_singular": [
-          "hablaras",
-          "hablases"
+          "conversaras",
+          "conversases"
         ],
         "second_singular_vos_form": [
-          "hablaras",
-          "hablases"
+          "conversaras",
+          "conversases"
         ],
         "third_singular": [
-          "hablara",
-          "hablase"
+          "conversara",
+          "conversase"
         ],
         "first_plural": [
-          "habláramos",
-          "hablásemos"
+          "conversáramos",
+          "conversásemos"
         ],
         "second_plural": [
-          "hablarais",
-          "hablaseis"
+          "conversarais",
+          "conversaseis"
         ],
         "third_plural": [
-          "hablaran",
-          "hablasen"
+          "conversaran",
+          "conversasen"
         ]
       },
       "future": {
         "regular": true,
         "first_singular": [
-          "hablare"
+          "conversare"
         ],
         "second_singular": [
-          "hablares"
+          "conversares"
         ],
         "second_singular_vos_form": [
-          "hablares"
+          "conversares"
         ],
         "third_singular": [
-          "hablare"
+          "conversare"
         ],
         "first_plural": [
-          "habláremos"
+          "conversáremos"
         ],
         "second_plural": [
-          "hablareis"
+          "conversareis"
         ],
         "third_plural": [
-          "hablaren"
+          "conversaren"
         ]
       }
     },
@@ -81201,44 +81201,44 @@
       "affirmative": {
         "first_singular": [],
         "second_singular": [
-          "habla"
+          "conversa"
         ],
         "second_singular_vos_form": [
-          "hablá"
+          "conversá"
         ],
         "third_singular": [
-          "hable"
+          "converse"
         ],
         "first_plural": [
-          "hablemos"
+          "conversemos"
         ],
         "second_plural": [
-          "hablad"
+          "conversad"
         ],
         "third_plural": [
-          "hablen"
+          "conversen"
         ],
         "regular": false
       },
       "negative": {
         "first_singular": [],
         "second_singular": [
-          "hables"
+          "converses"
         ],
         "second_singular_vos_form": [
-          "hablés"
+          "conversés"
         ],
         "third_singular": [
-          "hable"
+          "converse"
         ],
         "first_plural": [
-          "hablemos"
+          "conversemos"
         ],
         "second_plural": [
-          "habléis"
+          "converséis"
         ],
         "third_plural": [
-          "hablen"
+          "conversen"
         ],
         "regular": false
       }
@@ -81442,7 +81442,7 @@
           "hubiereis conversado"
         ],
         "third_plural": [
-          "huberen conversado"
+          "hubieren conversado"
         ]
       }
     }
@@ -81683,22 +81683,22 @@
       "negative": {
         "first_singular": [],
         "second_singular": [
-          "no salves"
+          "salves"
         ],
         "second_singular_vos_form": [
-          "no salvés"
+          "salvés"
         ],
         "third_singular": [
-          "no salve"
+          "salve"
         ],
         "first_plural": [
-          "no salvemos"
+          "salvemos"
         ],
         "second_plural": [
-          "no salvéis"
+          "salvéis"
         ],
         "third_plural": [
-          "no salven"
+          "salven"
         ],
         "regular": false
       }
@@ -82368,7 +82368,7 @@
     }
   },
   {
-    "infinitive": "disponerse",
+    "infinitive": "disponer",
     "gerund": "disponiendo",
     "participle": [
       "dispuesto"
@@ -82603,22 +82603,22 @@
       "negative": {
         "first_singular": [],
         "second_singular": [
-          "no dispongas"
+          "dispongas"
         ],
         "second_singular_vos_form": [
-          "no dispongás"
+          "dispongás"
         ],
         "third_singular": [
-          "no disponga"
+          "disponga"
         ],
         "first_plural": [
-          "no dispongamos"
+          "dispongamos"
         ],
         "second_plural": [
-          "no dispongáis"
+          "dispongáis"
         ],
         "third_plural": [
-          "no dispongan"
+          "dispongan"
         ],
         "regular": false
       }
@@ -83983,22 +83983,22 @@
       "negative": {
         "first_singular": [],
         "second_singular": [
-          "no escuches"
+          "escuches"
         ],
         "second_singular_vos_form": [
-          "no escuchés"
+          "escuchés"
         ],
         "third_singular": [
-          "no escuche"
+          "escuche"
         ],
         "first_plural": [
-          "no escuchemos"
+          "escuchemos"
         ],
         "second_plural": [
-          "no escuchéis"
+          "escuchéis"
         ],
         "third_plural": [
-          "no escuchen"
+          "escuchen"
         ],
         "regular": false
       }
@@ -84208,7 +84208,7 @@
     }
   },
   {
-    "infinitive": "graduarse",
+    "infinitive": "graduar",
     "gerund": "graduando",
     "participle": [
       "graduado"
@@ -84443,22 +84443,22 @@
       "negative": {
         "first_singular": [],
         "second_singular": [
-          "no gradúes"
+          "gradúes"
         ],
         "second_singular_vos_form": [
-          "no gradúes"
+          "gradúes"
         ],
         "third_singular": [
-          "no gradúe"
+          "gradúe"
         ],
         "first_plural": [
-          "no graduemos"
+          "graduemos"
         ],
         "second_plural": [
-          "no graduéis"
+          "graduéis"
         ],
         "third_plural": [
-          "no gradúen"
+          "gradúen"
         ],
         "regular": false
       }
@@ -84903,22 +84903,22 @@
       "negative": {
         "first_singular": [],
         "second_singular": [
-          "no envidies"
+          "envidies"
         ],
         "second_singular_vos_form": [
-          "no envidiés"
+          "envidiés"
         ],
         "third_singular": [
-          "no envidie"
+          "envidie"
         ],
         "first_plural": [
-          "no envidiemos"
+          "envidiemos"
         ],
         "second_plural": [
-          "no envidiéis"
+          "envidiéis"
         ],
         "third_plural": [
-          "no envidien"
+          "envidien"
         ],
         "regular": false
       }
@@ -85588,7 +85588,7 @@
     }
   },
   {
-    "infinitive": "animarse",
+    "infinitive": "animar",
     "gerund": "animando",
     "participle": [
       "animado"
@@ -87203,22 +87203,22 @@
       "negative": {
         "first_singular": [],
         "second_singular": [
-          "no anuncies"
+          "anuncies"
         ],
         "second_singular_vos_form": [
-          "no anunciés"
+          "anunciés"
         ],
         "third_singular": [
-          "no anuncie"
+          "anuncie"
         ],
         "first_plural": [
-          "no anunciemos"
+          "anunciemos"
         ],
         "second_plural": [
-          "no anunciéis"
+          "anunciéis"
         ],
         "third_plural": [
-          "no anuncien"
+          "anuncien"
         ],
         "regular": false
       }
@@ -87428,7 +87428,7 @@
     }
   },
   {
-    "infinitive": "prolongarse",
+    "infinitive": "prolongar",
     "gerund": "prolongando",
     "participle": [
       "prolongado"
@@ -87888,7 +87888,7 @@
     }
   },
   {
-    "infinitive": "preocuparse",
+    "infinitive": "preocupar",
     "gerund": "preocupando",
     "participle": [
       "preocupado"
@@ -88583,22 +88583,22 @@
       "negative": {
         "first_singular": [],
         "second_singular": [
-          "no instales"
+          "instales"
         ],
         "second_singular_vos_form": [
-          "no instalés"
+          "instalés"
         ],
         "third_singular": [
-          "no instale"
+          "instale"
         ],
         "first_plural": [
-          "no instalemos"
+          "instalemos"
         ],
         "second_plural": [
-          "no instaléis"
+          "instaléis"
         ],
         "third_plural": [
-          "no instalen"
+          "instalen"
         ],
         "regular": false
       }
@@ -89043,22 +89043,22 @@
       "negative": {
         "first_singular": [],
         "second_singular": [
-          "no toques"
+          "toques"
         ],
         "second_singular_vos_form": [
-          "no toqués"
+          "toqués"
         ],
         "third_singular": [
-          "no toque"
+          "toque"
         ],
         "first_plural": [
-          "no toquemos"
+          "toquemos"
         ],
         "second_plural": [
-          "no toquéis"
+          "toquéis"
         ],
         "third_plural": [
-          "no toquen"
+          "toquen"
         ],
         "regular": false
       }
