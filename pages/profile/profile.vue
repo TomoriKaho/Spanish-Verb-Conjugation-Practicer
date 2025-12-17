@@ -610,32 +610,20 @@ export default {
         return
       }
 
-      if (!this.editForm.school || !this.editForm.school.trim()) {
-        uni.showToast({
-          title: '请输入学校名称',
-          icon: 'none'
-        })
-        return
-      }
-
-      if (!this.editForm.enrollmentYear) {
-        uni.showToast({
-          title: '请选择入学年份',
-          icon: 'none'
-        })
-        return
-      }
-
       uni.showLoading({ title: '保存中...' })
 
       try {
         const trimmedUsername = this.editForm.username.trim()
+        const trimmedSchool = this.editForm.school ? this.editForm.school.trim() : ''
+        const enrollmentYearValue = this.editForm.enrollmentYear
+          ? parseInt(this.editForm.enrollmentYear)
+          : undefined
         const res = await api.updateProfile({
           username: trimmedUsername,
           password: this.editForm.password ? this.editForm.password : undefined,
           email: this.userInfo.email,
-          school: this.editForm.school.trim(),
-          enrollmentYear: parseInt(this.editForm.enrollmentYear)
+          school: trimmedSchool,
+          enrollmentYear: enrollmentYearValue
         })
 
         uni.hideLoading()
@@ -643,8 +631,10 @@ export default {
         if (res.success) {
           // 更新本地用户信息
           this.userInfo.username = trimmedUsername
-          this.userInfo.school = this.editForm.school.trim()
-          this.userInfo.enrollmentYear = parseInt(this.editForm.enrollmentYear)
+          this.userInfo.school = trimmedSchool
+          if (enrollmentYearValue !== undefined) {
+            this.userInfo.enrollmentYear = enrollmentYearValue
+          }
           uni.setStorageSync('userInfo', this.userInfo)
 
           this.showEditModal = false
