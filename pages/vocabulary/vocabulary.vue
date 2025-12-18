@@ -81,13 +81,13 @@
           <view class="word-main">
             <text class="word-infinitive">{{ item.infinitive }}</text>
             <text class="word-meaning">{{ item.meaning }}</text>
-          </view>
-          <view class="word-actions">
             <view class="word-badges">
               <view class="word-tag">{{ item.conjugationType }}</view>
               <view v-if="item.isReflexive" class="word-tag reflexive">反身</view>
               <view v-if="item.isIrregular" class="word-tag irregular">不规则</view>
             </view>
+          </view>
+          <view class="word-actions">
             <text class="detail-btn" @click="viewConjugations(item.verb_id)">查看全变位</text>
             <text class="remove-btn" @click="removeFavorite(item.verb_id)">删除</text>
           </view>
@@ -115,14 +115,16 @@
           <view class="word-main">
             <text class="word-infinitive">{{ item.infinitive }}</text>
             <text class="word-meaning">{{ item.meaning }}</text>
-          </view>
-          <view class="word-actions">
             <view class="word-badges">
               <view class="word-tag">{{ item.conjugationType }}</view>
               <view v-if="item.isReflexive" class="word-tag reflexive">反身</view>
               <view v-if="item.isIrregular" class="word-tag irregular">不规则</view>
             </view>
+          </view>
+          <view class="word-header-extra">
             <view class="wrong-count">错 {{ item.wrong_count }} 次</view>
+          </view>
+          <view class="word-actions">
             <text class="detail-btn" @click="viewConjugations(item.verb_id)">查看全变位</text>
             <text class="remove-btn" @click="removeWrong(item.verb_id)">删除</text>
           </view>
@@ -219,6 +221,12 @@ export default {
 
     async removeFavorite(verbId) {
       try {
+        const { confirm } = await uni.showModal({
+          title: '提示',
+          content: '确定要删除该收藏单词吗？'
+        })
+        if (!confirm) return
+
         const res = await api.removeFavorite({ verbId })
         if (res.success) {
           showToast('已取消收藏', 'success')
@@ -232,6 +240,12 @@ export default {
 
     async removeWrong(verbId) {
       try {
+        const { confirm } = await uni.showModal({
+          title: '提示',
+          content: '确定要删除该错题单词吗？'
+        })
+        if (!confirm) return
+
         const res = await api.removeWrongVerb({ verbId })
         if (res.success) {
           showToast('已删除', 'success')
@@ -407,8 +421,10 @@ export default {
 }
 
 .word-item {
+  position: relative;
   margin-bottom: 20rpx;
   padding: 30rpx;
+  padding-bottom: 120rpx;
 }
 
 .word-header {
@@ -416,6 +432,7 @@ export default {
   justify-content: space-between;
   align-items: flex-start;
   margin-bottom: 20rpx;
+  gap: 20rpx;
 }
 
 .word-main {
@@ -437,10 +454,20 @@ export default {
 }
 
 .word-actions {
+  position: absolute;
+  right: 30rpx;
+  bottom: 30rpx;
   display: flex;
   align-items: center;
   gap: 15rpx;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+}
+
+.word-header-extra {
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-start;
+  min-width: 160rpx;
 }
 
 .word-badges {
