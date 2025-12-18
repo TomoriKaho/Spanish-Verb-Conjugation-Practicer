@@ -109,7 +109,7 @@
           v-model="userAnswer"
           placeholder="请填入正确的动词变位"
           :disabled="showFeedback"
-          :focus="!showFeedback"
+          :focus="answerInputFocus && !showFeedback"
         />
       </view>
 
@@ -120,7 +120,7 @@
           v-model="userAnswer"
           placeholder="请输入目标变位形式"
           :disabled="showFeedback"
-          :focus="!showFeedback"
+          :focus="answerInputFocus && !showFeedback"
         />
       </view>
 
@@ -534,6 +534,7 @@ export default {
       usedQuestionIds: new Set(),  // 已使用的题目ID（包括题库题和AI题）
       currentIndex: 0,
       userAnswer: '',
+      answerInputFocus: false,  // 控制填空输入框的聚焦
       selectedAnswer: '',
       comboAnswers: [],  // 组合填空的答案数组
       showFeedback: false,
@@ -993,6 +994,7 @@ export default {
               }
               this.checkFavoriteStatus()
               this.checkQuestionFavoriteStatus()
+              this.focusAnswerInput()
             } else if (res.needAI && res.needAI > 0) {
               // 题库为空，等待AI生成
               console.log('题库为空，等待AI生成题目...')
@@ -1078,6 +1080,7 @@ export default {
               }
               this.checkFavoriteStatus()
               this.checkQuestionFavoriteStatus()
+              this.focusAnswerInput()
             } else {
               // 后续题目插入到当前题目之后的位置（避免影响currentIndex）
               // 计算插入位置：在当前题目后面到末尾之间随机选择
@@ -1624,6 +1627,7 @@ export default {
         if (this.totalAnswered < this.exerciseCount) {
           this.fillBuffer()
         }
+        this.focusAnswerInput()
       } else {
         // 下一题还没生成好
         if (this.generatingCount > 0) {
@@ -1638,6 +1642,7 @@ export default {
               hideLoading()
               this.currentIndex++
               this.fillBuffer()
+              this.focusAnswerInput()
             } else if (this.generationError && this.generatingCount === 0) {
               // 生成失败
               clearInterval(checkInterval)
@@ -1664,6 +1669,7 @@ export default {
           if (this.currentIndex + 1 < this.exercises.length) {
             this.currentIndex++
             this.fillBuffer()
+            this.focusAnswerInput()
           }
         }
       }
@@ -1700,6 +1706,7 @@ export default {
       this.currentIndex++
       this.checkFavoriteStatus()
       this.checkQuestionFavoriteStatus()
+      this.focusAnswerInput()
     },
     
     // 跳过错题重做，直接完成
@@ -1711,7 +1718,19 @@ export default {
       // 显示最终结果
       this.showResult = true
     },
-    
+
+    // 聚焦填空输入框（例句填空 & 快变快填）
+    focusAnswerInput() {
+      if (this.exerciseType === 'sentence' || this.exerciseType === 'quick-fill') {
+        this.answerInputFocus = false
+        this.$nextTick(() => {
+          this.answerInputFocus = true
+        })
+      } else {
+        this.answerInputFocus = false
+      }
+    },
+
     finishPractice() {
       // 如果是课程模式，自动标记课程完成
       if (this.isCourseMode && this.lessonId) {
