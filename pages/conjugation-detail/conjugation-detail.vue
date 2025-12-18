@@ -55,7 +55,7 @@
                 <!-- vos人称前添加分隔标签 -->
                 <view v-if="pronoun.person === 'vos'" class="vos-divider">
                   <view class="divider-line"></view>
-                  <text class="divider-text">拉美用法</text>
+                  <text class="divider-text">特殊变位</text>
                   <view class="divider-line"></view>
                 </view>
                 
@@ -97,7 +97,7 @@
                 <!-- vos人称前添加分隔标签 -->
                 <view v-if="isVosPerson(conj.person)" class="vos-divider">
                   <view class="divider-line"></view>
-                  <text class="divider-text">拉美用法</text>
+                  <text class="divider-text">特殊变位</text>
                   <view class="divider-line"></view>
                 </view>
                 
