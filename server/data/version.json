@@ -1,7 +1,8 @@
 {
-  "versionCode": 101,
-  "versionName": "1.1.0",
-  "releaseNotes": "1. 提升版本检查能力，支持强制更新。\n2. 新增下载进度展示和自动安装。\n3. 优化性能和稳定性。",
+  "versionCode": 100,
+  "versionName": "1.0.0",
+  "releaseNotes": "首次发行",
   "packageFileName": "app-release.apk",
-  "downloadUrl": ""
+  "downloadUrl": "",
+  "forceUpdate": false
 }

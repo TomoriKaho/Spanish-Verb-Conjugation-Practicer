@@ -18,6 +18,7 @@ export default {
     },
     async checkForUpdates() {
       try {
+        console.log('检查应用版本更新...')
         const baseInfo = uni.getAppBaseInfo ? uni.getAppBaseInfo() : {}
         const versionCode = Number(baseInfo.appVersionCode || 0)
 

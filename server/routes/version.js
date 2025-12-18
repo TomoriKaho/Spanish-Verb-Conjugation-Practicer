@@ -48,7 +48,8 @@ router.get('/check', (req, res) => {
         packageFileName: versionInfo.packageFileName,
         packageUrl,
         packageSize: size,
-        packageAvailable: Boolean(filePath)
+        packageAvailable: Boolean(filePath),
+        forceUpdate: Boolean(versionInfo.forceUpdate)
       }
     })
   } catch (error) {
@@ -60,15 +61,43 @@ router.get('/check', (req, res) => {
 router.get('/download', (req, res) => {
   try {
     const versionInfo = loadVersionInfo()
-    const { filePath } = getPackageInfo(versionInfo.packageFileName)
+    const { filePath, size } = getPackageInfo(versionInfo.packageFileName)
 
-    if (!filePath) {
+    console.log('[version-download] 请求下载')
+    console.log('[version-download] 文件名:', versionInfo.packageFileName)
+    console.log('[version-download] 文件路径:', filePath)
+    console.log('[version-download] 文件大小:', size)
+    console.log('[version-download] 文件是否存在:', filePath ? fs.existsSync(filePath) : false)
+
+    if (!filePath || !fs.existsSync(filePath)) {
+      console.error('[version-download] 文件不存在')
       return res.status(404).json({ error: '安装包不存在，请联系管理员' })
     }
 
-    res.download(filePath, versionInfo.packageFileName)
+    // 设置响应头
+    res.setHeader('Content-Type', 'application/vnd.android.package-archive')
+    res.setHeader('Content-Disposition', `attachment; filename="${versionInfo.packageFileName}"`)
+    res.setHeader('Content-Length', size)
+    
+    console.log('[version-download] 开始发送文件')
+    
+    // 使用流式传输
+    const fileStream = fs.createReadStream(filePath)
+    
+    fileStream.on('error', (error) => {
+      console.error('[version-download] 文件流错误:', error)
+      if (!res.headersSent) {
+        res.status(500).json({ error: '文件读取失败' })
+      }
+    })
+    
+    fileStream.on('end', () => {
+      console.log('[version-download] 文件发送完成')
+    })
+    
+    fileStream.pipe(res)
   } catch (error) {
-    console.error('下载失败:', error)
+    console.error('[version-download] 下载失败:', error)
     res.status(500).json({ error: '下载失败，请稍后重试' })
   }
 })
