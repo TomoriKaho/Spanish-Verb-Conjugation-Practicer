@@ -189,9 +189,10 @@ export default {
       const length = username?.length || 0
 
       if (length <= 6) return { fontSize: '32rpx' }
-      if (length <= 10) return { fontSize: '30rpx' }
-      if (length <= 13) return { fontSize: '28rpx' }
-      return { fontSize: '26rpx' }
+      if (length <= 9) return { fontSize: '30rpx' }
+      if (length <= 12) return { fontSize: '28rpx' }
+      if (length <= 14) return { fontSize: '26rpx' }
+      return { fontSize: '24rpx' }
     },
     startPractice() {
       uni.navigateTo({
@@ -316,6 +317,9 @@ export default {
   gap: 15rpx;
   margin-bottom: 40rpx;
   padding: 0 20rpx;
+  max-width: 720rpx;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .podium-item {
@@ -540,10 +544,9 @@ export default {
   font-size: 30rpx;
   font-weight: bold;
   color: #333;
-  max-width: 260rpx;
+  max-width: 380rpx;
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  flex: 1;
 }
 
 .user-badges {
