@@ -47,3 +47,5 @@ coverage/
 
 .venv/
 data/
+!server/data/
+!server/data/version.json

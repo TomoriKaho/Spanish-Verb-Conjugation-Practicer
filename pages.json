@@ -78,6 +78,13 @@
       "style": {
         "navigationBarTitleText": "用户反馈"
       }
+    },
+    {
+      "path": "pages/update/update",
+      "style": {
+        "navigationBarTitleText": "版本更新",
+        "navigationStyle": "custom"
+      }
     }
   ],
   "globalStyle": {
