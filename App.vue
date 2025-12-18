@@ -12,8 +12,27 @@ export default {
     console.log('App Hide')
   },
   methods: {
-    initApp() {
+    async initApp() {
       // 不在这里做登录检查，让各个页面自己处理
+      await this.checkForUpdates()
+    },
+    async checkForUpdates() {
+      try {
+        const baseInfo = uni.getAppBaseInfo ? uni.getAppBaseInfo() : {}
+        const versionCode = Number(baseInfo.appVersionCode || 0)
+
+        const api = require('./utils/api.js').default
+        const res = await api.checkAppVersion(versionCode)
+
+        if (!res.isLatest && res.latestVersion) {
+          uni.setStorageSync('pendingUpdate', res.latestVersion)
+          uni.reLaunch({
+            url: '/pages/update/update'
+          })
+        }
+      } catch (error) {
+        console.error('版本检查失败:', error)
+      }
     }
   }
 }

@@ -27,9 +27,10 @@ export function formatDate(date, format = 'YYYY-MM-DD HH:mm:ss') {
 export function showToast(title, icon = 'none', duration = 2000) {
   // 对于长文本，增加显示时长，并且不限制文本长度
   const finalDuration = title.length > 10 ? 3000 : duration
-  
+  const paddedTitle = `${title}\n` // 额外换行让提示框垂直拉长，避免文字被截断
+
   uni.showToast({
-    title,
+    title: paddedTitle,
     icon,
     duration: finalDuration,
     mask: false  // 不显示透明蒙层，避免阻挡用户操作

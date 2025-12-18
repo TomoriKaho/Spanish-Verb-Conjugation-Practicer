@@ -135,21 +135,6 @@
     <!-- 功能菜单 -->
     <view class="menu-section">
       <view class="menu-card">
-        <view class="menu-item" @click="goToStatistics">
-          <view class="menu-icon">📊</view>
-          <text class="menu-label">学习统计</text>
-          <text class="menu-arrow">→</text>
-        </view>
-        <view class="menu-item" @click="goToVocabulary">
-          <view class="menu-icon">📚</view>
-          <text class="menu-label">我的单词本</text>
-          <text class="menu-arrow">→</text>
-        </view>
-        <view class="menu-item" @click="goToQuestionBank">
-          <view class="menu-icon">💾</view>
-          <text class="menu-label">收藏题目</text>
-          <text class="menu-arrow">→</text>
-        </view>
         <view class="menu-item" @click="settings">
           <view class="menu-icon">⚙️</view>
           <text class="menu-label">设置</text>
@@ -195,8 +180,8 @@
             <input
               class="form-input"
               v-model="editForm.username"
-              placeholder="请输入8-20位字母或数字"
-              maxlength="20"
+              placeholder="请输入6-15位字母或数字"
+              maxlength="15"
               @blur="ensureUsernameAvailability"
             />
             <text v-if="editErrors.username" class="form-error">{{ editErrors.username }}</text>
@@ -670,7 +655,7 @@ export default {
 
     isUsernameValid(value = this.editForm.username) {
       if (!value || typeof value !== 'string') return false
-      const usernamePattern = /^[A-Za-z0-9]{8,20}$/
+      const usernamePattern = /^[A-Za-z0-9]{6,15}$/
       const trimmed = value.trim()
       return Boolean(trimmed && usernamePattern.test(trimmed))
     },
@@ -681,7 +666,7 @@ export default {
       }
 
       if (!this.isUsernameValid(value)) {
-        this.editErrors.username = '用户名需为8-20位字母或数字组合'
+        this.editErrors.username = '用户名需为6-15位字母或数字组合'
         return false
       }
 
@@ -756,26 +741,9 @@ export default {
         showCancel: false
       })
     },
-    goToStatistics() {
-      uni.navigateTo({
-        url: '/pages/statistics/statistics'
-      })
-    },
-    goToVocabulary() {
-      uni.switchTab({
-        url: '/pages/vocabulary/vocabulary'
-      })
-    },
-    goToQuestionBank() {
-      uni.navigateTo({
-        url: '/pages/question-bank/question-bank'
-      })
-    },
     settings() {
-      uni.showModal({
-        title: '设置',
-        content: '设置功能开发中，敬请期待',
-        showCancel: false
+      uni.navigateTo({
+        url: '/pages/profile/settings/settings'
       })
     },
     aboutApp() {
