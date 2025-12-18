@@ -17,7 +17,7 @@
       <text class="message-text">{{ customMessageText }}</text>
     </view>
     
-    <view class="practice-header">
+    <view class="practice-header" v-if="hasStarted">
       <view class="progress-bar-wrapper">
         <view class="progress-bar">
           <view class="progress-fill" :style="{ width: progress + '%' }"></view>
@@ -25,8 +25,14 @@
         <text class="progress-text">{{ completedCount }} / {{ exerciseCount }}</text>
       </view>
       <view class="progress-actions">
-        <button class="progress-btn back" @click="goToPreviousExercise" :disabled="!canGoPrevious">返回上题</button>
-        <button class="progress-btn skip" @click="skipCurrentExercise" :disabled="!canSkipCurrent">跳过此题</button>
+        <button class="progress-btn back" @click="goToPreviousExercise" :disabled="!canGoPrevious">
+          <text class="arrow">←</text>
+          <text>返回上题</text>
+        </button>
+        <button class="progress-btn skip" @click="skipCurrentExercise" :disabled="!canSkipCurrent">
+          <text>跳过此题</text>
+          <text class="arrow">→</text>
+        </button>
       </view>
     </view>
 
@@ -2047,33 +2053,27 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 20rpx;
+  padding: 0 4rpx;
 }
 
 .progress-btn {
-  flex: 1;
-  padding: 16rpx 0;
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  padding: 10rpx 12rpx;
   font-size: 26rpx;
-  border-radius: 12rpx;
+  border-radius: 8rpx;
   border: none;
-  color: #fff;
-  background: linear-gradient(135deg, #8e9efc 0%, #667eea 100%);
+  color: #5c6ac4;
+  background: transparent;
 }
 
 .progress-btn::after {
   border: none;
 }
 
-.progress-btn.back {
-  background: linear-gradient(135deg, #7f8cfa 0%, #5c6ac4 100%);
-}
-
-.progress-btn.skip {
-  background: linear-gradient(135deg, #ff9a9e 0%, #f5576c 100%);
-}
-
 .progress-btn:disabled {
-  opacity: 0.5;
+  color: #b3b8d4;
 }
 
 .exercise-card {
