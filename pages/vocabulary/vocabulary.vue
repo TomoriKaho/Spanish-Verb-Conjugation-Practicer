@@ -72,9 +72,9 @@
         <text class="empty-hint">在练习时点击星标收藏</text>
       </view>
 
-      <view 
-        v-for="item in favoriteList" 
-        :key="item.id" 
+      <view
+        v-for="item in favoriteList"
+        :key="item.id"
         class="word-item card"
       >
         <view class="word-header">
@@ -87,13 +87,13 @@
               <view v-if="item.isIrregular" class="word-tag irregular">不规则</view>
             </view>
           </view>
+        </view>
+        <view class="word-meta">
+          <text class="meta-item">收藏于 {{ formatDate(item.created_at) }}</text>
           <view class="word-actions">
             <text class="detail-btn" @click="viewConjugations(item.verb_id)">查看全变位</text>
             <text class="remove-btn" @click="removeFavorite(item.verb_id)">删除</text>
           </view>
-        </view>
-        <view class="word-meta">
-          <text class="meta-item">收藏于 {{ formatDate(item.created_at) }}</text>
         </view>
       </view>
     </view>
@@ -124,13 +124,13 @@
           <view class="word-header-extra">
             <view class="wrong-count">错 {{ item.wrong_count }} 次</view>
           </view>
+        </view>
+        <view class="word-meta">
+          <text class="meta-item">最近错误: {{ formatDate(item.last_wrong_at) }}</text>
           <view class="word-actions">
             <text class="detail-btn" @click="viewConjugations(item.verb_id)">查看全变位</text>
             <text class="remove-btn" @click="removeWrong(item.verb_id)">删除</text>
           </view>
-        </view>
-        <view class="word-meta">
-          <text class="meta-item">最近错误: {{ formatDate(item.last_wrong_at) }}</text>
         </view>
       </view>
     </view>
@@ -424,7 +424,6 @@ export default {
   position: relative;
   margin-bottom: 20rpx;
   padding: 30rpx;
-  padding-bottom: 120rpx;
 }
 
 .word-header {
@@ -453,10 +452,8 @@ export default {
   color: #666;
 }
 
+
 .word-actions {
-  position: absolute;
-  right: 30rpx;
-  bottom: 30rpx;
   display: flex;
   align-items: center;
   gap: 15rpx;
@@ -519,6 +516,8 @@ export default {
 
 .word-meta {
   display: flex;
+  justify-content: space-between;
+  align-items: center;
   gap: 30rpx;
 }
 
