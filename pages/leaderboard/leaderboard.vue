@@ -85,7 +85,7 @@
 
           <view class="user-info">
             <view class="user-main">
-              <text class="username">{{ user.username }}</text>
+              <text class="username" :style="getUsernameStyle(user.username)">{{ user.username }}</text>
               <view class="user-badges">
                 <view class="badge" v-if="user.isCurrentUser">我</view>
               </view>
@@ -184,6 +184,14 @@ export default {
     },
     getAvatarText(username) {
       return username ? username.charAt(0).toUpperCase() : '?'
+    },
+    getUsernameStyle(username) {
+      const length = username?.length || 0
+
+      if (length <= 6) return { fontSize: '32rpx' }
+      if (length <= 10) return { fontSize: '30rpx' }
+      if (length <= 13) return { fontSize: '28rpx' }
+      return { fontSize: '26rpx' }
     },
     startPractice() {
       uni.navigateTo({
@@ -311,7 +319,8 @@ export default {
 }
 
 .podium-item {
-  flex: 1;
+  flex: none;
+  width: 200rpx;
   text-align: center;
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(20px);
@@ -320,13 +329,14 @@ export default {
   box-shadow: 0 15rpx 30rpx rgba(0, 0, 0, 0.1);
   border: 1rpx solid rgba(255, 255, 255, 0.2);
   position: relative;
+  min-height: 320rpx;
 }
 
 .podium-item.first {
   order: 2;
   margin-bottom: -20rpx;
   z-index: 3;
-  transform: scale(1.05);
+  width: 230rpx;
 }
 
 .podium-item.second {
@@ -402,10 +412,21 @@ export default {
 
 .podium-name {
   display: block;
-  font-size: 28rpx;
+  font-size: 30rpx;
   font-weight: bold;
   color: #333;
   margin-bottom: 5rpx;
+  max-width: 180rpx;
+  margin-left: auto;
+  margin-right: auto;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.podium-item.first .podium-name {
+  max-width: 200rpx;
+  font-size: 32rpx;
 }
 
 .podium-school {
@@ -504,6 +525,7 @@ export default {
 
 .user-info {
   flex: 1;
+  min-width: 0;
 }
 
 .user-main {
@@ -511,12 +533,17 @@ export default {
   align-items: center;
   gap: 12rpx;
   margin-bottom: 8rpx;
+  min-width: 0;
 }
 
 .username {
   font-size: 30rpx;
   font-weight: bold;
   color: #333;
+  max-width: 260rpx;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .user-badges {
@@ -543,6 +570,8 @@ export default {
   flex-direction: column;
   gap: 5rpx;
   margin-right: 20rpx;
+  flex-shrink: 0;
+  width: 160rpx;
 }
 
 .stat-item {
