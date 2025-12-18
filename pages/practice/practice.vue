@@ -105,6 +105,7 @@
         </view>
         
         <input
+          :key="`sentence-${currentIndex}`"
           class="answer-input"
           v-model="userAnswer"
           placeholder="请填入正确的动词变位"
@@ -116,6 +117,7 @@
       <!-- 快变快填题 -->
       <view v-if="exerciseType === 'quick-fill'" class="input-container">
         <input
+          :key="`quick-${currentIndex}`"
           class="answer-input"
           v-model="userAnswer"
           placeholder="请输入目标变位形式"
@@ -1724,7 +1726,9 @@ export default {
       if (this.exerciseType === 'sentence' || this.exerciseType === 'quick-fill') {
         this.answerInputFocus = false
         this.$nextTick(() => {
-          this.answerInputFocus = true
+          setTimeout(() => {
+            this.answerInputFocus = true
+          }, 50)
         })
       } else {
         this.answerInputFocus = false
