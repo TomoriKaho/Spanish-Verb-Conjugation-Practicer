@@ -208,7 +208,7 @@
               class="form-input"
               type="password"
               v-model="editForm.password"
-              placeholder="留空则不修改，8-20位需包含至少两类字符"
+              placeholder="留空则不修改"
               maxlength="20"
               @blur="validateEditPassword"
             />
@@ -257,7 +257,7 @@
 
           <view class="form-note">
             <text class="note-icon">ℹ️</text>
-            <text class="note-text">邮箱和注册时间不可修改，用户名需唯一，密码为空则不修改</text>
+            <text class="note-text">邮箱和注册时间不可修改</text>
           </view>
         </view>
         

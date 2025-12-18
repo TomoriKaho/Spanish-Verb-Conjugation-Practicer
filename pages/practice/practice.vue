@@ -17,11 +17,23 @@
       <text class="message-text">{{ customMessageText }}</text>
     </view>
     
-    <view class="practice-header">
-      <view class="progress-bar">
-        <view class="progress-fill" :style="{ width: progress + '%' }"></view>
+    <view class="practice-header" v-if="hasStarted">
+      <view class="progress-bar-wrapper">
+        <view class="progress-bar">
+          <view class="progress-fill" :style="{ width: progress + '%' }"></view>
+        </view>
+        <text class="progress-text">{{ completedCount }} / {{ exerciseCount }}</text>
       </view>
-      <text class="progress-text">{{ totalAnswered }} / {{ exerciseCount }}</text>
+      <view class="progress-actions">
+        <button class="progress-btn back" @click="goToPreviousExercise" :disabled="!canGoPrevious">
+          <text class="arrow">←</text>
+          <text>返回上题</text>
+        </button>
+        <button class="progress-btn skip" @click="skipCurrentExercise" :disabled="!canSkipCurrent">
+          <text>跳过此题</text>
+          <text class="arrow">→</text>
+        </button>
+      </view>
     </view>
 
     <view class="card exercise-card" v-if="currentExercise">
@@ -105,22 +117,24 @@
         </view>
         
         <input
+          :key="`sentence-${currentIndex}`"
           class="answer-input"
           v-model="userAnswer"
           placeholder="请填入正确的动词变位"
           :disabled="showFeedback"
-          :focus="!showFeedback"
+          :focus="answerInputFocus && !showFeedback"
         />
       </view>
 
       <!-- 快变快填题 -->
       <view v-if="exerciseType === 'quick-fill'" class="input-container">
         <input
+          :key="`quick-${currentIndex}`"
           class="answer-input"
           v-model="userAnswer"
           placeholder="请输入目标变位形式"
           :disabled="showFeedback"
-          :focus="!showFeedback"
+          :focus="answerInputFocus && !showFeedback"
         />
       </view>
 
@@ -241,16 +255,16 @@
       <view class="modal-content result" @click.stop>
         <text class="result-title">练习完成！</text>
         <view class="result-stats">
-          <view class="result-item">
-            <text class="result-number">{{ correctCount }}</text>
-            <text class="result-label">答对</text>
-          </view>
-          <view class="result-item">
-            <text class="result-number">{{ exercises.length }}</text>
-            <text class="result-label">总题数</text>
-          </view>
-          <view class="result-item">
-            <text class="result-number">{{ accuracy }}%</text>
+        <view class="result-item">
+          <text class="result-number">{{ correctCount }}</text>
+          <text class="result-label">答对</text>
+        </view>
+        <view class="result-item">
+          <text class="result-number">{{ answeredCount }}</text>
+          <text class="result-label">作答题数</text>
+        </view>
+        <view class="result-item">
+          <text class="result-number">{{ accuracy }}%</text>
             <text class="result-label">正确率</text>
           </view>
         </view>
@@ -534,6 +548,7 @@ export default {
       usedQuestionIds: new Set(),  // 已使用的题目ID（包括题库题和AI题）
       currentIndex: 0,
       userAnswer: '',
+      answerInputFocus: false,  // 控制填空输入框的聚焦
       selectedAnswer: '',
       comboAnswers: [],  // 组合填空的答案数组
       showFeedback: false,
@@ -543,10 +558,12 @@ export default {
       // 流水线相关
       generatingCount: 0,  // 正在生成的题目数量（支持并发）
       generationError: false,  // 生成是否出错
-      totalAnswered: 0,  // 已答题数
       bufferSize: 2,  // 缓冲区大小：保持提前生成2题
       maxConcurrent: 2,  // 最大并发生成数
-      
+
+      // 题目状态记录
+      questionStates: [],
+
       // 单词本相关
       isFavorited: false,  // 当前单词是否已收藏
       practiceMode: 'normal', // 练习模式：normal/favorite/wrong
@@ -576,7 +593,10 @@ export default {
         correct: 0,
         wrong: 0,
         accuracy: 0
-      }
+      },
+
+      // 返回控制
+      allowNavigateBack: false
     }
   },
   onLoad(options) {
@@ -608,25 +628,50 @@ export default {
       this.practiceMode = options.mode
     }
   },
-  computed: {
-    containerPaddingTop() {
-      // 状态栏高度 + 导航栏内容高度(88rpx转px) + 额外间距
-      const navBarHeight = 88 / 750 * uni.getSystemInfoSync().windowWidth // 88rpx转px
-      return (this.statusBarHeight + navBarHeight + 10) + 'px'
+  onBackPress() {
+    if (this.allowNavigateBack) {
+      return false
+    }
+    if (this.hasStarted) {
+      this.goBack()
+      return true
+    }
+    return false
     },
-    currentExercise() {
-      return this.exercises[this.currentIndex]
-    },
-    progress() {
-      return this.exerciseCount ? ((this.totalAnswered) / this.exerciseCount) * 100 : 0
-    },
-    accuracy() {
-      return this.totalAnswered ? Math.round((this.correctCount / this.totalAnswered) * 100) : 0
-    },
-    exerciseTypeText() {
-      const types = { sentence: '例句填空', 'quick-fill': '快变快填', 'combo-fill': '组合填空' }
-      return types[this.exerciseType] || ''
-    },
+    computed: {
+      containerPaddingTop() {
+        // 状态栏高度 + 导航栏内容高度(88rpx转px) + 额外间距
+        const navBarHeight = 88 / 750 * uni.getSystemInfoSync().windowWidth // 88rpx转px
+        return (this.statusBarHeight + navBarHeight + 10) + 'px'
+      },
+      currentExercise() {
+        return this.exercises[this.currentIndex]
+      },
+      answeredCount() {
+        return this.questionStates.filter(s => s.status === 'answered').length
+      },
+      skippedCount() {
+        return this.questionStates.filter(s => s.status === 'skipped').length
+      },
+      completedCount() {
+        return this.answeredCount + this.skippedCount
+      },
+      progress() {
+        return this.exerciseCount ? (this.completedCount / this.exerciseCount) * 100 : 0
+      },
+      accuracy() {
+        return this.answeredCount ? Math.round((this.correctCount / this.answeredCount) * 100) : 0
+      },
+      canGoPrevious() {
+        return this.hasStarted && this.currentIndex > 0
+      },
+      canSkipCurrent() {
+        return this.hasStarted && this.currentExercise && !this.showFeedback
+      },
+      exerciseTypeText() {
+        const types = { sentence: '例句填空', 'quick-fill': '快变快填', 'combo-fill': '组合填空' }
+        return types[this.exerciseType] || ''
+      },
     // 根据选择的语气过滤时态选项
     filteredTenseOptions() {
       if (this.selectedMoods.length === 0) {
@@ -643,6 +688,7 @@ export default {
           content: '练习尚未完成，确定要返回吗？',
           success: (res) => {
             if (res.confirm) {
+              this.allowNavigateBack = true
               uni.navigateBack({
                 delta: 1
               })
@@ -669,6 +715,89 @@ export default {
         'combo-fill': '一次性完成同一个动词的六个不同时态、语气和人称的变位填空，全面考查对动词变位体系的掌握程度。'
       }
       return descriptions[this.exerciseType] || ''
+    },
+
+    createStateForExercise(exercise) {
+      return {
+        status: 'pending',
+        userAnswer: '',
+        selectedAnswer: '',
+        comboAnswers: exercise && exercise.comboItems ? new Array(exercise.comboItems.length).fill('') : [],
+        showFeedback: false,
+        isCorrect: false,
+        showExample: false,
+        showHint: false,
+        showTranslation: false,
+        showRatingButtons: false,
+        hasRated: false
+      }
+    },
+
+    ensureStateExists(index) {
+      if (!this.exercises[index]) return
+      if (!this.questionStates[index]) {
+        this.$set(this.questionStates, index, this.createStateForExercise(this.exercises[index]))
+      }
+    },
+
+    applyState(index) {
+      this.ensureStateExists(index)
+      const state = this.questionStates[index]
+      if (!state) return
+
+      this.userAnswer = state.userAnswer || ''
+      this.selectedAnswer = state.selectedAnswer || ''
+      if (state.comboAnswers && state.comboAnswers.length > 0) {
+        this.comboAnswers = [...state.comboAnswers]
+      } else if (this.exercises[index] && this.exercises[index].comboItems) {
+        this.comboAnswers = new Array(this.exercises[index].comboItems.length).fill('')
+      } else {
+        this.comboAnswers = []
+      }
+      this.showFeedback = !!state.showFeedback
+      this.isCorrect = !!state.isCorrect
+      this.showExample = !!state.showExample
+      this.showHint = !!state.showHint
+      this.showTranslation = !!state.showTranslation
+      this.showRatingButtons = !!state.showRatingButtons
+      this.hasRated = !!state.hasRated
+    },
+
+    saveCurrentState(statusOverride = null) {
+      if (!this.currentExercise) return
+      this.ensureStateExists(this.currentIndex)
+      const state = this.questionStates[this.currentIndex] || {}
+
+      const nextState = {
+        ...state,
+        status: statusOverride || state.status || 'pending',
+        userAnswer: this.userAnswer,
+        selectedAnswer: this.selectedAnswer,
+        comboAnswers: [...this.comboAnswers],
+        showFeedback: this.showFeedback,
+        isCorrect: this.isCorrect,
+        showExample: this.showExample,
+        showHint: this.showHint,
+        showTranslation: this.showTranslation,
+        showRatingButtons: this.showRatingButtons,
+        hasRated: this.hasRated
+      }
+
+      this.$set(this.questionStates, this.currentIndex, nextState)
+    },
+
+    goToExercise(index, skipSave = false) {
+      if (index < 0 || index >= this.exercises.length) return
+      if (!skipSave) {
+        this.saveCurrentState()
+      }
+
+      this.currentIndex = index
+      this.ensureStateExists(index)
+      this.applyState(index)
+      this.checkFavoriteStatus()
+      this.checkQuestionFavoriteStatus()
+      this.focusAnswerInput()
     },
     
     onExerciseTypeChange(e) {
@@ -976,8 +1105,8 @@ export default {
           this.hasStarted = true
           this.currentIndex = 0
           this.correctCount = 0
-          this.totalAnswered = 0
-          
+          this.questionStates = this.exercises.map(ex => this.createStateForExercise(ex))
+
           // 从题目池中随机抽取需要的题目添加到exercises中
           this.fillFromQuestionPool()
           
@@ -987,12 +1116,7 @@ export default {
           if (hasEnoughQuestions) {
             // 如果有题库题，检查第一题的收藏状态
             if (this.exercises.length > 0) {
-              // 初始化组合填空的答案数组
-              if (this.exerciseType === 'combo-fill' && this.currentExercise.comboItems) {
-                this.comboAnswers = new Array(this.currentExercise.comboItems.length).fill('')
-              }
-              this.checkFavoriteStatus()
-              this.checkQuestionFavoriteStatus()
+              this.goToExercise(0, true)
             } else if (res.needAI && res.needAI > 0) {
               // 题库为空，等待AI生成
               console.log('题库为空，等待AI生成题目...')
@@ -1069,24 +1193,22 @@ export default {
             if (isFirstBatch && i === 0) {
               // 第一题直接添加到开头
               this.exercises.push(res.exercise)
+              this.questionStates.push(this.createStateForExercise(res.exercise))
               console.log(`第一个AI题目已生成，开始练习`)
-              
+
               // 隐藏加载提示，初始化第一题
               uni.hideToast()
-              if (this.exerciseType === 'combo-fill' && this.currentExercise.comboItems) {
-                this.comboAnswers = new Array(this.currentExercise.comboItems.length).fill('')
-              }
-              this.checkFavoriteStatus()
-              this.checkQuestionFavoriteStatus()
+              this.goToExercise(0, true)
             } else {
               // 后续题目插入到当前题目之后的位置（避免影响currentIndex）
               // 计算插入位置：在当前题目后面到末尾之间随机选择
               const insertStart = this.currentIndex + 1
               const insertEnd = this.exercises.length + 1
               const randomIndex = insertStart + Math.floor(Math.random() * (insertEnd - insertStart))
-              
+
               this.exercises.splice(randomIndex, 0, res.exercise)
-              
+              this.questionStates.splice(randomIndex, 0, this.createStateForExercise(res.exercise))
+
               console.log(`AI题目已插入到位置 ${randomIndex}, 当前位置: ${this.currentIndex}, 当前题目总数: ${this.exercises.length}`)
               
               // 注意：因为插入位置在currentIndex之后，所以不需要调整currentIndex
@@ -1220,6 +1342,9 @@ export default {
       if (this.exercises.length !== uniqueFinalIds.size) {
         console.error('警告：exercises数组中有重复的题目ID！', finalQuestionIds)
       }
+
+      // 根据最新顺序重置题目状态
+      this.questionStates = this.exercises.map(ex => this.createStateForExercise(ex))
     },
     
     // 显示自定义消息提示
@@ -1332,6 +1457,7 @@ export default {
           this.showMessage(res.message, 'success', 3000)
           // 隐藏评价按钮
           this.showRatingButtons = false
+          this.saveCurrentState()
         }
       } catch (error) {
         console.error('评价题目失败:', error)
@@ -1441,16 +1567,19 @@ export default {
     // 切换例句显示
     toggleExample() {
       this.showExample = !this.showExample
+      this.saveCurrentState()
     },
-    
+
     // 切换提示显示
     toggleHint() {
       this.showHint = !this.showHint
+      this.saveCurrentState()
     },
-    
+
     // 切换翻译显示
     toggleTranslation() {
       this.showTranslation = !this.showTranslation
+      this.saveCurrentState()
     },
     
     // 统一处理提交答案和下一题的按钮点击
@@ -1462,6 +1591,24 @@ export default {
         // 还未提交，点击提交答案
         this.submitAnswer()
       }
+    },
+
+    skipCurrentExercise() {
+      if (!this.currentExercise || this.showFeedback) return
+
+      this.userAnswer = ''
+      this.selectedAnswer = ''
+      this.comboAnswers = this.currentExercise.comboItems ? new Array(this.currentExercise.comboItems.length).fill('') : []
+      this.showExample = false
+      this.showHint = false
+      this.showTranslation = false
+      this.showRatingButtons = false
+      this.hasRated = false
+      this.isCorrect = false
+      this.showFeedback = false
+
+      this.saveCurrentState('skipped')
+      this.nextExercise()
     },
     
     async submitAnswer() {
@@ -1517,9 +1664,8 @@ export default {
               console.log('错题已添加到队列，当前错题数:', this.wrongExercises.length)
             }
           }
-          
-          this.totalAnswered++
           this.showFeedback = true
+          this.saveCurrentState('answered')
         } catch (error) {
           showToast('提交失败')
         }
@@ -1565,8 +1711,7 @@ export default {
               console.log('错题已添加到队列，当前错题数:', this.wrongExercises.length)
             }
           }
-          this.totalAnswered++
-          
+
           // 如果是例句填空且是错题重做，显示评价按钮
           if (this.exerciseType === 'sentence' && this.currentExercise.isRetry) {
             // 只有AI生成的题目或题库题目才显示评价按钮
@@ -1574,29 +1719,25 @@ export default {
               this.showRatingButtons = true
             }
           }
-          
+
           this.showFeedback = true
+          this.saveCurrentState('answered')
         }
       } catch (error) {
         showToast('提交失败')
       }
     },
 
+    goToPreviousExercise() {
+      if (!this.canGoPrevious) return
+      this.goToExercise(this.currentIndex - 1)
+    },
+
     async nextExercise() {
-      this.showFeedback = false
-      this.userAnswer = ''
-      this.selectedAnswer = ''
-      this.comboAnswers = []  // 重置组合填空答案
-      this.showRatingButtons = false
-      this.hasRated = false
-      
-      // 重置辅助内容显示状态
-      this.showExample = false
-      this.showHint = false
-      this.showTranslation = false
+      this.saveCurrentState()
 
       // 检查是否完成所有初始题目（但还有错题需要重做）
-      if (this.totalAnswered >= this.exerciseCount && this.wrongExercises.length > 0) {
+      if (this.completedCount >= this.exerciseCount && this.wrongExercises.length > 0) {
         // 显示练习总结弹窗，让用户选择是否重做错题
         console.log('完成原有题目，有', this.wrongExercises.length, '道错题')
         this.showPracticeSummary()
@@ -1612,16 +1753,9 @@ export default {
       // 检查下一题是否已生成
       if (this.currentIndex + 1 < this.exercises.length) {
         // 下一题已准备好，直接跳转
-        this.currentIndex++
-        // 初始化组合填空的答案数组
-        if (this.exerciseType === 'combo-fill' && this.currentExercise.comboItems) {
-          this.comboAnswers = new Array(this.currentExercise.comboItems.length).fill('')
-        }
-        // 检查新题目的收藏状态
-        this.checkFavoriteStatus()
-        this.checkQuestionFavoriteStatus()
+        this.goToExercise(this.currentIndex + 1, true)
         // 继续填充缓冲区（只有在非错题重做阶段）
-        if (this.totalAnswered < this.exerciseCount) {
+        if (this.completedCount < this.exerciseCount) {
           this.fillBuffer()
         }
       } else {
@@ -1636,7 +1770,7 @@ export default {
               // 生成完成
               clearInterval(checkInterval)
               hideLoading()
-              this.currentIndex++
+              this.goToExercise(this.currentIndex + 1, true)
               this.fillBuffer()
             } else if (this.generationError && this.generatingCount === 0) {
               // 生成失败
@@ -1662,7 +1796,7 @@ export default {
           await this.fillBuffer()
           // 重试后检查
           if (this.currentIndex + 1 < this.exercises.length) {
-            this.currentIndex++
+            this.goToExercise(this.currentIndex + 1, true)
             this.fillBuffer()
           }
         }
@@ -1671,8 +1805,8 @@ export default {
     // 显示练习总结弹窗
     showPracticeSummary() {
       const initialCorrect = this.correctCount
-      const initialTotal = this.exerciseCount
-      const initialWrong = initialTotal - initialCorrect
+      const initialTotal = this.answeredCount
+      const initialWrong = Math.max(initialTotal - initialCorrect, 0)
       const accuracy = initialTotal > 0 ? Math.round((initialCorrect / initialTotal) * 100) : 0
       
       this.summaryData = {
@@ -1689,17 +1823,18 @@ export default {
     startRetryWrong() {
       this.showSummary = false
       console.log('开始重做错题，共', this.wrongExercises.length, '题')
-      
+
       // 将错题添加到exercises数组
-      this.exercises.push(...this.wrongExercises)
+      this.wrongExercises.forEach(ex => {
+        this.exercises.push(ex)
+        this.questionStates.push(this.createStateForExercise(ex))
+      })
       // 清空错题队列
       this.wrongExercises = []
       // 更新总题数
       this.exerciseCount = this.exercises.length
       // 继续下一题
-      this.currentIndex++
-      this.checkFavoriteStatus()
-      this.checkQuestionFavoriteStatus()
+      this.goToExercise(this.currentIndex + 1, true)
     },
     
     // 跳过错题重做，直接完成
@@ -1711,7 +1846,21 @@ export default {
       // 显示最终结果
       this.showResult = true
     },
-    
+
+    // 聚焦填空输入框（例句填空 & 快变快填）
+    focusAnswerInput() {
+      if (this.exerciseType === 'sentence' || this.exerciseType === 'quick-fill') {
+        this.answerInputFocus = false
+        this.$nextTick(() => {
+          setTimeout(() => {
+            this.answerInputFocus = true
+          }, 50)
+        })
+      } else {
+        this.answerInputFocus = false
+      }
+    },
+
     finishPractice() {
       // 如果是课程模式，自动标记课程完成
       if (this.isCourseMode && this.lessonId) {
@@ -1722,9 +1871,9 @@ export default {
       this.showSummary = false
       this.hasStarted = false
       this.exercises = []
+      this.questionStates = []
       this.currentIndex = 0
       this.correctCount = 0
-      this.totalAnswered = 0
       this.generatingCount = 0
       this.generationError = false
       this.wrongExercises = []
@@ -1747,9 +1896,12 @@ export default {
       this.showResult = false
       this.currentIndex = 0
       this.correctCount = 0
-      this.totalAnswered = 0
       this.generatingCount = 0
       this.generationError = false
+      this.questionStates = this.exercises.map(ex => this.createStateForExercise(ex))
+      if (this.exercises.length > 0) {
+        this.goToExercise(0, true)
+      }
     }
   }
 }
@@ -1868,16 +2020,20 @@ export default {
 
 .practice-header {
   /* margin-top 已由容器的 padding-top 处理 */
-  padding: 20rpx;
+  padding: 30rpx 20rpx 10rpx;
   background: #fff;
 }
 
+.progress-bar-wrapper {
+  margin-bottom: 20rpx;
+}
+
 .progress-bar {
-  height: 8rpx;
+  height: 12rpx;
   background: #f0f0f0;
   border-radius: 4rpx;
   overflow: hidden;
-  margin-bottom: 15rpx;
+  margin-bottom: 18rpx;
 }
 
 .progress-fill {
@@ -1891,6 +2047,33 @@ export default {
   text-align: center;
   font-size: 24rpx;
   color: #999;
+}
+
+.progress-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 4rpx;
+}
+
+.progress-btn {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  padding: 0rpx 12rpx;
+  font-size: 26rpx;
+  border-radius: 8rpx;
+  border: none;
+  color: #5c6ac4;
+  background: transparent;
+}
+
+.progress-btn::after {
+  border: none;
+}
+
+.progress-btn:disabled {
+  color: #b3b8d4;
 }
 
 .exercise-card {
