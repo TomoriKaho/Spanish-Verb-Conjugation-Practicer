@@ -135,21 +135,6 @@
     <!-- 功能菜单 -->
     <view class="menu-section">
       <view class="menu-card">
-        <view class="menu-item" @click="goToStatistics">
-          <view class="menu-icon">📊</view>
-          <text class="menu-label">学习统计</text>
-          <text class="menu-arrow">→</text>
-        </view>
-        <view class="menu-item" @click="goToVocabulary">
-          <view class="menu-icon">📚</view>
-          <text class="menu-label">我的单词本</text>
-          <text class="menu-arrow">→</text>
-        </view>
-        <view class="menu-item" @click="goToQuestionBank">
-          <view class="menu-icon">💾</view>
-          <text class="menu-label">收藏题目</text>
-          <text class="menu-arrow">→</text>
-        </view>
         <view class="menu-item" @click="settings">
           <view class="menu-icon">⚙️</view>
           <text class="menu-label">设置</text>
@@ -754,21 +739,6 @@ export default {
         title: '续费订阅',
         content: '支付功能开发中，敬请期待',
         showCancel: false
-      })
-    },
-    goToStatistics() {
-      uni.navigateTo({
-        url: '/pages/statistics/statistics'
-      })
-    },
-    goToVocabulary() {
-      uni.switchTab({
-        url: '/pages/vocabulary/vocabulary'
-      })
-    },
-    goToQuestionBank() {
-      uni.navigateTo({
-        url: '/pages/question-bank/question-bank'
       })
     },
     settings() {
