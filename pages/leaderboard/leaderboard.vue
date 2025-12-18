@@ -324,7 +324,7 @@ export default {
 
 .podium-item {
   flex: none;
-  width: 200rpx;
+  width: 190rpx;
   text-align: center;
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(20px);
@@ -340,24 +340,26 @@ export default {
   order: 2;
   margin-bottom: -20rpx;
   z-index: 3;
-  width: 230rpx;
+  width: 220rpx;
 }
 
 .podium-item.second {
   order: 1;
   margin-bottom: -10rpx;
   z-index: 2;
+  width: 180rpx;
 }
 
 .podium-item.third {
   order: 3;
   margin-bottom: -10rpx;
   z-index: 2;
+  width: 180rpx;
 }
 
 .podium-avatar {
-  width: 100rpx;
-  height: 100rpx;
+  width: 96rpx;
+  height: 96rpx;
   border-radius: 50%;
   background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
   display: flex;
@@ -431,6 +433,11 @@ export default {
 .podium-item.first .podium-name {
   max-width: 200rpx;
   font-size: 32rpx;
+}
+
+.podium-item.second .podium-name,
+.podium-item.third .podium-name {
+  max-width: 170rpx;
 }
 
 .podium-school {
@@ -544,7 +551,7 @@ export default {
   font-size: 30rpx;
   font-weight: bold;
   color: #333;
-  max-width: 380rpx;
+  max-width: 360rpx;
   white-space: nowrap;
   flex: 1;
 }
@@ -574,7 +581,10 @@ export default {
   gap: 5rpx;
   margin-right: 20rpx;
   flex-shrink: 0;
-  width: 160rpx;
+  width: 170rpx;
+  margin-left: auto;
+  align-items: flex-end;
+  text-align: right;
 }
 
 .stat-item {
