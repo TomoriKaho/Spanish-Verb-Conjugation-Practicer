@@ -145,6 +145,11 @@
           <text class="menu-label">关于应用</text>
           <text class="menu-arrow">→</text>
         </view>
+        <view class="menu-item" @click="checkUpdate">
+          <view class="menu-icon">🔄</view>
+          <text class="menu-label">检查更新</text>
+          <text class="menu-arrow">→</text>
+        </view>
       </view>
     </view>
 
@@ -752,6 +757,39 @@ export default {
         content: '西班牙语动词变位练习APP v1.0.0\n\n帮助学生轻松掌握西班牙语动词变位\n\n—— 让学习变得更简单',
         showCancel: false
       })
+    },
+    async checkUpdate() {
+      try {
+        const baseInfo = uni.getAppBaseInfo ? uni.getAppBaseInfo() : {}
+        const versionCode = Number(baseInfo.appVersionCode || 0)
+        const res = await api.checkAppVersion(versionCode)
+
+        if (res.isLatest) {
+          uni.showToast({
+            title: '当前已是最新版本',
+            icon: 'none'
+          })
+          return
+        }
+
+        if (res.latestVersion) {
+          uni.setStorageSync('pendingUpdate', res.latestVersion)
+          uni.navigateTo({
+            url: '/pages/update/update'
+          })
+        } else {
+          uni.showToast({
+            title: '暂未获取到更新信息',
+            icon: 'none'
+          })
+        }
+      } catch (error) {
+        console.error('检查更新失败:', error)
+        uni.showToast({
+          title: '检查更新失败，请稍后重试',
+          icon: 'none'
+        })
+      }
     },
     startPractice() {
       uni.navigateTo({
