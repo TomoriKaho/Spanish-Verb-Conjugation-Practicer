@@ -742,10 +742,8 @@ export default {
       })
     },
     settings() {
-      uni.showModal({
-        title: '设置',
-        content: '设置功能开发中，敬请期待',
-        showCancel: false
+      uni.navigateTo({
+        url: '/pages/profile/settings/settings'
       })
     },
     aboutApp() {

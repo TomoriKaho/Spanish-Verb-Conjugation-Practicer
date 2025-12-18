@@ -496,26 +496,12 @@
         <view class="theme-section">
           <text class="theme-subtitle">其他选项</text>
           <view class="checkbox-group">
-            <view 
+            <view
               :class="['checkbox-item', includeRegular ? 'checked' : '', isCourseMode ? 'disabled' : '']"
               @click="!isCourseMode && toggleRegular()"
             >
               <text class="checkbox-icon">{{ includeRegular ? '☑' : '☐' }}</text>
               <text class="checkbox-label">包含规则变位动词</text>
-            </view>
-            <view 
-              :class="['checkbox-item', includeVos ? 'checked' : '', isCourseMode ? 'disabled' : '']"
-              @click="!isCourseMode && toggleVos()"
-            >
-              <text class="checkbox-icon">{{ includeVos ? '☑' : '☐' }}</text>
-              <text class="checkbox-label">包含 vos</text>
-            </view>
-            <view 
-              :class="['checkbox-item', includeVosotros ? 'checked' : '', isCourseMode ? 'disabled' : '']"
-              @click="!isCourseMode && toggleVosotros()"
-            >
-              <text class="checkbox-icon">{{ includeVosotros ? '☑' : '☐' }}</text>
-              <text class="checkbox-label">包含 vosotros</text>
             </view>
           </view>
         </view>
@@ -537,6 +523,7 @@
 <script>
 import api from '@/utils/api.js'
 import { showToast, showLoading, hideLoading } from '@/utils/common.js'
+import { getPronounSettings } from '@/utils/settings.js'
 
 export default {
   data() {
@@ -689,9 +676,10 @@ export default {
     // 获取系统信息，设置状态栏高度
     const systemInfo = uni.getSystemInfoSync()
     this.statusBarHeight = systemInfo.statusBarHeight || 0
-    
+
     // 加载专项练习缓存配置
     this.loadThemeSettings()
+    this.loadPronounSettings()
     
     // 检查是否为课程模式
     if (options.mode === 'course' && options.lessonId) {
@@ -714,6 +702,9 @@ export default {
       this.practiceMode = options.mode
     }
     this.setExerciseCount(this.exerciseCount)
+  },
+  onShow() {
+    this.loadPronounSettings()
   },
   onBackPress() {
     if (this.allowNavigateBack) {
@@ -916,8 +907,6 @@ export default {
           this.selectedTenses = settings.selectedTenses || []
           this.selectedConjugationTypes = settings.selectedConjugationTypes || []
           this.includeRegular = settings.includeRegular !== undefined ? settings.includeRegular : true
-          this.includeVos = settings.includeVos !== undefined ? settings.includeVos : false
-          this.includeVosotros = settings.includeVosotros !== undefined ? settings.includeVosotros : true
         } else {
           // 没有缓存，默认全选
           this.selectAllThemes()
@@ -927,6 +916,13 @@ export default {
         this.selectAllThemes()
       }
     },
+
+    // 加载全局人称设置
+    loadPronounSettings() {
+      const settings = getPronounSettings()
+      this.includeVos = settings.includeVos
+      this.includeVosotros = settings.includeVosotros
+    },
     
     // 保存专项练习配置到缓存
     saveThemeSettings() {
@@ -935,9 +931,7 @@ export default {
           selectedMoods: this.selectedMoods,
           selectedTenses: this.selectedTenses,
           selectedConjugationTypes: this.selectedConjugationTypes,
-          includeRegular: this.includeRegular,
-          includeVos: this.includeVos,
-          includeVosotros: this.includeVosotros
+          includeRegular: this.includeRegular
         }
         uni.setStorageSync('themeSettings', JSON.stringify(settings))
       } catch (e) {
@@ -998,35 +992,21 @@ export default {
       this.includeRegular = !this.includeRegular
       this.saveThemeSettings()
     },
-    
-    toggleVos() {
-      this.includeVos = !this.includeVos
-      this.saveThemeSettings()
-    },
-    
-    toggleVosotros() {
-      this.includeVosotros = !this.includeVosotros
-      this.saveThemeSettings()
-    },
-    
+
     selectAllThemes() {
       this.selectedMoods = ['indicativo', 'subjuntivo', 'imperativo', 'indicativo_compuesto', 'subjuntivo_compuesto']
       this.selectedTenses = this.tenseOptions.map(t => t.value)
       this.selectedConjugationTypes = this.conjugationTypes.map(c => c.value)
       this.includeRegular = true
-      this.includeVos = false  // vos默认不勾选
-      this.includeVosotros = true  // vosotros默认勾选
       this.saveThemeSettings()
       showToast('已全选所有选项', 'success')
     },
-    
+
     clearAllThemes() {
       this.selectedMoods = []
       this.selectedTenses = []
       this.selectedConjugationTypes = []
       this.includeRegular = false
-      this.includeVos = false
-      this.includeVosotros = false
       this.saveThemeSettings()
       showToast('已清除所有选项', 'none')
     },
