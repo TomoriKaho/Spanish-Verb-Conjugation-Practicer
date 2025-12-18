@@ -35,8 +35,16 @@
             <text class="meta-tag" v-if="item.person">{{ item.person }}</text>
           </view>
           <view class="delete-btn" @click.stop="deleteQuestion(item.id)">
-            <text>🗑️ 删除</text>
+            <text>🗑️</text>
           </view>
+        </view>
+
+        <!-- 动词原型 -->
+        <view v-if="item.infinitive" class="verb-infinitive">
+          <text class="verb-icon">📖</text>
+          <text class="verb-label">动词原型：</text>
+          <text class="verb-text">{{ item.infinitive }}</text>
+          <text v-if="item.meaning" class="verb-meaning">（{{ item.meaning }}）</text>
         </view>
 
         <!-- 题目内容 -->
@@ -74,8 +82,7 @@
 
         <!-- 题目信息 -->
         <view class="question-footer">
-          <text class="footer-info">动词ID: {{ item.verb_id }}</text>
-          <text class="footer-info">收藏于 {{ formatDate(item.created_at) }}</text>
+          <text class="footer-info">📅 收藏于 {{ formatDate(item.created_at) }}</text>
         </view>
       </view>
     </view>
@@ -178,43 +185,45 @@ export default {
 .container {
   min-height: 100vh;
   padding: 40rpx;
-  background: #f8f8f8;
+  background: linear-gradient(180deg, #f5f7ff 0%, #f8f8f8 100%);
 }
 
 /* 页面标题 */
 .page-header {
   text-align: center;
-  margin-bottom: 30rpx;
+  margin-bottom: 40rpx;
 }
 
 .page-title {
   display: block;
-  font-size: 48rpx;
+  font-size: 52rpx;
   font-weight: bold;
-  color: #333;
-  margin-bottom: 10rpx;
+  color: #1a1a1a;
+  margin-bottom: 12rpx;
+  letter-spacing: 2rpx;
 }
 
 .page-subtitle {
   display: block;
   font-size: 28rpx;
-  color: #999;
+  color: #667eea;
+  font-weight: 500;
 }
 
 /* 题目类型标题 */
 .type-header {
-  background: #fff;
-  border-radius: 12rpx;
-  padding: 24rpx;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 16rpx;
+  padding: 28rpx;
   margin-bottom: 30rpx;
-  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4rpx 20rpx rgba(102, 126, 234, 0.25);
   text-align: center;
 }
 
 .type-title {
   font-size: 32rpx;
   font-weight: bold;
-  color: #667eea;
+  color: #fff;
 }
 
 /* 题目列表 */
@@ -231,7 +240,7 @@ export default {
 .question-header {
   display: flex;
   align-items: center;
-  margin-bottom: 25rpx;
+  margin-bottom: 20rpx;
   padding-bottom: 20rpx;
   border-bottom: 2rpx solid #f0f0f0;
 }
@@ -239,45 +248,86 @@ export default {
 .question-number {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: #fff;
-  padding: 8rpx 20rpx;
-  border-radius: 20rpx;
-  font-size: 24rpx;
+  padding: 10rpx 24rpx;
+  border-radius: 24rpx;
+  font-size: 26rpx;
   font-weight: bold;
-  margin-right: 15rpx;
+  margin-right: 20rpx;
+  box-shadow: 0 4rpx 12rpx rgba(102, 126, 234, 0.3);
 }
 
 .question-meta {
   flex: 1;
   display: flex;
-  gap: 10rpx;
+  gap: 12rpx;
   flex-wrap: wrap;
 }
 
 .meta-tag {
-  background: #f0f0f0;
-  padding: 6rpx 16rpx;
-  border-radius: 8rpx;
-  font-size: 22rpx;
-  color: #666;
+  background: linear-gradient(135deg, #f5f7ff 0%, #e8ecff 100%);
+  padding: 8rpx 18rpx;
+  border-radius: 12rpx;
+  font-size: 24rpx;
+  color: #667eea;
+  font-weight: 500;
+  border: 1rpx solid #d9e1ff;
 }
 
 .delete-btn {
   color: #ff4d4f;
-  font-size: 26rpx;
-  padding: 12rpx 20rpx;
+  font-size: 32rpx;
+  padding: 8rpx 16rpx;
   background: #fff1f0;
-  border-radius: 8rpx;
+  border-radius: 12rpx;
   border: 1rpx solid #ffccc7;
-  min-width: 100rpx;
   text-align: center;
   cursor: pointer;
   transition: all 0.3s;
+  box-shadow: 0 2rpx 8rpx rgba(255, 77, 79, 0.15);
 }
 
 .delete-btn:active {
   background: #ff4d4f;
   color: #fff;
   transform: scale(0.95);
+}
+
+/* 动词原型 */
+.verb-infinitive {
+  display: flex;
+  align-items: center;
+  padding: 18rpx 24rpx;
+  background: linear-gradient(135deg, #f0f4ff 0%, #e6f0ff 100%);
+  border-radius: 12rpx;
+  margin-bottom: 20rpx;
+  border-left: 6rpx solid #667eea;
+  box-shadow: 0 2rpx 8rpx rgba(102, 126, 234, 0.1);
+}
+
+.verb-icon {
+  font-size: 28rpx;
+  margin-right: 10rpx;
+}
+
+.verb-label {
+  font-size: 26rpx;
+  color: #667eea;
+  font-weight: 600;
+  margin-right: 10rpx;
+}
+
+.verb-text {
+  font-size: 28rpx;
+  color: #333;
+  font-weight: bold;
+  font-style: italic;
+}
+
+.verb-meaning {
+  font-size: 24rpx;
+  color: #888;
+  margin-left: 8rpx;
+  font-style: normal;
 }
 
 /* 题目内容 */
@@ -288,32 +338,35 @@ export default {
 .question-text {
   display: block;
   font-size: 32rpx;
-  color: #333;
-  line-height: 1.6;
+  color: #1a1a1a;
+  line-height: 1.8;
   font-weight: 500;
+  padding: 10rpx 0;
 }
 
 /* 例句 */
 .example-section {
-  background: #f8f9ff;
-  padding: 20rpx;
+  background: linear-gradient(135deg, #f8f9ff 0%, #f0f2ff 100%);
+  padding: 24rpx;
   border-radius: 12rpx;
   margin-bottom: 25rpx;
+  border: 1rpx solid #e8ecff;
+  box-shadow: 0 2rpx 8rpx rgba(102, 126, 234, 0.08);
 }
 
 .example-label {
   display: block;
   font-size: 24rpx;
   color: #667eea;
-  margin-bottom: 8rpx;
+  margin-bottom: 12rpx;
   font-weight: bold;
 }
 
 .example-text {
   display: block;
   font-size: 28rpx;
-  color: #333;
-  line-height: 1.5;
+  color: #1a1a1a;
+  line-height: 1.6;
 }
 
 /* 答案区域 */
@@ -326,71 +379,80 @@ export default {
 }
 
 .answer-label text {
-  font-size: 24rpx;
-  color: #999;
+  font-size: 26rpx;
+  color: #666;
+  font-weight: 500;
 }
 
 .answer-box {
-  background: #e8f5e9;
-  padding: 20rpx 25rpx;
+  background: linear-gradient(135deg, #e8f5e9 0%, #d4edd6 100%);
+  padding: 22rpx 28rpx;
   border-radius: 12rpx;
   border-left: 6rpx solid #4caf50;
+  box-shadow: 0 2rpx 8rpx rgba(76, 175, 80, 0.15);
 }
 
 .answer-text {
-  font-size: 30rpx;
+  font-size: 32rpx;
   color: #2e7d32;
   font-weight: bold;
+  letter-spacing: 1rpx;
 }
 
 /* 翻译 */
 .translation-section {
   display: flex;
   align-items: flex-start;
-  padding: 20rpx;
-  background: #fff9e6;
+  padding: 24rpx;
+  background: linear-gradient(135deg, #fff9e6 0%, #fff3d9 100%);
   border-radius: 12rpx;
   margin-bottom: 20rpx;
+  border: 1rpx solid #ffe8b3;
+  box-shadow: 0 2rpx 8rpx rgba(255, 193, 7, 0.1);
 }
 
 .translation-icon {
   font-size: 32rpx;
   margin-right: 12rpx;
+  line-height: 1.5;
 }
 
 .translation-text {
   flex: 1;
   font-size: 26rpx;
-  color: #666;
-  line-height: 1.5;
+  color: #555;
+  line-height: 1.6;
 }
 
 /* 提示 */
 .hint-section {
   display: flex;
   align-items: flex-start;
-  padding: 20rpx;
-  background: #fff3e0;
+  padding: 24rpx;
+  background: linear-gradient(135deg, #fff3e0 0%, #ffe8cc 100%);
   border-radius: 12rpx;
   margin-bottom: 20rpx;
+  border: 1rpx solid #ffd9a3;
+  box-shadow: 0 2rpx 8rpx rgba(255, 152, 0, 0.1);
 }
 
 .hint-icon {
   font-size: 32rpx;
   margin-right: 12rpx;
+  line-height: 1.5;
 }
 
 .hint-text {
   flex: 1;
   font-size: 26rpx;
-  color: #666;
-  line-height: 1.5;
+  color: #555;
+  line-height: 1.6;
 }
 
 /* 题目信息 */
 .question-footer {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   padding-top: 20rpx;
   border-top: 2rpx solid #f0f0f0;
 }
@@ -398,6 +460,7 @@ export default {
 .footer-info {
   font-size: 24rpx;
   color: #999;
+  font-weight: 400;
 }
 
 /* 空状态 */
@@ -429,7 +492,14 @@ export default {
 /* 通用卡片样式 */
 .card {
   background: #fff;
-  border-radius: 16rpx;
-  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.05);
+  border-radius: 20rpx;
+  box-shadow: 0 6rpx 24rpx rgba(0, 0, 0, 0.06);
+  transition: all 0.3s ease;
+  border: 1rpx solid #f0f0f0;
+}
+
+.card:active {
+  transform: translateY(-4rpx);
+  box-shadow: 0 8rpx 32rpx rgba(0, 0, 0, 0.1);
 }
 </style>
