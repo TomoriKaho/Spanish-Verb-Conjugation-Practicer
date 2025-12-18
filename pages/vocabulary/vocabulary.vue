@@ -481,6 +481,7 @@ export default {
   display: flex;
   gap: 10rpx;
   flex-wrap: wrap;
+  margin-top: 24rpx;
 }
 
 .word-tag {
