@@ -65,13 +65,19 @@ router.get('/check', (req, res) => {
         releaseNotes += '\n\nBug修复：\n' + latestVersion.bugFixes.map(f => `• ${f}`).join('\n')
       }
 
+      // 为了兼容旧版本前端的判断逻辑，添加 isLatest 和 latestVersion 字段
       return res.json({
-        versionCode: Number(latestVersion.versionCode),
-        versionName: latestVersion.versionName,
-        releaseNotes: releaseNotes.trim() || '版本更新',
-        packageFileName: latestVersion.packageFileName,
-        downloadUrl: packageUrl,
-        forceUpdate: Boolean(latestVersion.forceUpdate)
+        isLatest,
+        latestVersion: {
+          versionCode: Number(latestVersion.versionCode),
+          versionName: latestVersion.versionName,
+          releaseNotes: releaseNotes.trim() || '版本更新',
+          packageFileName: latestVersion.packageFileName,
+          packageUrl: packageUrl,
+          downloadUrl: packageUrl, // 兼容旧字段名
+          forceUpdate: Boolean(latestVersion.forceUpdate),
+          packageSize: size
+        }
       })
     }
 
