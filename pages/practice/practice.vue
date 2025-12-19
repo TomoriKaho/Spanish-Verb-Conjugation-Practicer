@@ -552,7 +552,9 @@ export default {
       lessonConfig: null,   // 课程配置（时态、变位类型等）
       defaultCourseCount: 20,  // 开始学习默认题量
       defaultReviewCount: 30,  // 滚动复习默认题量
-      
+      // 自定义动词练习
+      isCustomPractice: false,
+      customVerbIds: [],
       // 专项练习设置
       tenseOptions: [
         // 简单陈述式（5个）
@@ -700,6 +702,23 @@ export default {
     } else if (options.mode) {
       // 其他练习模式：favorite: 收藏练习, wrong: 错题练习
       this.practiceMode = options.mode
+    }
+        if (options.practiceMode) {
+      this.practiceMode = options.practiceMode
+    }
+    if (options.verbIds) {
+      this.customVerbIds = options.verbIds
+        .split(',')
+        .map(id => parseInt(id))
+        .filter(id => !Number.isNaN(id))
+    }
+    if (this.practiceMode === 'custom' && this.customVerbIds.length > 0) {
+      this.isCustomPractice = true
+      this.exerciseTypes = this.exerciseTypes.filter(type => type.value !== 'sentence')
+      if (this.exerciseTypes.length > 0) {
+        this.exerciseTypeIndex = 0
+        this.exerciseType = this.exerciseTypes[0].value
+      }
     }
     this.setExerciseCount(this.exerciseCount)
   },
@@ -1154,6 +1173,8 @@ export default {
         // 如果是课程模式，传递课程单词ID列表
         if (this.isCourseMode && this.lessonVocabulary.length > 0) {
           requestData.verbIds = this.lessonVocabulary.map(v => v.id)
+        } else if (this.isCustomPractice && this.customVerbIds.length > 0) {
+          requestData.verbIds = this.customVerbIds
         }
         
         // 使用新的批量生成接口

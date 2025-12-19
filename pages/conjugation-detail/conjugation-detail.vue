@@ -113,11 +113,7 @@
     </view>
 
     <!-- 底部操作按钮 -->
-    <view class="action-bar">
-      <view class="action-btn" @click="copyAll">
-        <text class="btn-icon">📋</text>
-        <text>复制全部</text>
-      </view>
+    <view class="action-bar single">
       <view class="action-btn primary" @click="startPractice">
         <text class="btn-icon">✏️</text>
         <text>开始练习</text>
@@ -369,35 +365,6 @@ export default {
     // 切换反身代词表格展开/折叠
     toggleReflexivePronouns() {
       this.showReflexivePronouns = !this.showReflexivePronouns
-    },
-
-    // 复制所有变位
-    copyAll() {
-      let text = `${this.verbInfo.infinitive} - ${this.verbInfo.meaning}\n\n`
-      
-      Object.keys(this.groupedConjugations).forEach(moodKey => {
-        const group = this.groupedConjugations[moodKey]
-        text += `【${this.getMoodName(moodKey)}】\n`
-        
-        group.tenses.forEach(tense => {
-          text += `\n${tense.tenseName}\n`
-          tense.conjugations.forEach(conj => {
-            text += `  ${this.getPersonLabel(conj.person)}: ${conj.conjugated_form}\n`
-          })
-        })
-        text += '\n'
-      })
-      
-      // 在uni-app中复制到剪贴板
-      uni.setClipboardData({
-        data: text,
-        success: () => {
-          showToast('已复制到剪贴板', 'success')
-        },
-        fail: () => {
-          showToast('复制失败', 'none')
-        }
-      })
     },
 
     // 开始练习这个动词
@@ -733,6 +700,10 @@ export default {
   padding: 20rpx;
   box-shadow: 0 -4rpx 20rpx rgba(0, 0, 0, 0.1);
   z-index: 100;
+}
+
+.action-bar.single {
+  justify-content: center;
 }
 
 .action-btn {
