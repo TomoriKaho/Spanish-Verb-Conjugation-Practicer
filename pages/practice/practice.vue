@@ -1870,6 +1870,55 @@ export default {
 
       // 检查是否完成所有题目（包括错题重做）
       if (this.currentIndex + 1 >= this.exercises.length && this.wrongExercises.length === 0) {
+        // 如果尚未达到目标题量，且还有AI生成在进行或题库可能还可填充，应该等待/尝试填充，而不是直接结束
+        if (this.completedCount < this.exerciseCount) {
+          // 如果正在生成AI题目，等待生成完成
+          if (this.generatingCount > 0) {
+            showLoading('正在生成下一题，请稍候...')
+            const checkInterval = setInterval(() => {
+              if (this.currentIndex + 1 < this.exercises.length) {
+                clearInterval(checkInterval)
+                hideLoading()
+                this.goToExercise(this.currentIndex + 1, true)
+                if (typeof this.fillBuffer === 'function') this.fillBuffer()
+              } else if (this.generationError && this.generatingCount === 0) {
+                clearInterval(checkInterval)
+                hideLoading()
+                showToast('生成题目失败，请重试', 'none')
+                if (typeof this.fillBuffer === 'function') this.fillBuffer()
+              }
+            }, 300)
+
+            // 超时保护（15秒）
+            setTimeout(() => {
+              if (this.generatingCount > 0) {
+                clearInterval(checkInterval)
+                hideLoading()
+                showToast('生成超时，请检查网络', 'none')
+              }
+            }, 15000)
+
+            return
+          }
+
+          // 如果没有正在生成，但仍未达到目标题量，尝试触发缓冲填充（如果实现了fillBuffer）
+          if (typeof this.fillBuffer === 'function') {
+            try {
+              await this.fillBuffer()
+            } catch (e) {
+              console.error('fillBuffer 调用失败:', e)
+            }
+
+            // 填充后如果有下一题，直接跳转并继续填充
+            if (this.currentIndex + 1 < this.exercises.length) {
+              this.goToExercise(this.currentIndex + 1, true)
+              if (typeof this.fillBuffer === 'function') this.fillBuffer()
+              return
+            }
+          }
+        }
+
+        // 无需等待或已达到目标题量，显示结果
         this.showResult = true
         return
       }
