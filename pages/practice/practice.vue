@@ -1169,28 +1169,42 @@ export default {
           includeVosotros: this.includeVosotros,  // 是否包含vosotros
           practiceMode: this.practiceMode
         }
-        
+
         // 如果是课程模式，传递课程单词ID列表
         if (this.isCourseMode && this.lessonVocabulary.length > 0) {
           requestData.verbIds = this.lessonVocabulary.map(v => v.id)
         } else if (this.isCustomPractice && this.customVerbIds.length > 0) {
           requestData.verbIds = this.customVerbIds
         }
-        
-        // 使用新的批量生成接口
-        const res = await api.getBatchExercises(requestData)
+
+        // 单动词练习使用常规题目生成，避免触发AI批量逻辑
+        const res = this.isCustomPractice
+          ? await api.getExercise(requestData)
+          : await api.getBatchExercises(requestData)
 
         hideLoading()
 
         if (res.success) {
           // 初始化练习
-          this.exercises = res.exercises || []
-          
+          let exercises = res.exercises || []
+
+          // 自定义练习时仅保留指定动词的题目
+          if (this.isCustomPractice && this.customVerbIds.length > 0) {
+            const allowList = new Set(this.customVerbIds)
+            exercises = exercises.filter(ex => allowList.has(ex.verbId))
+          }
+
+          this.exercises = exercises
+
           // 接收题目池并立即去重
-          const rawPool = res.questionPool || []
+          let rawPool = Array.isArray(res.questionPool) ? res.questionPool : []
+          if (this.isCustomPractice && this.customVerbIds.length > 0) {
+            const allowList = new Set(this.customVerbIds)
+            rawPool = rawPool.filter(q => allowList.has(q.verbId))
+          }
           const poolQuestionIds = new Set()
           this.questionPool = []
-          
+
           for (const q of rawPool) {
             if (q.questionId && !poolQuestionIds.has(q.questionId)) {
               poolQuestionIds.add(q.questionId)
@@ -1217,7 +1231,8 @@ export default {
           this.fillFromQuestionPool()
           
           // 检查是否有足够的题目（题库题或等待AI生成）
-          const hasEnoughQuestions = this.exercises.length > 0 || (res.needAI && res.needAI > 0)
+          const aiNeeded = this.isCustomPractice ? 0 : (res.needAI || 0)
+          const hasEnoughQuestions = this.exercises.length > 0 || aiNeeded > 0
           
           if (hasEnoughQuestions) {
             // 如果有题库题，检查第一题的收藏状态
@@ -1234,9 +1249,9 @@ export default {
           }
           
           // 异步生成AI题目（如果需要）
-          if (res.needAI && res.needAI > 0 && res.aiOptions) {
+          if (!this.isCustomPractice && aiNeeded > 0 && res.aiOptions) {
             console.log(`开始异步生成 ${res.needAI} 个AI题目`)
-            this.generateAIQuestionsAsync(res.needAI, res.aiOptions)
+            this.generateAIQuestionsAsync(aiNeeded, res.aiOptions)
           }
         } else {
           showToast('获取练习题失败')
@@ -1280,10 +1295,13 @@ export default {
           const usedVerbIds = new Set(this.exercises.map(e => e.verbId).filter(id => id))
           
           // 将已使用的动诋ID传递给后端
-          const res = await api.generateSingleAI({ 
+          const res = await api.generateSingleAI({
             aiOptions: {
               ...aiOptions,
-              excludeVerbIds: Array.from(usedVerbIds)
+              excludeVerbIds: Array.from(usedVerbIds),
+              verbIds: this.isCustomPractice && this.customVerbIds.length > 0
+                ? this.customVerbIds
+                : aiOptions.verbIds
             }
           })
           
