@@ -1,6 +1,6 @@
 const path = require('path');
 const fs = require('fs');
-const { vocabularyDb } = require('../database/db');
+const { vocabularyDb } = require('./db');
 const Textbook = require('../models/Textbook');
 const Lesson = require('../models/Lesson');
 const LessonVerb = require('../models/LessonVerb');

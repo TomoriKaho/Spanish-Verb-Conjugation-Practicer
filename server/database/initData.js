@@ -1,4 +1,4 @@
-const { vocabularyDb: db } = require('../database/db')
+const { vocabularyDb: db } = require('./db')
 const fs = require('fs')
 const path = require('path')
 
