@@ -8,7 +8,7 @@
           <text class="back-text">返回</text>
         </view>
         <view class="navbar-title">开始练习</view>
-        <view class="navbar-right" v-if="hasStarted">
+        <view class="navbar-right" v-if="shouldShowReportButton">
           <view class="report-btn" @click="showReportModal = true">
             <text class="report-icon">⚠️</text>
             <text class="report-text">反馈错误</text>
@@ -724,6 +724,14 @@ export default {
       },
       currentExercise() {
         return this.exercises[this.currentIndex]
+      },
+      currentQuestionState() {
+        return this.questionStates[this.currentIndex] || null
+      },
+      shouldShowReportButton() {
+        if (!this.hasStarted) return false
+        const state = this.currentQuestionState
+        return state ? state.status === 'answered' || state.showFeedback : false
       },
       answeredCount() {
         return this.questionStates.filter(s => s.status === 'answered').length
