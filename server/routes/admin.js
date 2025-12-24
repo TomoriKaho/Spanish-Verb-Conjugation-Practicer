@@ -12,13 +12,12 @@ const {
 } = require('../admin/userService')
 const LexiconItem = require('../models/LexiconItem')
 const Question = require('../models/Question')
-const Verb = require('../models/Verb')
+const VerbAdmin = require('../models/Verb')
 const Conjugation = require('../models/Conjugation')
 const QuestionBank = require('../models/QuestionBank')
 const Feedback = require('../models/Feedback')
 const QuestionFeedback = require('../models/QuestionFeedback')
 const AdminLog = require('../models/AdminLog')
-const Verb = require('../models/Verb')
 const { vocabularyDb } = require('../database/db')
 
 const loginAttempts = new Map()
@@ -249,7 +248,7 @@ router.get('/verbs', requireAdmin, (req, res) => {
 })
 
 router.get('/verbs/:id', requireAdmin, (req, res) => {
-  const item = Verb.findById(req.params.id)
+  const item = VerbAdmin.findById(req.params.id)
   if (!item) return res.status(404).json({ error: '记录不存在' })
   res.json(item)
 })
@@ -300,7 +299,7 @@ router.delete('/conjugations/:id', requireAdmin, (req, res) => {
 router.post('/verbs', requireAdmin, (req, res) => {
   const data = req.body || {}
   if (!data.infinitive) return res.status(400).json({ error: '缺少动词原形 (infinitive)' })
-  const id = Verb.create({
+  const id = VerbAdmin.create({
     infinitive: data.infinitive,
     meaning: data.meaning || null,
     conjugationType: data.conjugation_type || data.conjugationType || 1,
@@ -319,7 +318,7 @@ router.post('/verbs', requireAdmin, (req, res) => {
 router.put('/verbs/:id', requireAdmin, (req, res) => {
   const id = req.params.id
   const data = req.body || {}
-  const existing = Verb.findById(id)
+  const existing = VerbAdmin.findById(id)
   if (!existing) return res.status(404).json({ error: '记录不存在' })
   const stmt = vocabularyDb.prepare(`
     UPDATE verbs SET
@@ -412,7 +411,7 @@ router.get('/verbs/:id', requireAdmin, (req, res) => {
   if (!verbId || Number.isNaN(verbId)) {
     return res.status(400).json({ error: '动词ID不合法' })
   }
-  const verb = Verb.findById(verbId)
+  const verb = VerbAdmin.findById(verbId)
   if (!verb) {
     return res.status(404).json({ error: '动词不存在' })
   }
@@ -452,7 +451,7 @@ router.put('/questions/:id', requireAdmin, (req, res) => {
     return res.status(400).json({ error: '缺少动词ID', errors: { verb_id: '动词ID不能为空' } })
   }
 
-  const verb = Verb.findById(payload.verb_id)
+  const verb = VerbAdmin.findById(payload.verb_id)
   if (!verb) {
     return res.status(400).json({ error: '动词ID不存在', errors: { verb_id: '动词ID不存在' } })
   }
