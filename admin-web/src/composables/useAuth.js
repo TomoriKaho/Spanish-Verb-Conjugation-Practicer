@@ -1,6 +1,6 @@
 import { reactive, computed } from 'vue';
+import { apiRequest, ApiError } from '../utils/apiClient';
 
-const API_BASE = process.env.VUE_APP_ADMIN_API_BASE_URL || 'http://localhost:3000';
 const TOKEN_KEY = 'admin_token';
 
 const state = reactive({
@@ -10,26 +10,37 @@ const state = reactive({
   error: ''
 });
 
+window.addEventListener('auth:expired', () => {
+  state.token = '';
+  state.user = null;
+  localStorage.removeItem(TOKEN_KEY);
+});
+
 async function login(credentials) {
   state.loading = true;
   state.error = '';
   try {
-    const res = await fetch(`${API_BASE}/admin/auth/login`, {
+    const identifier = credentials.identifier || credentials.email || credentials.username;
+    if (!identifier || !credentials.password) {
+      throw new Error('请输入账号和密码');
+    }
+    const payload = { identifier, password: credentials.password };
+    const data = await apiRequest('/auth/login', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(credentials)
+      body: payload,
+      auth: false
     });
 
-    if (!res.ok) {
-      throw new Error('登录失败，请检查账号或密码');
-    }
-    const data = await res.json();
     state.token = data.token;
     localStorage.setItem(TOKEN_KEY, state.token);
-    await fetchMe();
+    state.user = data.user;
     return true;
   } catch (err) {
-    state.error = err.message || '登录失败';
+    if (err instanceof ApiError) {
+      state.error = err.message || '登录失败';
+    } else {
+      state.error = err.message || '登录失败';
+    }
     return false;
   } finally {
     state.loading = false;
@@ -42,13 +53,8 @@ async function fetchMe() {
     return null;
   }
   try {
-    const res = await fetch(`${API_BASE}/admin/auth/me`, {
-      headers: { Authorization: `Bearer ${state.token}` }
-    });
-    if (!res.ok) {
-      throw new Error('鉴权失败');
-    }
-    state.user = await res.json();
+    const data = await apiRequest('/auth/me');
+    state.user = data.user;
     return state.user;
   } catch (err) {
     logout();
@@ -57,13 +63,20 @@ async function fetchMe() {
 }
 
 function logout() {
+  const token = state.token;
   state.token = '';
   state.user = null;
   localStorage.removeItem(TOKEN_KEY);
+  if (token) {
+    apiRequest('/auth/logout', { method: 'POST' }).catch(() => {});
+  }
 }
 
 const isAuthenticated = computed(() => Boolean(state.token && state.user));
 const isAdmin = computed(() => state.user?.role === 'admin');
+const isDev = computed(() => state.user?.role === 'dev');
+const isPrivileged = computed(() => ['admin', 'dev'].includes(state.user?.role));
+const isInitialDev = computed(() => Boolean(state.user?.isInitialDev));
 
 export function useAuth() {
   return {
@@ -72,6 +85,9 @@ export function useAuth() {
     logout,
     fetchMe,
     isAuthenticated,
-    isAdmin
+    isAdmin,
+    isDev,
+    isPrivileged,
+    isInitialDev
   };
 }
