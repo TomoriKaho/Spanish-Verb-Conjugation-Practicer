@@ -186,6 +186,69 @@ docker-compose logs -f
 docker-compose down
 ```
 
+### 可观测性（Prometheus + Grafana + Loki）
+
+> 说明：请从 `./server` 目录启动 Compose，Grafana 端口已改为 **3002** 避免与后端 3000 冲突。
+
+#### 启动方式（必须从 ./server 目录）
+
+仅启动应用（不含可观测性）：
+```bash
+cd server
+docker compose up -d --build
+```
+
+启动应用 + 可观测性栈：
+```bash
+cd server
+docker compose -f docker-compose.yml -f docker-compose.observability.yml up -d --build
+```
+
+#### 访问地址
+
+- Web 前端：`http://localhost:3001`
+- 后端：`http://localhost:3000`
+- Grafana：`http://localhost:3002`（默认账号/密码：`admin` / `admin`，可通过环境变量 `GRAFANA_ADMIN_USER` / `GRAFANA_ADMIN_PASSWORD` 修改）
+- Prometheus：`http://localhost:9090`
+- Loki：`http://localhost:3100`
+
+#### Grafana 使用方法
+
+1. **Explore -> Loki** 示例查询：
+   - `{compose_service="spanish-verb-api"}`
+   - `{compose_service="spanish-verb-api"} |= "error"`
+   - `{compose_service="spanish-verb-api"} |= "req_id="`
+2. **Dashboards -> API RED** 查看 RPS / 错误率 / P95 延迟。
+
+#### 验证步骤
+
+```bash
+curl http://localhost:3000/metrics
+```
+
+手动触发几个 API 请求（示例）：
+```bash
+curl http://localhost:3000/api/health
+curl http://localhost:3000/api/verb/list
+```
+
+在 Prometheus Targets 页面确认 `backend` 为 **UP**：
+`http://localhost:9090/targets`
+
+#### 常见故障排查
+
+- **Grafana 端口冲突**：Grafana 已映射为 `3002:3000`，请确保宿主机 3002 未被占用。
+- **Promtail 无权限读日志**：需要挂载 `/var/lib/docker/containers` 与 `/var/run/docker.sock`，且 Docker 日志驱动需为 `json-file`（默认）。
+- **Prometheus 抓取失败（Targets DOWN）**：确认后端服务名为 `spanish-verb-api`、容器内监听 3000，并与 observability 栈在同一网络。
+
+#### 日志保留期
+
+Loki 默认保留 7 天（`168h`），如需调整可修改 `server/observability/loki/loki-config.yml` 中的 `limits_config.retention_period`。
+
+#### 安全建议
+
+Grafana 不建议直接暴露公网，请配合反向代理与鉴权（如 Nginx + 基础认证 / OAuth）。
+
 ### Admin 管理端
 
 - API 基础地址：`http://localhost:3000/admin`
