@@ -170,7 +170,7 @@ cp .env.example .env
 
 4. 启动服务：
 ```bash
-docker compose up -d --build
+docker-compose up -d --build
 ```
 
 Compose 会启动 API（默认 3000）和 Admin Web（默认 3001）。确保在 `server/.env` 中填写 `INITIAL_ADMIN_EMAIL`、`INITIAL_ADMIN_PASSWORD` 等变量，初始管理员会在容器启动时自动注入，幂等执行。
@@ -195,13 +195,13 @@ docker-compose down
 仅启动应用（不含可观测性）：
 ```bash
 cd server
-docker compose up -d --build
+docker-compose up -d --build
 ```
 
 启动应用 + 可观测性栈：
 ```bash
 cd server
-docker compose -f docker-compose.yml -f docker-compose.observability.yml up -d --build
+docker-compose -f docker-compose.yml -f docker-compose.observability.yml up -d --build
 ```
 
 #### 访问地址
