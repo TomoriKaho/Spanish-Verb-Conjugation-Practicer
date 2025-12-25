@@ -25,6 +25,11 @@ schema_config:
       index:
         prefix: index_
         period: 24h
+ 
+compactor:
+  working_directory: /loki/compactor
+  compaction_interval: 10m
+  retention_enabled: false
 
 storage_config:
   filesystem:
@@ -32,12 +37,9 @@ storage_config:
   tsdb_shipper:
     active_index_directory: /loki/index
     cache_location: /loki/cache
-    shared_store: filesystem
+  boltdb:
+    directory: /loki/compactor/delete_requests
 
-compactor:
-  working_directory: /loki/compactor
-  compaction_interval: 10m
-  retention_enabled: true
 
 limits_config:
   retention_period: 168h

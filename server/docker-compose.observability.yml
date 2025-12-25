@@ -1,6 +1,6 @@
 services:
   prometheus:
-    image: prom/prometheus:v2.52.0
+    image: quay.io/prometheus/prometheus:latest
     container_name: spanish-verb-prometheus
     ports:
       - "9090:9090"
@@ -11,7 +11,7 @@ services:
       - spanish-verb-network
 
   loki:
-    image: grafana/loki:2.9.8
+    image: grafana/loki:3.2.0
     container_name: spanish-verb-loki
     command: -config.file=/etc/loki/config.yml
     ports:
@@ -23,7 +23,7 @@ services:
       - spanish-verb-network
 
   promtail:
-    image: grafana/promtail:2.9.8
+    image: grafana/promtail:3.2.0
     container_name: spanish-verb-promtail
     command: -config.file=/etc/promtail/config.yml
     volumes:
@@ -37,7 +37,7 @@ services:
       - spanish-verb-network
 
   grafana:
-    image: grafana/grafana:11.1.0
+    image: grafana/grafana:11.3.0
     container_name: spanish-verb-grafana
     ports:
       - "3002:3000"
