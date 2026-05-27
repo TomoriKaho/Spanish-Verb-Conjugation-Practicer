@@ -1,53 +1,75 @@
 <template>
-  <section class="card feedback-page">
-    <div class="header-row">
+  <section class="card feedback-page management-page">
+    <div class="management-header">
       <div>
-        <h2>反馈处理</h2>
-        <p class="muted">处理用户反馈与题目反馈，支持状态标记、备注与删除。</p>
-        <p class="muted total-count">共 {{ total }} 条</p>
+        <h2>{{ feedbackPageTitle }}</h2>
       </div>
-      <div class="toolbar">
-        <select v-model="tab">
-          <option value="general">用户反馈</option>
-          <option value="question">题目反馈</option>
-        </select>
-        <input v-model.trim="keyword" placeholder="搜索用户/内容/动词/题目ID" />
-        <select v-if="tab==='general'" v-model="statusFilter">
-          <option value="all">全部状态</option>
-          <option value="open">open</option>
-          <option value="handled">handled</option>
-          <option value="closed">closed</option>
-        </select>
-        <select v-if="tab==='general'" v-model.number="satisfactionFilter">
-          <option :value="0">全部满意度</option>
-          <option :value="1">1</option>
-          <option :value="2">2</option>
-          <option :value="3">3</option>
-          <option :value="4">4</option>
-        </select>
-        <button
-          v-if="tab === 'question'"
-          class="ghost"
-          :disabled="downloadingAll"
-          @click="downloadAllQuestionFeedbackJson"
-        >
-          下载题目反馈JSON
-        </button>
-        <button class="ghost" @click="refresh" :disabled="loading">刷新</button>
+      <div class="toolbar management-toolbar">
+        <div class="toolbar-left">
+          <select v-if="!isSuperAdmin" v-model="tab">
+            <option value="general">用户反馈</option>
+            <option value="question">题目反馈</option>
+          </select>
+          <span class="muted feedback-total-inline">共 {{ total }} 条</span>
+          <input v-model.trim="keyword" placeholder="搜索用户/内容/动词/题目ID" />
+          <select v-if="activeTab==='general'" v-model="statusFilter">
+            <option value="all">全部状态</option>
+            <option value="open">open</option>
+            <option value="handled">handled</option>
+            <option value="closed">closed</option>
+          </select>
+          <select v-if="activeTab==='general'" v-model.number="satisfactionFilter">
+            <option :value="0">全部满意度</option>
+            <option :value="1">1</option>
+            <option :value="2">2</option>
+            <option :value="3">3</option>
+            <option :value="4">4</option>
+          </select>
+          <button class="ghost" @click="refresh" :disabled="loading">刷新</button>
+        </div>
+        <div class="management-actions">
+          <button
+            v-if="activeTab === 'question' && !isSuperAdmin"
+            class="ghost"
+            :disabled="downloadingAll"
+            @click="downloadAllQuestionFeedbackJson"
+          >
+            下载题目反馈JSON
+          </button>
+          <div class="pagination inline-pagination management-inline-pagination">
+            <template v-if="total > pageSize">
+              <button class="ghost" :disabled="page === 1 || loading" @click="changePage(page - 1)">上一页</button>
+              <label class="management-pagination-jump" for="feedback-page-jump">
+                第
+                <input
+                  id="feedback-page-jump"
+                  v-model.number="pageJump"
+                  class="page-jump-input management-page-number-input"
+                  type="number"
+                  min="1"
+                  :max="totalPages"
+                  @keydown.enter.prevent="jumpToPage"
+                  @blur="jumpToPage"
+                />
+                / {{ totalPages }} 页
+              </label>
+              <button class="ghost" :disabled="page === totalPages || loading" @click="changePage(page + 1)">下一页</button>
+            </template>
+          </div>
+        </div>
       </div>
     </div>
 
-    <div v-if="error" class="error-block">
-      <p class="error">{{ error }}</p>
-      <button class="ghost" @click="refresh">重试</button>
-    </div>
-
-    <div v-else>
-      <div v-if="loading" class="loading">加载中...</div>
-      <div v-else>
+    <div class="management-page-body">
+      <div v-if="error" class="error-block">
+        <p class="error">{{ error }}</p>
+        <button class="ghost" @click="refresh">重试</button>
+      </div>
+      <div v-else-if="loading" class="loading">加载中...</div>
+      <div v-else class="management-table-scroll">
         <table class="table">
           <thead>
-            <tr v-if="tab === 'general'">
+            <tr v-if="activeTab === 'general'">
               <th>ID</th>
               <th>用户ID</th>
               <th>用户名</th>
@@ -70,13 +92,13 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-if="(tab==='general' ? filteredGeneral.length : filteredQuestion.length) === 0">
-              <td :colspan="tab==='general' ? 8 : 9">暂无数据</td>
+            <tr v-if="(activeTab==='general' ? filteredGeneral.length : filteredQuestion.length) === 0">
+              <td :colspan="activeTab==='general' ? 8 : 9">暂无数据</td>
             </tr>
-            <tr v-for="item in (tab === 'general' ? filteredGeneral : filteredQuestion)" :key="(tab==='general'? 'g-'+item.id : 'q-'+item.id)">
+            <tr v-for="item in (activeTab === 'general' ? filteredGeneral : filteredQuestion)" :key="(activeTab==='general'? 'g-'+item.id : 'q-'+item.id)">
               <td>{{ item.id }}</td>
               <td>{{ item.user_id }}</td>
-              <template v-if="tab==='general'">
+              <template v-if="activeTab==='general'">
                 <td>{{ item.username || '-' }}</td>
                 <td>{{ item.satisfaction }}</td>
                 <td>{{ (item.comment || '-').slice(0, 60) }}</td>
@@ -105,13 +127,7 @@
       </div>
     </div>
 
-    <div class="pagination" v-if="total > pageSize">
-      <button class="ghost" :disabled="page === 1 || loading" @click="changePage(page - 1)">上一页</button>
-      <span>第 {{ page }} / {{ totalPages }} 页</span>
-      <button class="ghost" :disabled="page === totalPages || loading" @click="changePage(page + 1)">下一页</button>
-    </div>
-
-    <div v-if="drawerOpen" class="overlay" @click.self="closeDrawer">
+    <div v-if="drawerOpen" class="overlay">
       <div class="drawer">
         <header>
           <h3>反馈详情</h3>
@@ -212,9 +228,12 @@
       </div>
     </div>
 
-    <div v-if="deleteDialog" class="overlay" @click.self="closeDelete">
+    <div v-if="deleteDialog" class="overlay">
       <div class="modal">
-        <h3>确认删除</h3>
+        <div class="modal-header">
+          <h3>确认删除</h3>
+          <button class="ghost" @click="closeDelete">关闭</button>
+        </div>
         <p>即将删除反馈：<strong>{{ deleteDialog.id }}</strong></p>
         <div class="modal-actions">
           <button class="ghost" @click="closeDelete">取消</button>
@@ -233,15 +252,18 @@ import { useRouter } from 'vue-router';
 import { apiRequest, ApiError } from '../utils/apiClient';
 import { useAuth } from '../composables/useAuth';
 
-const { state, isAdmin, isDev, logout } = useAuth();
+const { logout, isSuperAdmin } = useAuth();
 const router = useRouter();
 
-const tab = ref('general');
+const tab = ref(isSuperAdmin.value ? 'question' : 'general');
+const activeTab = computed(() => (isSuperAdmin.value ? 'question' : tab.value));
+const feedbackPageTitle = computed(() => (isSuperAdmin.value ? '题目反馈页面' : '反馈处理'));
 const keyword = ref('');
 const statusFilter = ref('all');
 const satisfactionFilter = ref(0);
 const page = ref(1);
 const pageSize = ref(10);
+const pageJump = ref(1);
 const total = ref(0);
 const loading = ref(false);
 const error = ref('');
@@ -351,13 +373,23 @@ async function fetchQuestion() {
 }
 
 function refresh() {
-  page.value = 1;
-  if (tab.value === 'general') fetchGeneral();
+  if (activeTab.value === 'general') fetchGeneral();
   else fetchQuestion();
 }
 
 function changePage(nextPage) {
   page.value = Math.min(Math.max(nextPage, 1), totalPages.value);
+}
+
+function jumpToPage() {
+  const target = Number(pageJump.value);
+  if (!Number.isFinite(target)) {
+    pageJump.value = page.value;
+    return;
+  }
+  const nextPage = Math.min(Math.max(Math.trunc(target), 1), totalPages.value);
+  pageJump.value = nextPage;
+  changePage(nextPage);
 }
 
 function formatDate(value) {
@@ -474,7 +506,7 @@ async function fetchQuestionDetailCached(questionId, cache) {
 }
 
 async function downloadAllQuestionFeedbackJson() {
-  if (tab.value !== 'question') return;
+  if (activeTab.value !== 'question' || isSuperAdmin.value) return;
   if (downloadingAll.value) return;
   downloadingAll.value = true;
   try {
@@ -586,14 +618,105 @@ async function submitDelete() {
   }
 }
 
-watch([page, pageSize, tab], () => {
+watch(page, (value) => {
+  pageJump.value = value;
+}, { immediate: true });
+
+watch([page, pageSize], () => {
   refresh();
 });
 
-fetchGeneral();
+watch(tab, () => {
+  if (page.value !== 1) {
+    page.value = 1;
+    return;
+  }
+  refresh();
+});
+
+refresh();
 </script>
 
 <style scoped>
+.feedback-page .management-header {
+  align-items: center;
+  flex-wrap: nowrap;
+}
+
+.feedback-page .management-header h2 {
+  margin: 0;
+  white-space: nowrap;
+}
+
+.feedback-page .management-toolbar {
+  margin-left: auto;
+  width: auto;
+  min-width: 0;
+  gap: 8px;
+  flex-wrap: nowrap;
+  justify-content: flex-end;
+}
+
+.feedback-page .toolbar-left,
+.feedback-page .management-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: nowrap;
+  min-width: 0;
+}
+
+.feedback-page .toolbar-left {
+  flex: 0 1 auto;
+  justify-content: flex-end;
+}
+
+.feedback-page .toolbar-left input {
+  width: 240px;
+  min-width: 240px;
+}
+
+.feedback-page .feedback-total-inline {
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.feedback-page .toolbar-left select {
+  max-width: 132px;
+}
+
+.feedback-page .management-toolbar select,
+.feedback-page .management-toolbar button {
+  white-space: nowrap;
+}
+
+.feedback-page .management-toolbar button,
+.feedback-page .management-toolbar .ghost {
+  padding: 6px 10px;
+  font-size: 13px;
+  line-height: 1.15;
+}
+
+.feedback-page .management-inline-pagination {
+  gap: 8px;
+}
+
+.feedback-page .management-pagination-jump {
+  min-width: 112px;
+  gap: 4px;
+}
+
+.feedback-page .management-page-number-input {
+  width: 52px;
+  min-width: 52px;
+}
+
+.feedback-page .table tbody td button {
+  padding: 5px 9px;
+  font-size: 12px;
+  line-height: 1.1;
+}
+
 .detail-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -623,5 +746,17 @@ fetchGeneral();
 .detail-grid select,
 .detail-grid textarea {
   width: 100%;
+}
+
+@media (max-width: 1280px) {
+  .feedback-page .management-header,
+  .feedback-page .management-toolbar {
+    flex-wrap: wrap;
+  }
+
+  .feedback-page .toolbar-left,
+  .feedback-page .management-actions {
+    flex-wrap: wrap;
+  }
 }
 </style>

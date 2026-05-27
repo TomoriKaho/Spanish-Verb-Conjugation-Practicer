@@ -9,6 +9,20 @@ const ExerciseGeneratorService = require('../services/exerciseGenerator')
 const QuestionGeneratorService = require('../services/traditional_conjugation/questionGenerator')
 const { authMiddleware } = require('../middleware/auth')
 
+function normalizeComparableAnswer(value) {
+  return String(value ?? '')
+    .replace(/\u00A0/g, ' ')
+    .trim()
+    .replace(/\s+/g, ' ')
+}
+
+function parseAcceptedAnswers(rawAnswer) {
+  return String(rawAnswer ?? '')
+    .split(/\s*[|｜]\s*/u)
+    .map(item => normalizeComparableAnswer(item))
+    .filter(Boolean)
+}
+
 // 批量生成练习题（新版：题库+AI混合模式，带题目池管理）
 router.post('/generate-batch', authMiddleware, async (req, res) => {
   try {
@@ -23,7 +37,11 @@ router.post('/generate-batch', authMiddleware, async (req, res) => {
       includeVosotros = true,
       reduceRareTenseFrequency = true,
       practiceMode = 'normal',
-      verbIds = null  // 从请求体接收 verbIds（课程模式会传递）
+      verbIds = null,  // 从请求体接收 verbIds（课程模式会传递）
+      sentenceMode = 'verb-only',
+      conjugationForms = [],
+      hostForms = [],
+      pronounPatterns = []
     } = req.body
 
     const userId = req.userId
@@ -41,7 +59,11 @@ router.post('/generate-batch', authMiddleware, async (req, res) => {
       includeVosotros,
       reduceRareTenseFrequency,
       practiceMode,
-      verbIds  // 直接使用前端传递的 verbIds
+      verbIds,  // 直接使用前端传递的 verbIds
+      sentenceMode,
+      conjugationForms,
+      hostForms,
+      pronounPatterns
     }
 
     // 根据练习模式获取动词ID列表（仅在未传递 verbIds 时生效）
@@ -75,7 +97,8 @@ router.post('/generate-batch', authMiddleware, async (req, res) => {
       exercises: result.exercises,
       questionPool: result.questionPool,  // 返回题目池供前端管理
       needAI: result.needAI || 0,         // 需要异步生成的AI题目数量
-      aiOptions: result.aiOptions || null // AI生成所需参数
+      aiOptions: result.aiOptions || null, // AI生成所需参数（单计划）
+      aiPlans: result.aiPlans || null      // AI生成计划（多计划，如 mixed）
     })
   } catch (error) {
     console.error('批量生成练习题错误:', error)
@@ -95,7 +118,11 @@ router.post('/generate-one', authMiddleware, async (req, res) => {
       includeVos = false,
       includeVosotros = true,
       reduceRareTenseFrequency = true,
-      practiceMode = 'normal'
+      practiceMode = 'normal',
+      sentenceMode = 'verb-only',
+      conjugationForms = [],
+      hostForms = [],
+      pronounPatterns = []
     } = req.body
 
     const userId = req.userId
@@ -111,7 +138,11 @@ router.post('/generate-one', authMiddleware, async (req, res) => {
       includeVos,
       includeVosotros,
       reduceRareTenseFrequency,
-      practiceMode
+      practiceMode,
+      sentenceMode,
+      conjugationForms,
+      hostForms,
+      pronounPatterns
     }
 
     // 根据练习模式获取动词ID列表
@@ -295,23 +326,15 @@ router.post('/submit', authMiddleware, (req, res) => {
       mood, 
       person,
       questionId,        // 题库题目ID（如果来自题库）
-      questionSource     // 题目来源：'public' 或 'private'
+      questionSource     // 题目来源：public_traditional/public_pronoun/private（兼容 public）
     } = req.body
 
     const userId = req.userId
 
-    // 判断答案是否正确（支持多个答案，用 | 分隔）
-    let isCorrect = false
-    const userAnswer = answer !== undefined && answer !== null ? String(answer) : ''
-    const correctAnswers = String(correctAnswer || '').split('|')
-    
-    // 只要匹配任意一个正确答案即可
-    for (const correct of correctAnswers) {
-      if (userAnswer === correct) {
-        isCorrect = true
-        break
-      }
-    }
+    // 支持 A | B 和 A ｜ B 这类多答案写法，任意一个匹配即判对。
+    const userAnswer = normalizeComparableAnswer(answer)
+    const correctAnswers = parseAcceptedAnswers(correctAnswer)
+    const isCorrect = correctAnswers.includes(userAnswer)
 
     // 保存练习记录
     PracticeRecord.create({

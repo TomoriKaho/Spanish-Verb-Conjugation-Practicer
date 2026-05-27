@@ -1,26 +1,26 @@
 <template>
-  <section class="card version-page">
-    <div class="users-header">
+  <section class="card version-page management-page">
+    <div class="management-header">
       <div>
         <h2>版本管理</h2>
-        <p class="muted">仅 dev 可查看历史版本更新日志与发布新版本。</p>
-        <p class="muted total-count">共 {{ versions.length }} 条</p>
       </div>
-      <div class="toolbar">
-        <button class="ghost" @click="refresh" :disabled="loading">刷新</button>
-        <button @click="openCreate">发布新版本</button>
-        <button class="ghost" :disabled="!latestVersion" @click="downloadLatest">下载最新版本</button>
+      <div class="toolbar management-toolbar">
+        <div class="management-actions">
+          <span class="muted management-pagination-total">共 {{ versions.length }} 条</span>
+          <button class="ghost" @click="refresh" :disabled="loading">刷新</button>
+          <button @click="openCreate">发布新版本</button>
+          <button class="ghost" :disabled="!latestVersion" @click="downloadLatest">下载最新版本</button>
+        </div>
       </div>
     </div>
 
-    <div v-if="error" class="error-block">
-      <p class="error">{{ error }}</p>
-      <button class="ghost" @click="refresh">重试</button>
-    </div>
-
-    <div v-else>
-      <div v-if="loading" class="loading">加载中...</div>
-      <div v-else>
+    <div class="management-page-body">
+      <div v-if="error" class="error-block">
+        <p class="error">{{ error }}</p>
+        <button class="ghost" @click="refresh">重试</button>
+      </div>
+      <div v-else-if="loading" class="loading">加载中...</div>
+      <div v-else class="management-table-scroll">
         <table class="table">
           <thead>
             <tr>
@@ -57,71 +57,73 @@
       </div>
     </div>
 
-    <div v-if="detailOpen" class="overlay" @click.self="closeDetail">
-      <div class="drawer">
+    <div v-if="detailOpen" class="overlay">
+      <div class="drawer detail-drawer">
         <header>
           <h3>版本详情</h3>
           <button class="ghost" @click="closeDetail">关闭</button>
         </header>
-        <div class="detail-grid">
-          <div class="detail-item">
-            <span class="detail-label">版本号</span>
-            <span class="detail-value">{{ activeVersion.versionName }}</span>
-          </div>
-          <div class="detail-item">
-            <span class="detail-label">版本码</span>
-            <span class="detail-value">{{ activeVersion.versionCode }}</span>
-          </div>
-          <div class="detail-item">
-            <span class="detail-label">发布日期</span>
-            <span class="detail-value">{{ activeVersion.releaseDate || '-' }}</span>
-          </div>
-          <div class="detail-item">
-            <span class="detail-label">强制更新</span>
-            <span class="detail-value">{{ activeVersion.forceUpdate ? '是' : '否' }}</span>
-          </div>
-          <div class="detail-item detail-span">
-            <span class="detail-label">更新说明</span>
-            <span class="detail-value muted">{{ activeVersion.description || '-' }}</span>
-          </div>
-          <div class="detail-item detail-span">
-            <span class="detail-label">新增功能</span>
-            <span class="detail-value muted">
-              <template v-if="activeVersion.newFeatures && activeVersion.newFeatures.length">
-                <span v-for="(item, index) in activeVersion.newFeatures" :key="`nf-${index}`" class="list-line">
-                  {{ item }}
-                </span>
-              </template>
-              <span v-else>-</span>
-            </span>
-          </div>
-          <div class="detail-item detail-span">
-            <span class="detail-label">优化改进</span>
-            <span class="detail-value muted">
-              <template v-if="activeVersion.improvements && activeVersion.improvements.length">
-                <span v-for="(item, index) in activeVersion.improvements" :key="`im-${index}`" class="list-line">
-                  {{ item }}
-                </span>
-              </template>
-              <span v-else>-</span>
-            </span>
-          </div>
-          <div class="detail-item detail-span">
-            <span class="detail-label">Bug 修复</span>
-            <span class="detail-value muted">
-              <template v-if="activeVersion.bugFixes && activeVersion.bugFixes.length">
-                <span v-for="(item, index) in activeVersion.bugFixes" :key="`bf-${index}`" class="list-line">
-                  {{ item }}
-                </span>
-              </template>
-              <span v-else>-</span>
-            </span>
+        <div class="detail-scroll">
+          <div class="detail-grid">
+            <div class="detail-item">
+              <span class="detail-label">版本号</span>
+              <span class="detail-value">{{ activeVersion.versionName }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">版本码</span>
+              <span class="detail-value">{{ activeVersion.versionCode }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">发布日期</span>
+              <span class="detail-value">{{ activeVersion.releaseDate || '-' }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">强制更新</span>
+              <span class="detail-value">{{ activeVersion.forceUpdate ? '是' : '否' }}</span>
+            </div>
+            <div class="detail-item detail-span">
+              <span class="detail-label">更新说明</span>
+              <span class="detail-value muted">{{ activeVersion.description || '-' }}</span>
+            </div>
+            <div class="detail-item detail-span">
+              <span class="detail-label">新增功能</span>
+              <span class="detail-value muted">
+                <template v-if="activeVersion.newFeatures && activeVersion.newFeatures.length">
+                  <span v-for="(item, index) in activeVersion.newFeatures" :key="`nf-${index}`" class="list-line">
+                    {{ item }}
+                  </span>
+                </template>
+                <span v-else>-</span>
+              </span>
+            </div>
+            <div class="detail-item detail-span">
+              <span class="detail-label">优化改进</span>
+              <span class="detail-value muted">
+                <template v-if="activeVersion.improvements && activeVersion.improvements.length">
+                  <span v-for="(item, index) in activeVersion.improvements" :key="`im-${index}`" class="list-line">
+                    {{ item }}
+                  </span>
+                </template>
+                <span v-else>-</span>
+              </span>
+            </div>
+            <div class="detail-item detail-span">
+              <span class="detail-label">Bug 修复</span>
+              <span class="detail-value muted">
+                <template v-if="activeVersion.bugFixes && activeVersion.bugFixes.length">
+                  <span v-for="(item, index) in activeVersion.bugFixes" :key="`bf-${index}`" class="list-line">
+                    {{ item }}
+                  </span>
+                </template>
+                <span v-else>-</span>
+              </span>
+            </div>
           </div>
         </div>
       </div>
     </div>
 
-    <div v-if="createOpen" class="overlay" @click.self="closeCreate">
+    <div v-if="createOpen" class="overlay">
       <div class="drawer">
         <header>
           <h3>发布新版本</h3>
@@ -283,7 +285,7 @@ async function fetchVersions() {
   loading.value = true;
   error.value = '';
   try {
-    const data = await apiRequest('/api/version/all', { auth: false });
+    const data = await apiRequest('/versions');
     versions.value = Array.isArray(data?.versions) ? data.versions : [];
     latestVersion.value = data?.latestVersion || null;
   } catch (err) {
@@ -416,3 +418,15 @@ function downloadLatest() {
 
 onMounted(fetchVersions);
 </script>
+
+<style scoped>
+.version-page .detail-drawer {
+  max-height: 62vh;
+}
+
+.version-page .detail-scroll {
+  min-height: 0;
+  overflow-y: auto;
+  padding-right: 6px;
+}
+</style>

@@ -36,7 +36,7 @@
 <script>
 import { getSpanishLayout, getNumSymbolLayout } from '@/utils/ime/keyboard-layout.js'
 import { IMECore } from '@/utils/ime/ime-core.js'
-import { subscribeActiveTarget, setActiveTarget } from '@/utils/ime/focus-controller.js'
+import { subscribeActiveTarget, setActiveTarget, dispatchMaskTap } from '@/utils/ime/focus-controller.js'
 import { getUseInAppIME, subscribeUseInAppIME } from '@/utils/ime/settings-store.js'
 
 const imeCore = new IMECore()
@@ -44,6 +44,12 @@ const LONG_PRESS_MS = 380
 
 export default {
   name: 'InAppKeyboardHost',
+  props: {
+    deferMaskDismiss: {
+      type: Boolean,
+      default: false
+    }
+  },
   data() {
     return {
       visible: false,
@@ -114,9 +120,42 @@ export default {
         'is-shift-lock': key.action === 'SHIFT' && this.shiftState === 'LOCK'
       }
     },
-    handleMaskTap() {
+    handleMaskTap(e) {
+      const tapPoint = this.getTapPoint(e)
+      // 若当前聚焦的输入框处理了此次点击（光标重定位），则不走关闭/通知流程
+      if (tapPoint && dispatchMaskTap(tapPoint)) {
+        return
+      }
+      if (!this.deferMaskDismiss) {
+        this.dismissKeyboard()
+      }
+      this.$emit('mask-tap', tapPoint)
+    },
+    dismissKeyboard() {
       this.hideKeyboard()
       setActiveTarget(null)
+    },
+    getTapPoint(e) {
+      const touch = (e && e.changedTouches && e.changedTouches[0]) || (e && e.touches && e.touches[0]) || null
+      if (touch && typeof touch.clientX === 'number' && typeof touch.clientY === 'number') {
+        return {
+          x: touch.clientX,
+          y: touch.clientY
+        }
+      }
+      if (touch && typeof touch.pageX === 'number' && typeof touch.pageY === 'number') {
+        return {
+          x: touch.pageX,
+          y: touch.pageY
+        }
+      }
+      if (e && e.detail && typeof e.detail.x === 'number' && typeof e.detail.y === 'number') {
+        return {
+          x: e.detail.x,
+          y: e.detail.y
+        }
+      }
+      return null
     },
     hideKeyboard() {
       this.visible = false
